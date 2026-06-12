@@ -146,11 +146,6 @@ rcon.password=your_password
 
 ---
 
-## Screenshots
-
-> Dashboard with server status and live console
-
----
 
 ## License
 
