@@ -163,6 +163,18 @@ rcon.password=your_password
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="assets/Screen1.png" width="300">
+  <img src="assets/Screen2.png" width="300">
+</p>
+
+<p align="center">
+  <img src="assets/Screen3.png" width="300">
+  <img src="assets/Screen4.png" width="300">
+</p>
+---
 ## License
 
 MIT License
