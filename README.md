@@ -174,8 +174,9 @@ rcon.password=your_password
   <img src="assets/Screen3.png" width="300">
   <img src="assets/Screen4.png" width="300">
 </p>
+
 ---
+
 ## License
 
 MIT License
-**
