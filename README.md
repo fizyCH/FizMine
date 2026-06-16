@@ -1,6 +1,10 @@
 # FizMine Panel
 
 <p align="center">
+  <img src="assets/FizMine.png" alt="FizMine Panel" width="800" style="border-radius:12px">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-brightgreen" alt="Platform">
   <img src="https://img.shields.io/badge/Java-17%2B-orange?logo=openjdk&logoColor=white" alt="Java">
