@@ -178,3 +178,4 @@ rcon.password=your_password
 ## License
 
 MIT License
+**
