@@ -1,4 +1,4 @@
-**# FizMine Panel
+# FizMine Panel
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white" alt="Python">
@@ -8,24 +8,33 @@
 </p>
 
 <p align="center">
-  Lightweight, cross-platform Minecraft server management panel with a modern dark UI.
+  <b>Lightweight, cross-platform Minecraft server management panel with a modern dark UI.</b>
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#features">Features</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#commands">Commands</a>
 </p>
 
 ---
 
-## What's new?
+## What's New
 
 ### v2.0
 
-- Custom confirmation modals instead of the browser's `confirm()` function
-- File editor (.json, .yml, .txt, .properties)
-- Folder navigation in the file browser
-- Fireflies background effect
-- 5 languages: English, Russian, German, French, Chinese
-- Crash detection with sound notification
-- Extensive UI improvements
-- Panel settings can be edited from the `.env` file in the UI
-- Bug fixes: TPS display, ban/unban UUID resolution for both premium and offline accounts
+| Change | Description |
+|--------|-------------|
+| Confirmation modals | Custom animated modals instead of browser `confirm()` |
+| File editor | Edit `.json`, `.yml`, `.txt`, `.properties` directly in panel |
+| Folder navigation | Browse server directories with breadcrumbs |
+| Fireflies | Ambient background effect with accent color |
+| 5 languages | English, Russian, German, French, Chinese |
+| Crash detection | Sound notification when server crashes |
+| UI overhaul | Animations, SVG icons, Minecraft-style FM logo |
+| .env settings | Edit MC_DIR, PORT, JAVA_ARGS from the panel |
+| Bug fixes | TPS display, ban/unban UUIDs for premium & offline accounts |
 
 ---
 
@@ -54,7 +63,7 @@
 ### Files
 - Edit `server.properties` with validation
 - Browse server files with folder navigation and breadcrumbs
-- Edit .json, .yml, .txt, .properties and other text files directly
+- Edit `.json`, `.yml`, `.txt`, `.properties` and other text files directly
 
 ### Plugins & Mods
 - Upload `.jar` files via drag & drop or file picker
@@ -75,8 +84,8 @@
 
 ### 1. Download panel
 
-Download the archive
-Unzip it into the server folder
+Download the archive.
+Unzip it into the server folder.
 
 ### 2. Configure
 
@@ -84,13 +93,14 @@ Unzip it into the server folder
 nano .env
 ```
 
-in `.env` set up what you need:
+In `.env` set up what you need (for example, take the `.env.example`):
 
 ```env
-MC_DIR=/minecraft
+MC_DIR=YOURFOLDER
 PANEL_PORT=8080
-PANEL_LANG=en
 ```
+
+> In the new version, you can remove `PANEL_LANG` from `.env` and set the language through the panel settings.
 
 ### 3. Run
 
@@ -121,7 +131,7 @@ All settings are in `.env`:
 |----------|---------|-------------|
 | `MC_DIR` | `/minecraft` | Minecraft server directory |
 | `PANEL_PORT` | `8080` | Panel web port |
-| `PANEL_LANG` | `en` | Panel language (`en`, `ru`, `de`, `fr`, `ch`) |
+| `PANEL_LANG` | `en` | Panel language (`en`, `ru`, `de`, `fr`, `zh`) |
 | `JAVA_PATH` | *(auto)* | Path to Java executable |
 | `JAVA_ARGS` | `-Xmx2G -Xms1G` | JVM arguments |
 
@@ -129,11 +139,9 @@ All settings are in `.env`:
 
 ## Windows Support
 
-FizMine Panel works on both **Linux** and **Windows**:
+FizMine Panel works on both **Linux** and **Windows**.
 
-### Recommended: Enable RCON
-
-For best results on Windows, enable RCON in `server.properties`:
+> **Recommended:** Enable RCON in `server.properties` for best Windows support:
 
 ```properties
 enable-rcon=true
@@ -154,4 +162,3 @@ rcon.password=your_password
 ## License
 
 MIT License
-**
