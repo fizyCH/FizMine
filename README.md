@@ -1,7 +1,7 @@
 # FizMine Panel
 
 <p align="center">
-  <img src="assets/FizMine.png" alt="FizMine Panel" width="800" style="border-radius:12px">
+  <img src="assets/FizMine.png" alt="FizMine Panel" width="500" style="border-radius:12px">
 </p>
 
 <p align="center">
