@@ -145,14 +145,6 @@ All settings are in `.env`:
 
 FizMine Panel works on both **Linux** and **Windows**.
 
-> **Recommended:** Enable RCON in `server.properties` for best Windows support:
-
-```properties
-enable-rcon=true
-rcon.port=25575
-rcon.password=your_password
-```
-
 ---
 
 ## Requirements
