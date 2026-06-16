@@ -1,4 +1,4 @@
-# FizMine Panel
+**# FizMine Panel
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white" alt="Python">
@@ -10,6 +10,22 @@
 <p align="center">
   Lightweight, cross-platform Minecraft server management panel with a modern dark UI.
 </p>
+
+---
+
+## What's new?
+
+### v2.0
+
+- Custom confirmation modals instead of the browser's `confirm()` function
+- File editor (.json, .yml, .txt, .properties)
+- Folder navigation in the file browser
+- Fireflies background effect
+- 5 languages: English, Russian, German, French, Chinese
+- Crash detection with sound notification
+- Extensive UI improvements
+- Panel settings can be edited from the `.env` file in the UI
+- Bug fixes: TPS display, ban/unban UUID resolution for both premium and offline accounts
 
 ---
 
@@ -37,36 +53,38 @@
 
 ### Files
 - Edit `server.properties` with validation
-- Browse server files and directories
+- Browse server files with folder navigation and breadcrumbs
+- Edit .json, .yml, .txt, .properties and other text files directly
 
 ### Plugins & Mods
 - Upload `.jar` files via drag & drop or file picker
-- Delete installed plugins and mods
+- Delete individual or all plugins/mods
+- Delete All button when more than 2 installed
 
 ### Settings
-- Multi-language: **English**, **Русский**, **Deutsch**
+- Multi-language: **English**, **Русский**, **Deutsch**, **Français**, **中文**
+- Accent color picker with 10 presets + custom color
+- Fireflies ambient background effect (toggle)
 - Java auto-detection (prefers Java 17+)
 - RCON support for reliable command delivery
-- Configurable via `.env` file
+- MC_DIR, PANEL_PORT, JAVA_ARGS, JAVA_ENCODING configurable from UI
 
 ---
 
 ## Quick Start
 
-### 1. Clone
+### 1. Download panel
 
-```bash
-git clone https://github.com/yourusername/fizmine-panel.git
-cd fizmine-panel/panel
-```
+Download the archive
+Unzip it into the server folder
 
 ### 2. Configure
 
 ```bash
-cp .env.example .env
+nano .env
 ```
 
-Edit `.env` if needed:
+in `.env` set up what you need:
 
 ```env
 MC_DIR=/minecraft
@@ -86,18 +104,11 @@ Open **http://localhost:8080** in your browser.
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `python3 ctl.py start` | Start the panel |
-| `python3 ctl.py stop` | Stop the panel |
-| `python3 ctl.py restart` | Restart the panel |
-| `python3 ctl.py status` | Check panel status |
-
-Or use the bash script:
-
 ```bash
-./ctl.sh start
-./ctl.sh stop
+python3 ctl.py start     # Start the panel
+python3 ctl.py stop      # Stop the panel
+python3 ctl.py restart   # Restart the panel
+python3 ctl.py status    # Check panel status
 ```
 
 ---
@@ -110,21 +121,15 @@ All settings are in `.env`:
 |----------|---------|-------------|
 | `MC_DIR` | `/minecraft` | Minecraft server directory |
 | `PANEL_PORT` | `8080` | Panel web port |
-| `PANEL_LANG` | `en` | Panel language (`en`, `ru`, `de`) |
+| `PANEL_LANG` | `en` | Panel language (`en`, `ru`, `de`, `fr`, `ch`) |
 | `JAVA_PATH` | *(auto)* | Path to Java executable |
 | `JAVA_ARGS` | `-Xmx2G -Xms1G` | JVM arguments |
-| `JAVA_ENCODING` | *(auto)* | Console encoding (`cp1251` for Windows Russian) |
 
 ---
 
 ## Windows Support
 
 FizMine Panel works on both **Linux** and **Windows**:
-
-- Auto-detects Java installations from common paths
-- Uses `CREATE_NO_WINDOW` for process management
-- RCON support for reliable command delivery on Windows
-- Set `JAVA_ENCODING=cp1251` in `.env` for correct Russian console output
 
 ### Recommended: Enable RCON
 
@@ -146,13 +151,7 @@ rcon.password=your_password
 
 ---
 
-
 ## License
 
-MIT License — use freely, modify freely.
-
----
-
-<p align="center">
-  Made with care for the Minecraft community
-</p>
+MIT License
+**
