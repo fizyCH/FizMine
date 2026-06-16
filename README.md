@@ -32,7 +32,7 @@
 | Fireflies | Ambient background effect with accent color |
 | 5 languages | English, Russian, German, French, Chinese |
 | Crash detection | Sound notification when server crashes |
-| UI overhaul | Animations, SVG icons, Minecraft-style FM logo |
+| UI overhaul | Animations, Minecraft-style FizMine logo |
 | .env settings | Edit MC_DIR, PORT, JAVA_ARGS from the panel |
 | Bug fixes | TPS display, ban/unban UUIDs for premium & offline accounts |
 
