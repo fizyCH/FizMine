@@ -157,12 +157,12 @@ FizMine Panel works on both **Linux** and **Windows**.
 ## Screenshots
 
 <p align="center">
-  <img src="assets/Screen1.png" width="300">
-  <img src="assets/Screen2.png" width="300">
+  <img src="assets/Screen1.jpg" width="300">
+  <img src="assets/Screen2.jpg" width="300">
 </p>
 
 <p align="center">
-  <img src="assets/Screen3.png" width="300">
+  <img src="assets/Screen3.jpg" width="300">
 </p>
 
 ---
