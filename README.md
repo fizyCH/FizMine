@@ -26,19 +26,18 @@
 
 ## What's New
 
-### v2.0
+### v3.0
 
 | Change | Description |
-|--------|-------------|
-| Confirmation modals | Custom animated modals instead of browser `confirm()` |
-| File editor | Edit `.json`, `.yml`, `.txt`, `.properties` directly in panel |
-| Folder navigation | Browse server directories with breadcrumbs |
-| Fireflies | Ambient background effect with accent color |
-| 5 languages | English, Russian, German, French, Chinese |
-| Crash detection | Sound notification when server crashes |
-| UI overhaul | Animations, Minecraft-style FizMine logo |
-| .env settings | Edit MC_DIR, PORT, JAVA_ARGS from the panel |
-| Bug fixes | TPS display, ban/unban UUIDs for premium & offline accounts |
+|----------|------------|
+| **Authentication** | Login with protection against settings tampering via `/api/settings`<br>, Anti-brute-force protection: 5 failed attempts = 5-minute lockout<br>• Weak password rejection (minimum 5 characters, common words blocked) |
+| **Server Core Dashboard** | Memory, disk, and CPU usage displayed in percentages<br>, Click any metric to open ring chart diagrams<br>• Real-time chart updates<br>• Crash detection with sound alerts |
+| **File Manager** | Sort by name (all languages) and file size<br>• Recursive file search<br>, File upload and download support<br>• Automatic ZIP compression for folder downloads<br>• Delete confirmation before removal |
+| **Server Core** | Core replacement functionality<br>• Select files to keep during replacement<br>, All unselected files are automatically deleted |
+| **Settings** | Accent color customization<br>• Firefly particle effects<br>• Panel opacity slider<br>, Authentication options<br>• Backup management |
+| **Console & Players** | Fixed command output issues<br>• Fixed real-time output updates<br>, Improved OP, whitelist, and ban management |
+| **Cross-platform** | Linux and Windows support<br>, Automatic Flask installation<br>, Automatic Java detection |
+
 
 ---
 
