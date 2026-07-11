@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FizMine Panel — Minecraft Server Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.min.css">
+</head>
+<body>
+
+<canvas id="fireflies"></canvas>
+
+<nav id="navbar">
+  <div class="nav-logo">
+    <div class="icon">
+      <svg viewBox="0 0 28 22" shape-rendering="crispEdges">
+        <g fill="rgba(0,0,0,.25)" transform="translate(1.5,1.5)">
+          <rect x="1" y="2" width="3" height="17"/>
+          <rect x="4" y="2" width="7" height="3"/>
+          <rect x="4" y="9" width="5" height="3"/>
+          <rect x="13" y="2" width="3" height="17"/>
+          <rect x="16" y="5" width="2" height="3"/>
+          <rect x="18" y="8" width="2" height="3"/>
+          <rect x="20" y="5" width="2" height="3"/>
+          <rect x="22" y="2" width="3" height="17"/>
+        </g>
+        <g fill="currentColor">
+          <rect x="1" y="1" width="3" height="17"/>
+          <rect x="4" y="1" width="7" height="3"/>
+          <rect x="4" y="8" width="5" height="3"/>
+          <rect x="13" y="1" width="3" height="17"/>
+          <rect x="16" y="4" width="2" height="3"/>
+          <rect x="18" y="7" width="2" height="3"/>
+          <rect x="20" y="4" width="2" height="3"/>
+          <rect x="22" y="1" width="3" height="17"/>
+        </g>
+        <g fill="rgba(255,255,255,.15)">
+          <rect x="1" y="1" width="3" height="2"/>
+          <rect x="4" y="1" width="7" height="1"/>
+          <rect x="13" y="1" width="3" height="2"/>
+          <rect x="22" y="1" width="3" height="2"/>
+        </g>
+      </svg>
+    </div>
+    <span>FizMine</span>
+  </div>
+  <div class="nav-links">
+    <a href="#features" data-i18n="nav_features">Возможности</a>
+    <a href="#demo" data-i18n="nav_demo">Демо</a>
+    <a href="#download" data-i18n="nav_download">Скачать</a>
+    <select id="langSwitch" class="lang-switch">
+      <option value="ru">🇷🇺 RU</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="de">🇩🇪 DE</option>
+      <option value="fr">🇫🇷 FR</option>
+      <option value="zh">🇨🇳 ZH</option>
+    </select>
+    <a href="https://github.com/fizyCH/FizMine" target="_blank" class="nav-btn">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Open Source &bull; Free &bull; Cross-Platform
+  </div>
+  <p style="font-style:italic;color:var(--text-dim);font-size:1rem;margin-bottom:1rem;animation:fadeInUp .6s ease-out .05s both">"Free as in freedom"</p>
+  <h1>FizMine Panel</h1>
+  <p data-i18n="hero_sub">Мощная панель управления Minecraft-сервером. Запуск, консоль, игроки, файлы, плагины — всё в одном красивом интерфейсе.</p>
+  <div class="hero-buttons">
+    <a href="#download" class="btn-primary">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span data-i18n="hero_download">Скачать</span>
+    </a>
+    <a href="https://github.com/fizyCH/FizMine" target="_blank" class="btn-secondary">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="num">5</div>
+    <div class="label" data-i18n="stat_langs">Языков</div>
+  </div>
+  <div class="stat">
+    <div class="num">2</div>
+    <div class="label" data-i18n="stat_platforms">Платформы</div>
+  </div>
+  <div class="stat">
+    <div class="num">10+</div>
+    <div class="label" data-i18n="stat_features">Фич</div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="section-header">
+    <div class="glow-line"></div>
+    <h2 data-i18n="features_title">Возможности</h2>
+    <p data-i18n="features_sub">Всё, что нужно для управления сервером, в одном интерфейсе</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card" onclick="showFeatureModal('console')">
+      <div class="feature-icon">🖥️</div>
+      <h3 data-i18n="feat_console">Консоль</h3>
+      <p data-i18n="feat_console_desc">Живая консоль с логами в реальном времени. Отправляйте команды прямо из браузера.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('players')">
+      <div class="feature-icon">👥</div>
+      <h3 data-i18n="feat_players">Игроки</h3>
+      <p data-i18n="feat_players_desc">Управление операторами, вайтлистом и банами. Добавляйте и удаляйте игроков одним кликом.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('files')">
+      <div class="feature-icon">📁</div>
+      <h3 data-i18n="feat_files">Файлы</h3>
+      <p data-i18n="feat_files_desc">Загрузка, скачивание, редактирование и удаление файлов. Навигация по папкам сервера.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('plugins')">
+      <div class="feature-icon">🧩</div>
+      <h3 data-i18n="feat_plugins">Плагины и Моды</h3>
+      <p data-i18n="feat_plugins_desc">Загружайте и управляйте плагинами и модами. Поддержка Spigot, Paper, Purpur, Forge.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('server')">
+      <div class="feature-icon">⚙️</div>
+      <h3 data-i18n="feat_settings">Настройки</h3>
+      <p data-i18n="feat_settings_desc">Редактируйте server.properties, порты, слоты, MOTD и другие параметры сервера.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('monitoring')">
+      <div class="feature-icon">📊</div>
+      <h3 data-i18n="feat_monitoring">Мониторинг</h3>
+      <p data-i18n="feat_monitoring_desc">CPU, оперативная память, диск и TPS в реальном времени. Кольцевые диаграммы.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('custom')">
+      <div class="feature-icon">🎨</div>
+      <h3 data-i18n="feat_custom">Кастомизация</h3>
+      <p data-i18n="feat_custom_desc">Цвет акцента, прозрачность панелей, анимированные светлячки. Настройте под себя.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('security')">
+      <div class="feature-icon">🔒</div>
+      <h3 data-i18n="feat_security">Безопасность</h3>
+      <p data-i18n="feat_security_desc">Защита паролем, анти-брутфорс, валидация паролей. Безопасность на первом месте.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('i18n')">
+      <div class="feature-icon">🌍</div>
+      <h3 data-i18n="feat_langs">5 Языков</h3>
+      <p data-i18n="feat_langs_desc">EN, RU, DE, FR, ZH — переключение языка в настройках панели. Мгновенно.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('backup')">
+      <div class="feature-icon">💾</div>
+      <h3 data-i18n="feat_backup">Бэкапы</h3>
+      <p data-i18n="feat_backup_desc">Скачивайте резервные копии панели и сервера. Всё в одном архиве.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('cross')">
+      <div class="feature-icon">🐧</div>
+      <h3 data-i18n="feat_cross">Кросс-платформа</h3>
+      <p data-i18n="feat_cross_desc">Linux и Windows. Автоматический поиск Java, автоустановка зависимостей.</p>
+    </div>
+    <div class="feature-card" onclick="showFeatureModal('status')">
+      <div class="feature-icon">⚡</div>
+      <h3 data-i18n="feat_status">Статус</h3>
+      <p data-i18n="feat_status_desc">Онлайн/оффлайн, игроки, TPS, uptime. Вся информация на главном экране.</p>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="section-header">
+    <div class="glow-line"></div>
+    <h2 data-i18n="demo_title">Демо</h2>
+    <p data-i18n="demo_sub">Посмотрите, как работает панель</p>
+  </div>
+  <div class="demo-section">
+    <div class="demo-tabs">
+      <button class="demo-tab active" data-tab="lang" data-i18n="demo_tab_lang">Смена языка</button>
+      <button class="demo-tab" data-tab="op" data-i18n="demo_tab_op">Добавить в OP</button>
+      <button class="demo-tab" data-tab="color" data-i18n="demo_tab_color">Цвет акцента</button>
+      <button class="demo-tab" data-tab="auth" data-i18n="demo_tab_auth">Логин и защита</button>
+    </div>
+
+    <div class="demo-content active" data-content="lang">
+      <div class="demo-placeholder" id="demo-lang">
+        <video src="lang.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:10px"></video>
+      </div>
+    </div>
+    <div class="demo-content" data-content="op">
+      <div class="demo-placeholder" id="demo-op">
+        <video src="op.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:10px"></video>
+      </div>
+    </div>
+    <div class="demo-content" data-content="color">
+      <div class="demo-placeholder" id="demo-color">
+        <video src="custom.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:10px"></video>
+      </div>
+    </div>
+    <div class="demo-content" data-content="auth">
+      <div class="demo-placeholder" id="demo-auth">
+        <video src="login.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:10px"></video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="download" class="download-section">
+  <div class="glow-line"></div>
+    <h2 data-i18n="dl_title">Скачать</h2>
+    <p data-i18n="dl_sub">Выберите формат архива и установите панель за минуту</p>
+    <div class="download-buttons">
+      <a href="https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play!/panel.tar" class="download-btn" target="_blank">
+        <span class="ext">tar</span>
+        <span data-i18n="dl_tar">Скачать .tar</span>
+      </a>
+      <a href="https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play!/panel.7z" class="download-btn" target="_blank">
+        <span class="ext">7z</span>
+        <span data-i18n="dl_7z">Скачать .7z</span>
+      </a>
+      <a href="https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play!/panel.zip" class="download-btn" target="_blank">
+        <span class="ext">zip</span>
+        <span data-i18n="dl_zip">Скачать .zip</span>
+      </a>
+    </div>
+</section>
+
+<div class="github-banner">
+  <div class="gh-info">
+    <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    <div>
+      <h3 data-i18n="gh_title">Open Source на GitHub</h3>
+      <p data-i18n="gh_sub">Ставьте звёзды, форкайте, контрибьютьте</p>
+    </div>
+  </div>
+  <a href="https://github.com/fizyCH/FizMine" target="_blank" class="gh-link">
+    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    Открыть
+  </a>
+</div>
+
+<footer>
+  &copy; 2026 FizMine &mdash; Minecraft Panel. <span data-i18n="footer">Made with ❤️</span>
+</footer>
+
+<div class="modal-overlay" id="featureModal">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalDesc" style="color:var(--text-dim);margin-bottom:1.5rem;font-size:.9rem"></p>
+    <button class="modal-close" onclick="closeModal()" data-i18n="modal_close">Закрыть</button>
+  </div>
+</div>
+
+<script src="script.min.js"></script>
+</body>
+</html>
