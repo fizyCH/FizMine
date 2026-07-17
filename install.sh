@@ -68,7 +68,7 @@ mkdir -p "$INSTALL_DIR"
 cd /tmp
 curl -sL "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar" -o fizmine-panel.tar
 
-if [ ! -s fizmine-panel.tar ] || ! file fizmine-panel.tar | grep -q gzip; then
+if [ ! -s fizmine-panel.tar ] || ! file fizmine-panel.tar | grep -qi "tar\|gzip"; then
   echo "Download failed. Please download manually from:"
   echo "https://github.com/fizyCH/FizMine/releases"
   rm -f fizmine-panel.tar
@@ -76,7 +76,7 @@ if [ ! -s fizmine-panel.tar ] || ! file fizmine-panel.tar | grep -q gzip; then
 fi
 
 echo "Extracting to $INSTALL_DIR..."
-sudo tar xzf fizmine-panel.tar -C "$INSTALL_DIR" --strip-components=0
+sudo tar xf fizmine-panel.tar -C "$INSTALL_DIR" --strip-components=0
 rm -f fizmine-panel.tar
 
 chmod +x "$INSTALL_DIR/ctl.sh" 2>/dev/null || true
