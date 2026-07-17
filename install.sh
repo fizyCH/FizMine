@@ -1,16 +1,13 @@
 #!/bin/bash
 set -e
 
-C=$'\033[0;36m'
-R=$'\033[0m'
-
 echo ""
-printf "${C}  _____ _     __  __ _            ${R}\n"
-printf "${C} |  ___(_)___|  \\/  (_)_ __   ___ ${R}\n"
-printf "${C} | |_  | |_  / |\\/| | | '_ \\ / _ \\${R}\n"
-printf "${C} |  _| | |/ /| |  | | | | | |  __/${R}\n"
-printf "${C} |_|   |_/___|_|  |_|_|_| |_|\\___| ${R}\n"
-printf "${C}          Panel Installer${R}\n"
+printf '\033[0;36m  _____ _     __  __ _            \033[0m\n'
+printf '\033[0;36m |  ___(_)___|  \\/  (_)_ __   ___ \033[0m\n'
+printf '\033[0;36m | |_  | |_  / |\\/| | | '_ \\ / _ \\\033[0m\n'
+printf '\033[0;36m |  _| | |/ /| |  | | | | | |  __/\033[0m\n'
+printf '\033[0;36m |_|   |_/___|_|  |_|_|_| |_|\___| \033[0m\n'
+printf '\033[0;36m          Panel Installer\033[0m\n'
 echo ""
 
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
@@ -97,7 +94,7 @@ PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
-printf "${C}  Installation complete!${R}\n"
+printf '\033[0;36m  Installation complete!\033[0m\n'
 echo "  ======================"
 echo "  cd $INSTALL_DIR"
 echo "  ./ctl.sh start"
