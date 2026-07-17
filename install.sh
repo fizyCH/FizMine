@@ -66,11 +66,14 @@ fi
 echo "Downloading FizMine Panel..."
 mkdir -p "$INSTALL_DIR"
 cd /tmp
+rm -f fizmine-panel.tar
 curl -sL "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar" -o fizmine-panel.tar
 
-if [ ! -s fizmine-panel.tar ] || ! file fizmine-panel.tar | grep -qi "tar\|gzip"; then
-  echo "Download failed. Please download manually from:"
-  echo "https://github.com/fizyCH/FizMine/releases"
+SIZE=$(wc -c < fizmine-panel.tar 2>/dev/null || echo "0")
+SIZE=$(echo "$SIZE" | tr -d ' ')
+if [ "$SIZE" -lt 10000 ]; then
+  echo "Download failed (file too small: ${SIZE} bytes)."
+  echo "Download manually from: https://github.com/fizyCH/FizMine/releases"
   rm -f fizmine-panel.tar
   exit 1
 fi
