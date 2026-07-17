@@ -5,12 +5,12 @@ C='\033[0;36m'
 R='\033[0m'
 
 echo ""
-echo -e "${C}  _____ _     __  __ _            ${R}"
-echo -e "${C} |  ___(_)___|  \\/  (_)_ __   ___ ${R}"
-echo -e "${C} | |_  | |_  / |\\/| | | '_ \\ / _ \\${R}"
-echo -e "${C} |  _| | |/ /| |  | | | | | |  __/${R}"
-echo -e "${C} |_|   |_/___|_|  |_|_|_| |_|\\___| ${R}"
-echo -e "${C}          Panel Installer${R}"
+printf "${C}  _____ _     __  __ _            ${R}\n"
+printf "${C} |  ___(_)___|  \\/  (_)_ __   ___ ${R}\n"
+printf "${C} | |_  | |_  / |\\/| | | '_ \\ / _ \\${R}\n"
+printf "${C} |  _| | |/ /| |  | | | | | |  __/${R}\n"
+printf "${C} |_|   |_/___|_|  |_|_|_| |_|\\___| ${R}\n"
+printf "${C}          Panel Installer${R}\n"
 echo ""
 
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
@@ -103,7 +103,7 @@ PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
-echo -e "${C}  Installation complete!${R}"
+printf "${C}  Installation complete!${R}\n"
 echo "  ======================"
 echo "  cd $INSTALL_DIR"
 echo "  ./ctl.sh start"
