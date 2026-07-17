@@ -228,7 +228,7 @@
     <div class="install-cmd">
       <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.6rem" data-i18n="dl_install_title">Linux / macOS:</p>
       <div class="cmd-box" onclick="navigator.clipboard.writeText(this.querySelector('code').textContent);this.querySelector('.copy-hint').textContent='Copied!';setTimeout(()=>this.querySelector('.copy-hint').textContent='Click to copy',1500)">
-        <code>curl -sL https://raw.githubusercontent.com/fizyCH/FizMine/main/install.sh | bash</code>
+        <code>curl -sLO https://raw.githubusercontent.com/fizyCH/FizMine/main/install.sh && bash install.sh</code>
         <span class="copy-hint" data-i18n="dl_copy">Click to copy</span>
       </div>
       <p style="color:var(--text-dim);font-size:.85rem;margin-top:1.2rem;margin-bottom:.6rem">Windows (PowerShell):</p>
