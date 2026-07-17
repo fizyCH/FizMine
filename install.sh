@@ -37,8 +37,6 @@ for cmd in curl tar; do
       sudo yum install -y "$cmd"
     elif command -v apk &>/dev/null; then
       sudo apk add "$cmd"
-    elif command -v brew &>/dev/null; then
-      brew install "$cmd"
     else
       echo "Error: $cmd is required."
       exit 1
@@ -54,8 +52,6 @@ if ! command -v python3 &>/dev/null; then
     sudo yum install -y python3 python3-pip
   elif command -v apk &>/dev/null; then
     sudo apk add python3 py3-pip
-  elif command -v brew &>/dev/null; then
-    brew install python3
   fi
 fi
 
@@ -67,8 +63,6 @@ if ! command -v java &>/dev/null; then
     sudo yum install -y java-17-openjdk-headless 2>/dev/null || sudo yum install -y java-latest-openjdk-headless
   elif command -v apk &>/dev/null; then
     sudo apk add openjdk17-jre-headless
-  elif command -v brew &>/dev/null; then
-    brew install openjdk@17
   fi
 fi
 

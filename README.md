@@ -4,10 +4,10 @@ Minecraft server management panel.
 
 ## Quick Install
 
-### Linux / macOS
+### Linux
 
 ```bash
-curl -sL https://raw.githubusercontent.com/fizyCH/FizMine/main/install.sh | sudo bash -s -- /minecraft
+curl -sLO https://raw.githubusercontent.com/fizyCH/FizMine/main/install.sh && bash install.sh
 ```
 
 Replace `/minecraft` with your server directory path.
@@ -35,7 +35,7 @@ Default install path: `C:\minecraft`
 
 ```bash
 # Start panel
-./ctl.sh start      # Linux/macOS
+./ctl.sh start      # Linux
 python panel.py     # All platforms
 
 # Panel commands
