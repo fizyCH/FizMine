@@ -5,12 +5,12 @@ C='\033[0;36m'
 R='\033[0m'
 
 echo ""
-echo -e "${C}  _____ _     __  __ _            ${R}"
-echo -e "${C} |  ___(_)___|  \\/  (_)_ __   ___ ${R}"
-echo -e "${C} | |_  | |_  / |\\/| | | '_ \\ / _ \\${R}"
-echo -e "${C} |  _| | |/ /| |  | | | | | |  __/${R}"
-echo -e "${C} |_|   |_/___|_|  |_|_|_| |_|\\___| ${R}"
-echo -e "${C}          Panel Installer${R}"
+printf "${C}  _____ _     __  __ _            ${R}\n"
+printf "${C} |  ___(_)___|  \\/  (_)_ __   ___ ${R}\n"
+printf "${C} | |_  | |_  / |\\/| | | '_ \\ / _ \\${R}\n"
+printf "${C} |  _| | |/ /| |  | | | | | |  __/${R}\n"
+printf "${C} |_|   |_/___|_|  |_|_|_| |_|\\___| ${R}\n"
+printf "${C}          Panel Installer${R}\n"
 echo ""
 
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
@@ -37,8 +37,6 @@ for cmd in curl tar; do
       sudo yum install -y "$cmd"
     elif command -v apk &>/dev/null; then
       sudo apk add "$cmd"
-    elif command -v brew &>/dev/null; then
-      brew install "$cmd"
     else
       echo "Error: $cmd is required."
       exit 1
@@ -54,8 +52,6 @@ if ! command -v python3 &>/dev/null; then
     sudo yum install -y python3 python3-pip
   elif command -v apk &>/dev/null; then
     sudo apk add python3 py3-pip
-  elif command -v brew &>/dev/null; then
-    brew install python3
   fi
 fi
 
@@ -67,17 +63,15 @@ if ! command -v java &>/dev/null; then
     sudo yum install -y java-17-openjdk-headless 2>/dev/null || sudo yum install -y java-latest-openjdk-headless
   elif command -v apk &>/dev/null; then
     sudo apk add openjdk17-jre-headless
-  elif command -v brew &>/dev/null; then
-    brew install openjdk@17
   fi
 fi
 
 echo "Downloading FizMine Panel..."
 mkdir -p "$INSTALL_DIR"
 cd /tmp
-curl -sL "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play!/panel.tar" -o fizmine-panel.tar
+curl -sL "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar" -o fizmine-panel.tar
 
-if ! file fizmine-panel.tar | grep -q gzip; then
+if [ ! -s fizmine-panel.tar ] || ! file fizmine-panel.tar | grep -q gzip; then
   echo "Download failed. Please download manually from:"
   echo "https://github.com/fizyCH/FizMine/releases"
   rm -f fizmine-panel.tar
@@ -103,7 +97,7 @@ PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
-echo -e "${C}  Installation complete!${R}"
+printf "${C}  Installation complete!${R}\n"
 echo "  ======================"
 echo "  cd $INSTALL_DIR"
 echo "  ./ctl.sh start"
