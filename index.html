@@ -228,7 +228,7 @@
     <div class="install-cmd">
       <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.6rem" data-i18n="dl_install_title">Linux / macOS:</p>
       <div class="cmd-box" onclick="navigator.clipboard.writeText(this.querySelector('code').textContent);this.querySelector('.copy-hint').textContent='Copied!';setTimeout(()=>this.querySelector('.copy-hint').textContent='Click to copy',1500)">
-        <code>curl -sL https://raw.githubusercontent.com/fizyCH/FizMine/main/install.sh | sudo bash -s -- /minecraft</code>
+        <code>curl -sL https://raw.githubusercontent.com/fizyCH/FizMine/main/install.sh | bash</code>
         <span class="copy-hint" data-i18n="dl_copy">Click to copy</span>
       </div>
       <p style="color:var(--text-dim);font-size:.85rem;margin-top:1.2rem;margin-bottom:.6rem">Windows (PowerShell):</p>
@@ -236,7 +236,6 @@
         <code>irm https://raw.githubusercontent.com/fizyCH/FizMine/main/install.ps1 | iex</code>
         <span class="copy-hint">Click to copy</span>
       </div>
-      <p style="color:var(--text-dim);font-size:.75rem;margin-top:.5rem" data-i18n="dl_install_hint">Замените /minecraft на путь к папке сервера</p>
     </div>
 
 <div class="github-banner">
