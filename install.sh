@@ -25,7 +25,7 @@ echo "Auth: $AUTH_CHOICE"
 echo "Port: $PANEL_PORT"
 echo ""
 
-for cmd in curl tar; do
+for cmd in wget tar; do
   if ! command -v "$cmd" &>/dev/null; then
     echo "Installing $cmd..."
     if command -v apt-get &>/dev/null; then
@@ -69,13 +69,12 @@ cd /tmp
 rm -f fizmine-panel.tar
 
 DOWNLOAD_URL="https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar"
-curl -L --max-time 120 -H "User-Agent: Mozilla/5.0" "$DOWNLOAD_URL" -o fizmine-panel.tar 2>/dev/null
+wget -q "$DOWNLOAD_URL" -O fizmine-panel.tar
 
 if [ ! -s fizmine-panel.tar ]; then
-  echo "Download failed. Please download manually:"
-  echo "wget https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar -O panel.tar"
-  echo "tar xf panel.tar -C $INSTALL_DIR"
-  echo "cd $INSTALL_DIR && ./ctl.sh start"
+  echo "Download failed."
+  echo "Download manually: wget \"$DOWNLOAD_URL\" -O panel.tar"
+  echo "Then: tar xf panel.tar -C $INSTALL_DIR && cd $INSTALL_DIR && ./ctl.sh start"
   exit 1
 fi
 
