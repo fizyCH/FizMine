@@ -2,12 +2,12 @@
 set -e
 
 echo ""
-printf '\033[0;36m  _____ _     __  __ _            \033[0m\n'
-printf '\033[0;36m |  ___(_)___|  \\/  (_)_ __   ___ \033[0m\n'
-printf '\033[0;36m | |_  | |_  / |\\/| | | '_ \\ / _ \\\033[0m\n'
-printf '\033[0;36m |  _| | |/ /| |  | | | | | |  __/\033[0m\n'
-printf '\033[0;36m |_|   |_/___|_|  |_|_|_| |_|\___| \033[0m\n'
-printf '\033[0;36m          Panel Installer\033[0m\n'
+echo "  _____ _     __  __ _            "
+echo " |  ___(_)___|  \/  (_)_ __   ___ "
+echo " | |_  | |_  / |\/| | | '_ \ / _ \\"
+echo " |  _| | |/ /| |  | | | | | |  __/"
+echo " |_|   |_/___|_|  |_|_|_| |_|\___| "
+echo "          Panel Installer"
 echo ""
 
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
@@ -94,9 +94,9 @@ PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
-printf '\033[0;36m  Installation complete!\033[0m\n'
-echo "  ======================"
-echo "  cd $INSTALL_DIR"
-echo "  ./ctl.sh start"
-echo "  Panel: http://localhost:$PANEL_PORT"
+echo "Installation complete!"
+echo "======================"
+echo "cd $INSTALL_DIR"
+echo "./ctl.sh start"
+echo "Panel: http://localhost:$PANEL_PORT"
 echo ""
