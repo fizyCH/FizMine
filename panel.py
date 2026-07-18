@@ -2420,14 +2420,6 @@ const CORE_VERSIONS={
    {v:'1.20.1-20.1.76',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.1.76/neoforge-20.1.76-installer.jar'},
     {v:'1.19.4-19.4.84',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/19.4.84/neoforge-19.4.84-installer.jar'},
    ]
- },
-  mohist:{
-   name:'Purpur',
-   versions:[
-    {v:'1.20.1',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/b562929a2a69aed40a99293d84d7c210bc811705/download'},
-    {v:'1.16.5',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.16.5/builds/latest/download'},
-    {v:'1.12.2',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.12.2/builds/latest/download'},
-   ]
   },
   purpur:{
    name:'Purpur',
