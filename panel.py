@@ -2294,7 +2294,7 @@ async function loadSetup(){
       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoMohist</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2326,7 +2326,7 @@ async function loadSetup(){
       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoMohist</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2394,7 +2394,7 @@ const CORE_VERSIONS={
   ]
  },
  neoforge:{
-  name:'NeoMohist',
+  name:'NeoForge',
   versions:[
    {v:'1.21.5-21.1.2',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.2/neoforge-21.1.2-installer.jar'},
    {v:'1.21.4-21.1.1',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.1/neoforge-21.1.1-installer.jar'},
@@ -2410,12 +2410,11 @@ const CORE_VERSIONS={
   mohist:{
    name:'Mohist',
    versions:[
-    {v:'1.20.4-489',java:17,url:'https://api.mohistmc.com/v2/versions/1.20.4/489/download'},
-    {v:'1.20.2-463',java:17,url:'https://api.mohistmc.com/v2/versions/1.20.2/463/download'},
-    {v:'1.20.1-459',java:17,url:'https://api.mohistmc.com/v2/versions/1.20.1/459/download'},
-    {v:'1.19.4-392',java:17,url:'https://api.mohistmc.com/v2/versions/1.19.4/392/download'},
-    {v:'1.18.2-375',java:17,url:'https://api.mohistmc.com/v2/versions/1.18.2/375/download'},
-    {v:'1.16.5-323',java:8,url:'https://api.mohistmc.com/v2/versions/1.16.5/323/download'},
+    {v:'1.20.1 (build 66)',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/b562929a2a69aed40a99293d84d7c210bc811705/download'},
+    {v:'1.20.1 (build 65)',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/84c037f94beae281a4baa2813c6a716db86a4bdf/download'},
+    {v:'1.20.1 (build 64)',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/10090b816a1014823bc2c0f2864df56e1c7085a0/download'},
+    {v:'1.16.5',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.16.5/builds/latest/download'},
+    {v:'1.12.2',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.12.2/builds/latest/download'},
    ]
   }
 };
