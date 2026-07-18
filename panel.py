@@ -612,7 +612,13 @@ def start_server():
     if java_ver > 0 and java_ver < 17:
         return f"Java {java_ver} found but server requires Java 17+. Set JAVA_PATH in .env to a Java 17+ installation."
 
-    java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
+    run_sh = MC_DIR / "run.sh"
+    if run_sh.exists() and not IS_WINDOWS:
+        java_cmd = ["bash", str(run_sh), "nogui"]
+    elif IS_WINDOWS and (MC_DIR / "run.bat").exists():
+        java_cmd = ["cmd", "/c", str(MC_DIR / "run.bat"), "nogui"]
+    else:
+        java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
 
     if IS_WINDOWS:
         _server_proc = subprocess.Popen(
@@ -3834,11 +3840,6 @@ def api_download_core():
             
             if r.returncode != 0:
                 return jsonify({"error": f"Installer failed (code {r.returncode}): {stdout_text[:500]}"}), 500
-            
-            for script in ["run.sh", "run.bat", "user_jvm_args.txt", "start.sh", "start.bat"]:
-                sp = MC_DIR / script
-                if sp.exists():
-                    sp.unlink()
             
             eula_path = MC_DIR / "eula.txt"
             if not eula_path.exists():
