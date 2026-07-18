@@ -2309,6 +2309,7 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Magma</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2341,6 +2342,7 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Magma</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2431,6 +2433,13 @@ const CORE_VERSIONS={
     {v:'1.19.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.19.4/builds/1993/downloads/purpur-1.19.4-1993.jar'},
     {v:'1.18.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.18.2/builds/1687/downloads/purpur-1.18.2-1687.jar'},
     {v:'1.16.5',java:8,url:'https://api.purpurmc.org/v2/purpur/1.16.5/builds/1001/downloads/purpur-1.16.5-1001.jar'},
+   ]
+  },
+  magma:{
+   name:'Magma',
+   versions:[
+    {v:'Forge 1.16.5 (DEV)',java:8,url:'https://github.com/magmafoundation/Magma-Forge/releases/download/v5269561-DEV/Magma-5269561-DEV-server.jar'},
+    {v:'Forge 1.16.5 (DEV 2)',java:8,url:'https://github.com/magmafoundation/Magma-Forge/releases/download/va549e0d-DEV/Magma-a549e0d-DEV-server.jar'},
    ]
   }
 };
