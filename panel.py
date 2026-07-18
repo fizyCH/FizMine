@@ -43,6 +43,7 @@ except ImportError:
 
 from flask import Flask, request, jsonify, Response, abort, send_file, session, redirect, url_for
 
+PANEL_VERSION = "2.1"
 app = Flask(__name__)
 app.secret_key = os.urandom(32).hex()
 
@@ -1095,7 +1096,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Delete", "uploading": "Uploading...", "uploaded": "Uploaded",
         "confirm": "Confirm", "edit_file": "Edit File", "warning_title": "Warning!",
         "confirm_replace_core": "Replace server core",
-        "backup_panel": "Backup Panel", "backup_panel_desc": "Download a zip archive of all panel files", "download_backup": "backup", "check_updates": "Check for updates", "check_update": "Check Update",
+        "backup_panel": "Backup Panel", "backup_panel_desc": "Download a zip archive of all panel files", "download_backup": "backup", "check_updates": "Check for updates", "check_update": "Check Update", "update_available": "Update available", "install_update": "Install Update", "up_to_date": "Up to date", "update_error": "Error checking updates",
         "backup_server": "server backup",
         "login_password": "Password", "login_btn": "Login", "login_error": "Invalid password", "login_locked": "Too many attempts. Try again later.",
         "auth_settings": "Authorization", "auth_settings_desc": "Set or change access password", "auth_token": "Password",
@@ -1152,7 +1153,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Удалить", "uploading": "Загрузка...", "uploaded": "Загружено",
         "confirm": "Подтвердить", "edit_file": "Редактировать файл", "warning_title": "Внимание!",
         "confirm_replace_core": "Заменить ядро сервера",
-        "backup_panel": "Резервная копия", "backup_panel_desc": "Скачать архив со всеми файлами панели", "download_backup": "backup", "check_updates": "Проверить обновления", "check_update": "Проверить",
+        "backup_panel": "Резервная копия", "backup_panel_desc": "Скачать архив со всеми файлами панели", "download_backup": "backup", "check_updates": "Проверить обновления", "check_update": "Проверить", "update_available": "Доступно обновление", "install_update": "Установить", "up_to_date": "Обновлена", "update_error": "Ошибка проверки обновлений",
         "backup_server": "бэкап сервера",
         "login_password": "Пароль", "login_btn": "Войти", "login_error": "Неверный пароль", "login_locked": "Слишком много попыток. Попробуйте позже.",
         "auth_settings": "Авторизация", "auth_settings_desc": "Установить или сменить пароль доступа", "auth_token": "Пароль",
@@ -1210,7 +1211,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Löschen", "uploading": "Hochladen...", "uploaded": "Hochgeladen",
         "confirm": "Bestätigen", "edit_file": "Datei bearbeiten", "warning_title": "Achtung!",
         "confirm_replace_core": "Server-Kern ersetzen",
-        "backup_panel": "Backup", "backup_panel_desc": "Alle Panel-Dateien als ZIP herunterladen", "download_backup": "backup", "check_updates": "Nach Updates suchen", "check_update": "Prüfen",
+        "backup_panel": "Backup", "backup_panel_desc": "Alle Panel-Dateien als ZIP herunterladen", "download_backup": "backup", "check_updates": "Nach Updates suchen", "check_update": "Prüfen", "update_available": "Update verfügbar", "install_update": "Installieren", "up_to_date": "Aktuell", "update_error": "Fehler beim Prüfen",
         "backup_server": "Server-Backup",
         "login_password": "Passwort", "login_btn": "Anmelden", "login_error": "Falsches Passwort", "login_locked": "Zu viele Versuche. Bitte später versuchen.",
         "auth_settings": "Autorisierung", "auth_settings_desc": "Zugangspasswort setzen oder ändern", "auth_token": "Zugangstoken",
@@ -1268,7 +1269,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Supprimer", "uploading": "Téléchargement...", "uploaded": "Téléchargé",
         "confirm": "Confirmer", "edit_file": "Modifier le fichier", "warning_title": "Attention !",
         "confirm_replace_core": "Remplacer le noyau du serveur",
-        "backup_panel": "Sauvegarde", "backup_panel_desc": "Télécharger une archive ZIP de tous les fichiers du panneau", "download_backup": "backup", "check_updates": "Vérifier les mises à jour", "check_update": "Vérifier",
+        "backup_panel": "Sauvegarde", "backup_panel_desc": "Télécharger une archive ZIP de tous les fichiers du panneau", "download_backup": "backup", "check_updates": "Vérifier les mises à jour", "check_update": "Vérifier", "update_available": "Mise à jour disponible", "install_update": "Installer", "up_to_date": "À jour", "update_error": "Erreur de vérification",
         "backup_server": "sauvegarde serveur",
         "login_password": "Mot de passe", "login_btn": "Connexion", "login_error": "Mot de passe incorrect", "login_locked": "Trop de tentatives. Réessayez plus tard.",
         "auth_settings": "Autorisation", "auth_settings_desc": "Définir ou changer le mot de passe", "auth_token": "Jeton d'accès",
@@ -1326,7 +1327,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "删除", "uploading": "上传中...", "uploaded": "已上传",
         "confirm": "确认", "edit_file": "编辑文件", "warning_title": "注意！",
         "confirm_replace_core": "替换服务器核心",
-        "backup_panel": "备份面板", "backup_panel_desc": "下载包含所有面板文件的ZIP压缩包", "download_backup": "backup", "check_updates": "检查更新", "check_update": "检查",
+        "backup_panel": "备份面板", "backup_panel_desc": "下载包含所有面板文件的ZIP压缩包", "download_backup": "backup", "check_updates": "检查更新", "check_update": "检查", "update_available": "有可用更新", "install_update": "安装更新", "up_to_date": "已是最新", "update_error": "检查更新出错",
         "backup_server": "服务器备份",
         "login_password": "密码", "login_btn": "登录", "login_error": "密码错误", "login_locked": "尝试次数过多，请稍后再试。",
         "auth_settings": "授权", "auth_settings_desc": "设置或修改访问密码", "auth_token": "密碼",
@@ -1877,7 +1878,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
      <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
       <p style="color:var(--text2);font-size:12px;margin-bottom:8px" data-i18n="check_updates">Check for updates</p>
       <button class="btn btn-accent btn-sm" onclick="checkForUpdates()" id="btn-check-update">
-       <svg class="ico ico-sm" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9"/></svg>
+       <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
        <span data-i18n="check_update">Check Update</span>
       </button>
       <div id="update-result" style="margin-top:10px;display:none"></div>
@@ -3156,21 +3157,21 @@ async function saveAuthState(enabled){
   const btn=document.getElementById('btn-check-update');
   const result=document.getElementById('update-result');
   btn.disabled=true;
-  btn.innerHTML='<svg class="ico ico-sm" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" class="spin"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg> Checking...';
+  btn.innerHTML='<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" class="spin"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> '+t('check_update')+'...';
   try{
    const data=await api('check-update');
    result.style.display='block';
    if(data.update){
-    result.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px"><p style="margin:0 0 8px;font-size:13px">Update available: <b>${data.local}</b> → <b>${data.remote}</b></p><button class="btn btn-accent btn-sm" onclick="doUpdate()">Install Update</button></div>`;
+    result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px"><p style="margin:0 0 8px;font-size:13px">'+t('update_available')+': <b>v'+data.local+'</b> -> <b>v'+data.remote+'</b></p><button class="btn btn-accent btn-sm" onclick="doUpdate()">'+t('install_update')+'</button></div>';
    }else{
-    result.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--green);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--green)">Up to date (v${data.local})</p></div>`;
+    result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--green);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--green)">'+t('up_to_date')+' (v'+data.local+')</p></div>';
    }
   }catch(e){
    result.style.display='block';
-   result.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--red)">Error checking updates</p></div>`;
+   result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--red)">'+t('update_error')+'</p></div>';
   }
   btn.disabled=false;
-  btn.innerHTML='<svg class="ico ico-sm" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg> Check Update';
+  btn.innerHTML='<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> '+t('check_update');
  }
 
  async function doUpdate(){
@@ -3992,10 +3993,7 @@ def api_file_delete():
 def api_check_update():
     import urllib.request
     try:
-        with open(Path(__file__), "r", errors="replace") as f:
-            content = f.read(10000)
-        local_ver = re.search(r'FizMine Panel v([\d.]+)', content)
-        local_ver = local_ver.group(1) if local_ver else "0"
+        local_ver = PANEL_VERSION
         
         req = urllib.request.Request(
             "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py",
@@ -4003,7 +4001,7 @@ def api_check_update():
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
             remote = resp.read(10000).decode("utf-8", errors="replace")
-        remote_ver = re.search(r'FizMine Panel v([\d.]+)', remote)
+        remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([\d.]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
         if remote_ver > local_ver:
