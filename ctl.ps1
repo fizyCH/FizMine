@@ -15,29 +15,29 @@ $PanelPort = if ($env:PANEL_PORT) { $env:PANEL_PORT } else { "8080" }
 function Show-Menu {
     Clear-Host
     Write-Host ""
-    Write-Host "  ╔═══════════════════════════════════════╗" -ForegroundColor DarkCyan
+    Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor DarkCyan
     Write-Host "  ║  _____ _     __  __ _                ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ |  ___(_)___|  \/  (_)_ __   ___     ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ | |_  | |_  / |\/| | | '_ \ / _ \    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ |  _| | |/ /| |  | | | | | |  __/    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ |_|   |_/___|_|  |_|_|_| |_|\___|    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║         Control Panel v2.0            ║" -ForegroundColor DarkCyan
-    Write-Host "  ╠═══════════════════════════════════════╣" -ForegroundColor DarkCyan
-    Write-Host "  ║                                       ║" -ForegroundColor DarkCyan
-    Write-Host "  ║  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "  ║ |  ___(_)___|  \/  (_)_ __   ___    ║" -ForegroundColor DarkCyan
+    Write-Host "  ║ | |_  | |_  / |\/| | | '_ \ / _ \   ║" -ForegroundColor DarkCyan
+    Write-Host "  ║ |  _| | |/ /| |  | | | | | |  __/   ║" -ForegroundColor DarkCyan
+    Write-Host "  ║ |_|   |_/___|_|  |_|_|_| |_|\___|   ║" -ForegroundColor DarkCyan
+    Write-Host "  ║         Control Panel v2.0           ║" -ForegroundColor DarkCyan
+    Write-Host "  ╠══════════════════════════════════════╣" -ForegroundColor DarkCyan
+    Write-Host "  ║                                      ║" -ForegroundColor DarkCyan
+    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
     Write-Host "1)" -ForegroundColor Green -NoNewline
     Write-Host " Change port                     ║" -ForegroundColor DarkCyan
-    Write-Host "  ║  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
     Write-Host "2)" -ForegroundColor Red -NoNewline
     Write-Host " Delete panel                    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
     Write-Host "3)" -ForegroundColor Yellow -NoNewline
     Write-Host " Java version                    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
     Write-Host "4)" -ForegroundColor Gray -NoNewline
     Write-Host " Exit                            ║" -ForegroundColor DarkCyan
-    Write-Host "  ║                                       ║" -ForegroundColor DarkCyan
-    Write-Host "  ╚═══════════════════════════════════════╝" -ForegroundColor DarkCyan
+    Write-Host "  ║                                      ║" -ForegroundColor DarkCyan
+    Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor DarkCyan
     Write-Host ""
 }
 
@@ -94,9 +94,9 @@ function Change-Port {
 
 function Delete-Panel {
     Write-Host ""
-    Write-Host "  ╔══════════════════════════════════╗" -ForegroundColor Red
-    Write-Host "  ║  ⚠  WARNING: Delete all files?  ║" -ForegroundColor Red
-    Write-Host "  ╚══════════════════════════════════╝" -ForegroundColor Red
+    Write-Host "  ╔═══════════════════════════════════╗" -ForegroundColor Red
+    Write-Host "  ║   ⚠  WARNING: Delete all files?  ║" -ForegroundColor Red
+    Write-Host "  ╚═══════════════════════════════════╝" -ForegroundColor Red
     Write-Host "  " -NoNewline; Write-Host "Path: $ScriptDir" -ForegroundColor DarkGray
     Write-Host ""
     $confirm = Read-Host "  Type 'DELETE' to confirm"
@@ -122,7 +122,6 @@ function Check-Java {
     }
 }
 
-# Quick commands
 if ($args.Count -gt 0) {
     switch ($args[0]) {
         "start"   { Start-Panel }
@@ -147,7 +146,6 @@ if ($args.Count -gt 0) {
     exit
 }
 
-# Interactive menu
 while ($true) {
     Show-Menu
     $choice = Read-Host "  Select [1-4]"

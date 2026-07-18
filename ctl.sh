@@ -22,21 +22,21 @@ NC='\033[0m'
 show_menu() {
   clear
   echo ""
-  echo -e "  ${CYAN}╔═══════════════════════════════════════╗${NC}"
-  echo -e "  ${CYAN}║${NC}  ${BOLD}_____ _     __  __ _            ${NC}     ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${BOLD}|  ___(_)___|  \\/  (_)_ __   ___${NC}     ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${BOLD}| |_  | |_  / |\\/| | | '_ \\ / _ \\${NC}   ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${BOLD}|  _| | |/ /| |  | | | | | |  __/${NC}   ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${BOLD}|_|   |_/___|_|  |_|_|_| |_|\\___| ${NC}   ${CYAN}║${NC}"
+  echo -e "  ${CYAN}╔══════════════════════════════════════╗${NC}"
+  echo -e "  ${CYAN}║${NC}  _____ _     __  __ _                ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC} |  ___(_)___|  \\/  (_)_ __   ___    ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC} | |_  | |_  / |\\/| | | '_ \\ / _ \\   ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC} |  _| | |/ /| |  | | | | | |  __/   ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC} |_|   |_/___|_|  |_|_|_| |_|\\___|   ${CYAN}║${NC}"
   echo -e "  ${CYAN}║${NC}         ${DIM}Control Panel v2.0${NC}           ${CYAN}║${NC}"
-  echo -e "  ${CYAN}╠═══════════════════════════════════════╣${NC}"
-  echo -e "  ${CYAN}║${NC}                                     ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${GREEN}1)${NC} Change port                     ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${RED}2)${NC} Delete panel                    ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${YELLOW}3)${NC} Java version                    ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}  ${DIM}4)${NC} Exit                            ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}                                     ${CYAN}║${NC}"
-  echo -e "  ${CYAN}╚═══════════════════════════════════════╝${NC}"
+  echo -e "  ${CYAN}╠══════════════════════════════════════╣${NC}"
+  echo -e "  ${CYAN}║${NC}                                      ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC}   ${GREEN}1)${NC} Change port                     ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC}   ${RED}2)${NC} Delete panel                    ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC}   ${YELLOW}3)${NC} Java version                    ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC}   ${DIM}4)${NC} Exit                            ${CYAN}║${NC}"
+  echo -e "  ${CYAN}║${NC}                                      ${CYAN}║${NC}"
+  echo -e "  ${CYAN}╚══════════════════════════════════════╝${NC}"
   echo ""
 }
 
@@ -59,9 +59,9 @@ change_port() {
 
 delete_panel() {
   echo ""
-  echo -e "  ${RED}╔══════════════════════════════════╗${NC}"
-  echo -e "  ${RED}║${NC}  ⚠  WARNING: Delete all files?  ${RED}║${NC}"
-  echo -e "  ${RED}╚══════════════════════════════════╝${NC}"
+  echo -e "  ${RED}╔═══════════════════════════════════╗${NC}"
+  echo -e "  ${RED}║${NC}   ⚠  WARNING: Delete all files?  ${RED}║${NC}"
+  echo -e "  ${RED}╚═══════════════════════════════════╝${NC}"
   echo -e "  ${DIM}Path: $SCRIPT_DIR${NC}"
   echo ""
   read -rp "  Type 'DELETE' to confirm: " CONFIRM
@@ -89,7 +89,7 @@ check_java() {
 
 start_panel() {
   if pgrep -f "panel.py" > /dev/null; then
-    echo -e "  ${YELLOW}Panel is already running${NC}"
+    echo -e "  ${YELLOW}⚠ Panel is already running${NC}"
     return
   fi
   cd "$SCRIPT_DIR"
@@ -107,7 +107,7 @@ stop_panel() {
     pkill -f "panel.py"
     echo -e "  ${GREEN}✓ Panel stopped${NC}"
   else
-    echo -e "  ${YELLOW}Panel is not running${NC}"
+    echo -e "  ${YELLOW}⚠ Panel is not running${NC}"
   fi
 }
 
