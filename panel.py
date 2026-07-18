@@ -3804,18 +3804,25 @@ def api_download_core():
             
             install_args = [java_bin, "-jar", str(installer_path), "--installServer", str(MC_DIR)]
             
-            r = subprocess.run(
-                install_args,
-                cwd=str(MC_DIR), capture_output=True, text=True, timeout=600
-            )
+            log_file = MC_DIR / "installer.log"
+            with open(log_file, "w") as lf:
+                r = subprocess.run(
+                    install_args,
+                    cwd=str(MC_DIR), stdout=lf, stderr=subprocess.STDOUT, timeout=600
+                )
             
-            stdout_text = r.stdout if r.stdout else ""
-            stderr_text = r.stderr if r.stderr else ""
+            stdout_text = ""
+            stderr_text = ""
+            try:
+                stdout_text = log_file.read_text(errors="replace")[-500:]
+            except:
+                pass
             
             installer_path.unlink(missing_ok=True)
+            log_file.unlink(missing_ok=True)
             
             if r.returncode != 0:
-                return jsonify({"error": f"Installer failed (code {r.returncode}): {(stderr_text+stdout_text)[:500]}"}), 500
+                return jsonify({"error": f"Installer failed (code {r.returncode}): {stdout_text[:500]}"}), 500
             
             for script in ["run.sh", "run.bat", "user_jvm_args.txt", "start.sh", "start.bat"]:
                 sp = MC_DIR / script
