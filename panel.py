@@ -2998,6 +2998,18 @@ document.addEventListener('click',e=>{
  if(!e.target.closest('.custom-select'))document.querySelectorAll('.custom-select').forEach(s=>s.classList.remove('open'));
 });
 
+let envData={};
+
+async function loadEnvInfo(){
+ try{
+  envData=await api('env-info');
+  if(envData.java_path)document.getElementById('set-java').value=envData.java_path+' (v'+envData.java_version+')';
+  if(envData.platform)document.getElementById('set-screen').value=envData.platform;
+  const rconStatus=envData.rcon_enabled?'Enabled (port '+envData.rcon_port+')':'Disabled';
+  if(document.getElementById('set-rcon'))document.getElementById('set-rcon').value=rconStatus;
+ }catch(e){}
+}
+
 async function loadSettingsPage(){
  const data=await api('settings');
  if(data.lang){
@@ -3022,16 +3034,8 @@ async function loadSettingsPage(){
     document.getElementById('fireflies-canvas').classList.remove('active');
     if(fireflyAnim){cancelAnimationFrame(fireflyAnim);fireflyAnim=null;}
    }
- const env=await api('env-info').catch(()=>({}));
- if(env.mc_dir)document.getElementById('set-mcdir').value=env.mc_dir;
- if(env.port)document.getElementById('set-port').value=env.port;
- if(env.platform)document.getElementById('set-screen').value=env.platform;
- if(env.java_path)document.getElementById('set-java').value=env.java_path+' (v'+env.java_version+')';
- const rconStatus=env.rcon_enabled?`Enabled (port ${env.rcon_port})`:'Disabled';
- document.getElementById('set-rcon').value=rconStatus;
- document.getElementById('set-javaargs').value=env.java_args||'';
- document.getElementById('set-encoding').value=env.encoding||'auto';
- document.getElementById('token-status').textContent=env.token_set?t('auth_status_set'):t('auth_status_unset');
+ await loadEnvInfo();
+ document.getElementById('token-status').textContent=envData.token_set?t('auth_status_set'):t('auth_status_unset');
  const authEnabled=data.auth_enabled||false;
  document.getElementById('auth-toggle').checked=authEnabled;
   if(authEnabled){const b=document.getElementById('auth-body');b.style.maxHeight=b.scrollHeight+'px';b.style.opacity='1';}
@@ -3297,6 +3301,7 @@ window.addEventListener('resize',()=>{
 
 refreshDashboard();
 loadLang();
+loadEnvInfo();
 setInterval(()=>{if(currentTab==='dashboard')refreshDashboard();},2000);
 setInterval(()=>{if(currentTab==='players')loadOnlinePlayers();},3000);
 </script>
