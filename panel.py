@@ -3807,7 +3807,7 @@ def api_download_core():
             )
             installer_path.unlink(missing_ok=True)
             if r.returncode != 0:
-                return jsonify({"error": f"Purpur installer failed: {r.stderr[:300]}"}), 500
+                return jsonify({"error": f"Installer failed: {r.stderr[:300]}"}), 500
             for script in ["run.sh", "run.bat", "user_jvm_args.txt"]:
                 sp = MC_DIR / script
                 if sp.exists():
@@ -3828,12 +3828,16 @@ def api_download_core():
                 forge_jars = list(MC_DIR.glob("**/neoforge-*-server.jar"))
             if not forge_jars:
                 forge_jars = list(MC_DIR.glob("**/neoforge-*.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("libraries/**/neoforge-*.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/libraries/**/neoforge-*.jar"))
             if forge_jars:
                 target = forge_jars[0]
                 if target != MC_DIR / "server.jar":
                     target.rename(MC_DIR / "server.jar")
             else:
-                return jsonify({"error": "Purpur installer did not produce a server jar"}), 500
+                return jsonify({"error": "Installer did not produce a server jar"}), 500
         else:
             fpath = MC_DIR / "server.jar"
             fpath.write_bytes(data)
