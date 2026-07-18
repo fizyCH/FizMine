@@ -30,13 +30,6 @@ if [ -f "$HOME/minecraft/panel.py" ]; then
     fi
   fi
 fi
-echo "  _____ _     __  __ _            "
-echo " |  ___(_)___|  \/  (_)_ __   ___ "
-echo " | |_  | |_  / |\/| | | '_ \ / _ \\"
-echo " |  _| | |/ /| |  | | | | | |  __/"
-echo " |_|   |_/___|_|  |_|_|_| |_|\___| "
-echo "          Panel Installer"
-echo ""
 
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
 INSTALL_DIR="${INSTALL_DIR:-$HOME/minecraft}"
