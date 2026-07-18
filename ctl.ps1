@@ -24,10 +24,14 @@ function Show-Menu {
     Write-Host "  |         Control Panel v2.0           |"
     Write-Host "  +---------------------------------------+"
     Write-Host "  |                                       |"
-    Write-Host "  |   1) Change port                      |"
-    Write-Host "  |   2) Delete panel                     |"
-    Write-Host "  |   3) Java version                     |"
-    Write-Host "  |   4) Exit                             |"
+    Write-Host "  |   1) Start panel                      |"
+    Write-Host "  |   2) Stop panel                       |"
+    Write-Host "  |   3) Restart panel                    |"
+    Write-Host "  |   4) Panel status                     |"
+    Write-Host "  |   5) Change port                      |"
+    Write-Host "  |   6) Java version                     |"
+    Write-Host "  |   7) Delete panel                     |"
+    Write-Host "  |   8) Exit                             |"
     Write-Host "  |                                       |"
     Write-Host "  +---------------------------------------+"
     Write-Host ""
@@ -58,6 +62,15 @@ function Restart-Panel {
     Stop-Panel
     Start-Sleep 1
     Start-Panel
+}
+
+function Status-Panel {
+    $proc = Get-Process -Name python* -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*panel.py*" }
+    if ($proc) {
+        Write-Host "  Running (PID: $($proc.Id))"
+    } else {
+        Write-Host "  Stopped"
+    }
 }
 
 function Change-Port {
@@ -117,11 +130,7 @@ if ($args.Count -gt 0) {
         "start"   { Start-Panel }
         "stop"    { Stop-Panel }
         "restart" { Restart-Panel }
-        "status"  {
-            $proc = Get-Process -Name python* -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*panel.py*" }
-            if ($proc) { Write-Host "  Running (PID: $($proc.Id))" }
-            else { Write-Host "  Stopped" }
-        }
+        "status"  { Status-Panel }
         "log"     {
             $logPath = Join-Path $ScriptDir "..\logs\latest.log"
             if (Test-Path $logPath) { Get-Content $logPath -Tail 50 }
@@ -134,12 +143,16 @@ if ($args.Count -gt 0) {
 
 while ($true) {
     Show-Menu
-    $choice = Read-Host "  Select [1-4]"
+    $choice = Read-Host "  Select [1-8]"
     switch ($choice) {
-        "1" { Change-Port }
-        "2" { Delete-Panel }
-        "3" { Check-Java }
-        "4" { Write-Host "  Bye!"; exit }
+        "1" { Start-Panel }
+        "2" { Stop-Panel }
+        "3" { Restart-Panel }
+        "4" { Status-Panel }
+        "5" { Change-Port }
+        "6" { Check-Java }
+        "7" { Delete-Panel }
+        "8" { Write-Host "  Bye!"; exit }
         default { Write-Host "  Invalid choice" }
     }
     Write-Host ""

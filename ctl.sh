@@ -23,10 +23,14 @@ show_menu() {
   echo "  |         Control Panel v2.0           |"
   echo "  +---------------------------------------+"
   echo "  |                                       |"
-  echo "  |   1) Change port                      |"
-  echo "  |   2) Delete panel                     |"
-  echo "  |   3) Java version                     |"
-  echo "  |   4) Exit                             |"
+  echo "  |   1) Start panel                      |"
+  echo "  |   2) Stop panel                       |"
+  echo "  |   3) Restart panel                    |"
+  echo "  |   4) Panel status                     |"
+  echo "  |   5) Change port                      |"
+  echo "  |   6) Java version                     |"
+  echo "  |   7) Delete panel                     |"
+  echo "  |   8) Exit                             |"
   echo "  |                                       |"
   echo "  +---------------------------------------+"
   echo ""
@@ -109,18 +113,20 @@ restart_panel() {
   start_panel
 }
 
+status_panel() {
+  if pgrep -f "panel.py" > /dev/null; then
+    echo "  Running (PID: $(pgrep -f panel.py))"
+  else
+    echo "  Stopped"
+  fi
+}
+
 if [ -n "$1" ]; then
   case "$1" in
     start) start_panel ;;
     stop) stop_panel ;;
     restart) restart_panel ;;
-    status)
-      if pgrep -f "panel.py" > /dev/null; then
-        echo "  Running (PID: $(pgrep -f panel.py))"
-      else
-        echo "  Stopped"
-      fi
-      ;;
+    status) status_panel ;;
     log) tail -50 /tmp/mcpanel.log ;;
     *) echo "Usage: $0 {start|stop|restart|status|log}" ;;
   esac
@@ -129,12 +135,16 @@ fi
 
 while true; do
   show_menu
-  read -rp "  Select [1-4]: " CHOICE
+  read -rp "  Select [1-8]: " CHOICE
   case "$CHOICE" in
-    1) change_port ;;
-    2) delete_panel ;;
-    3) check_java ;;
-    4) echo "  Bye!"; exit 0 ;;
+    1) start_panel ;;
+    2) stop_panel ;;
+    3) restart_panel ;;
+    4) status_panel ;;
+    5) change_port ;;
+    6) check_java ;;
+    7) delete_panel ;;
+    8) echo "  Bye!"; exit 0 ;;
     *) echo "  Invalid choice" ;;
   esac
   echo ""
