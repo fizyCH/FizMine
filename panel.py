@@ -1077,7 +1077,7 @@ TRANSLATIONS = {
         "upload_replace": "Upload & Replace", "upload_create": "Upload & Create Server",
         "setup_welcome": "Setup Minecraft Server",
         "setup_desc": "Upload a server .jar file to get started. EULA will be accepted automatically.",
-        "drop_jar_here": "Drop server.jar here", "supported": "Spigot, Paper, Purpur, Mohist, etc.",
+        "drop_jar_here": "Drop server.jar here", "supported": "Spigot, Paper, Purpur, Purpur, etc.",
         "quick_actions": "Quick Actions", "start": "Start", "restart": "Restart", "stop": "Stop",
         "server_properties": "server.properties", "save_properties": "Save Properties",
         "server_files": "Server Files", "plugins_tab": "Plugins", "mods_tab": "Mods",
@@ -1134,7 +1134,7 @@ TRANSLATIONS = {
         "upload_replace": "Загрузить и заменить", "upload_create": "Загрузить и создать сервер",
         "setup_welcome": "Настройка Minecraft сервера",
         "setup_desc": "Загрузите .jar файл сервера для начала. EULA примется автоматически.",
-        "drop_jar_here": "Перетащите server.jar сюда", "supported": "Spigot, Paper, Purpur, Mohist и др.",
+        "drop_jar_here": "Перетащите server.jar сюда", "supported": "Spigot, Paper, Purpur, Purpur и др.",
         "quick_actions": "Быстрые действия", "start": "Старт", "restart": "Перезапуск", "stop": "Стоп",
         "server_properties": "server.properties", "save_properties": "Сохранить",
         "server_files": "Файлы сервера", "plugins_tab": "Плагины", "mods_tab": "Моды",
@@ -1192,7 +1192,7 @@ TRANSLATIONS = {
         "upload_replace": "Hochladen & Ersetzen", "upload_create": "Hochladen & Server erstellen",
         "setup_welcome": "Minecraft Server einrichten",
         "setup_desc": "Laden Sie eine .jar Datei hoch. EULA wird automatisch akzeptiert.",
-        "drop_jar_here": "server.jar hier ablegen", "supported": "Spigot, Paper, Purpur, Mohist usw.",
+        "drop_jar_here": "server.jar hier ablegen", "supported": "Spigot, Paper, Purpur, Purpur usw.",
         "quick_actions": "Schnellaktionen", "start": "Start", "restart": "Neustart", "stop": "Stopp",
         "server_properties": "server.properties", "save_properties": "Speichern",
         "server_files": "Serverdateien", "plugins_tab": "Plugins", "mods_tab": "Mods",
@@ -1249,7 +1249,7 @@ TRANSLATIONS = {
         "upload_replace": "Télécharger et remplacer", "upload_create": "Télécharger et créer le serveur",
         "setup_welcome": "Configurer le serveur Minecraft",
         "setup_desc": "Téléchargez un fichier .jar pour commencer. L'EULA sera acceptée automatiquement.",
-        "drop_jar_here": "Déposez server.jar ici", "supported": "Spigot, Paper, Purpur, Mohist, etc.",
+        "drop_jar_here": "Déposez server.jar ici", "supported": "Spigot, Paper, Purpur, Purpur, etc.",
         "quick_actions": "Actions rapides", "start": "Démarrer", "restart": "Redémarrer", "stop": "Arrêter",
         "server_properties": "server.properties", "save_properties": "Enregistrer",
         "server_files": "Fichiers serveur", "plugins_tab": "Plugins", "mods_tab": "Mods",
@@ -1307,7 +1307,7 @@ TRANSLATIONS = {
         "upload_replace": "上传并替换", "upload_create": "上传并创建服务器",
         "setup_welcome": "设置Minecraft服务器",
         "setup_desc": "上传.jar文件开始。EULA将自动接受。",
-        "drop_jar_here": "拖放server.jar到此处", "supported": "Spigot, Paper, Purpur, Mohist等",
+        "drop_jar_here": "拖放server.jar到此处", "supported": "Spigot, Paper, Purpur, Purpur等",
         "quick_actions": "快捷操作", "start": "启动", "restart": "重启", "stop": "停止",
         "server_properties": "server.properties", "save_properties": "保存",
         "server_files": "服务器文件", "plugins_tab": "插件", "mods_tab": "Mod",
@@ -2306,9 +2306,8 @@ async function loadSetup(){
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
@@ -2339,9 +2338,8 @@ async function loadSetup(){
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
@@ -2424,23 +2422,23 @@ const CORE_VERSIONS={
    ]
  },
   mohist:{
-   name:'Mohist',
+   name:'Purpur',
    versions:[
     {v:'1.20.1',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/b562929a2a69aed40a99293d84d7c210bc811705/download'},
     {v:'1.16.5',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.16.5/builds/latest/download'},
     {v:'1.12.2',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.12.2/builds/latest/download'},
    ]
   },
-  paper:{
-   name:'Paper',
+  purpur:{
+   name:'Purpur',
    versions:[
-    {v:'1.21.1',java:21,url:'https://api.papermc.io/v2/projects/paper/versions/1.21.1/builds/132/downloads/paper-1.21.1-132.jar'},
-    {v:'1.20.4',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/218/downloads/paper-1.20.4-218.jar'},
-    {v:'1.20.2',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.20.2/builds/200/downloads/paper-1.20.2-200.jar'},
-    {v:'1.20.1',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/196/downloads/paper-1.20.1-196.jar'},
-    {v:'1.19.4',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.19.4/builds/170/downloads/paper-1.19.4-170.jar'},
-    {v:'1.18.2',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.18.2/builds/176/downloads/paper-1.18.2-176.jar'},
-    {v:'1.16.5',java:8,url:'https://api.papermc.io/v2/projects/paper/versions/1.16.5/builds/794/downloads/paper-1.16.5-794.jar'},
+    {v:'1.21.1',java:21,url:'https://api.purpurmc.org/v2/purpur/1.21.1/builds/2329/downloads/purpur-1.21.1-2329.jar'},
+    {v:'1.20.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.4/builds/2204/downloads/purpur-1.20.4-2204.jar'},
+    {v:'1.20.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.2/builds/2082/downloads/purpur-1.20.2-2082.jar'},
+    {v:'1.20.1',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.1/builds/2069/downloads/purpur-1.20.1-2069.jar'},
+    {v:'1.19.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.19.4/builds/1993/downloads/purpur-1.19.4-1993.jar'},
+    {v:'1.18.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.18.2/builds/1687/downloads/purpur-1.18.2-1687.jar'},
+    {v:'1.16.5',java:8,url:'https://api.purpurmc.org/v2/purpur/1.16.5/builds/1001/downloads/purpur-1.16.5-1001.jar'},
    ]
   }
 };
@@ -3791,13 +3789,9 @@ def api_download_core():
         with urllib.request.urlopen(req, timeout=120) as resp:
             data = resp.read()
 
-        is_installer = "forge" in url.lower() and "installer" in url.lower()
-
-        old_jar = list(MC_DIR.glob("*.jar"))
-        for j in old_jar:
-            j.unlink()
-
-        if is_installer:
+        is_forge_installer = ("forge" in url.lower() or "neoforge" in url.lower()) and "installer" in url.lower()
+        
+        if is_forge_installer:
             installer_path = MC_DIR / "forge-installer.jar"
             installer_path.write_bytes(data)
             java_bin = find_java()
@@ -3807,7 +3801,7 @@ def api_download_core():
             )
             installer_path.unlink(missing_ok=True)
             if r.returncode != 0:
-                return jsonify({"error": f"Mohist installer failed: {r.stderr[:300]}"}), 500
+                return jsonify({"error": f"Purpur installer failed: {r.stderr[:300]}"}), 500
             for script in ["run.sh", "run.bat", "user_jvm_args.txt"]:
                 sp = MC_DIR / script
                 if sp.exists():
@@ -3822,12 +3816,18 @@ def api_download_core():
                 forge_jars = list(MC_DIR.glob("**/forge-*-universal.jar"))
             if not forge_jars:
                 forge_jars = list(MC_DIR.glob("**/forge-*.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("neoforge-*-server.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/neoforge-*-server.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/neoforge-*.jar"))
             if forge_jars:
                 target = forge_jars[0]
                 if target != MC_DIR / "server.jar":
                     target.rename(MC_DIR / "server.jar")
             else:
-                return jsonify({"error": "Mohist installer did not produce a server jar"}), 500
+                return jsonify({"error": "Purpur installer did not produce a server jar"}), 500
         else:
             fpath = MC_DIR / "server.jar"
             fpath.write_bytes(data)
