@@ -3803,8 +3803,6 @@ def api_download_core():
             java_bin = find_java()
             
             install_args = [java_bin, "-jar", str(installer_path), "--installServer", str(MC_DIR)]
-            if "neoforge" in url.lower():
-                install_args = [java_bin, "-jar", str(installer_path), str(MC_DIR)]
             
             r = subprocess.run(
                 install_args,
