@@ -2,6 +2,12 @@
 
 Minecraft server management panel.
 
+## Screenshots
+
+![Dashboard](assets/screen1.png)
+![Players](assets/screen2.png)
+![Settings](assets/screen3.png)
+
 ## Quick Install
 
 ### Linux
