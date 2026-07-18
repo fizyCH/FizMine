@@ -2314,7 +2314,6 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Arclight</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
@@ -2347,7 +2346,6 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Arclight</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
@@ -2413,20 +2411,6 @@ const CORE_VERSIONS={
    {v:'1.18.2',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.18.2/0.14.8/1.0.1/server/jar'},
    {v:'1.17.1',java:16,url:'https://meta.fabricmc.net/v2/versions/loader/1.17.1/0.14.8/1.0.1/server/jar'},
    {v:'1.16.5',java:8,url:'https://meta.fabricmc.net/v2/versions/loader/1.16.5/0.14.8/1.0.1/server/jar'},
-  ]
- },
- neoforge:{
-  name:'NeoForge',
-  versions:[
-   {v:'1.21.5-21.1.2',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.2/neoforge-21.1.2-installer.jar'},
-   {v:'1.21.4-21.1.1',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.1/neoforge-21.1.1-installer.jar'},
-   {v:'1.21.3-21.1.0',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.0/neoforge-21.1.0-installer.jar'},
-   {v:'1.21.1-21.0.167',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.0.167/neoforge-21.0.167-installer.jar'},
-   {v:'1.20.6-20.6.119',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.6.119/neoforge-20.6.119-installer.jar'},
-   {v:'1.20.4-20.4.235',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.4.235/neoforge-20.4.235-installer.jar'},
-   {v:'1.20.2-20.2.155',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.2.155/neoforge-20.2.155-installer.jar'},
-   {v:'1.20.1-20.1.76',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.1.76/neoforge-20.1.76-installer.jar'},
-    {v:'1.19.4-19.4.84',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/19.4.84/neoforge-19.4.84-installer.jar'},
    ]
   },
   purpur:{
