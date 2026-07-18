@@ -11,44 +11,36 @@ fi
 MC_DIR="${MC_DIR:-$SCRIPT_DIR}"
 PANEL_PORT="${PANEL_PORT:-8080}"
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-DIM='\033[2m'
-BOLD='\033[1m'
-NC='\033[0m'
-
 show_menu() {
   clear
   echo ""
-  echo -e "  ${CYAN}╔══════════════════════════════════════╗${NC}"
-  echo -e "  ${CYAN}║${NC}  _____ _     __  __ _                ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC} |  ___(_)___|  \\/  (_)_ __   ___    ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC} | |_  | |_  / |\\/| | | '_ \\ / _ \\   ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC} |  _| | |/ /| |  | | | | | |  __/   ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC} |_|   |_/___|_|  |_|_|_| |_|\\___|   ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}         ${DIM}Control Panel v2.0${NC}           ${CYAN}║${NC}"
-  echo -e "  ${CYAN}╠══════════════════════════════════════╣${NC}"
-  echo -e "  ${CYAN}║${NC}                                      ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}   ${GREEN}1)${NC} Change port                     ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}   ${RED}2)${NC} Delete panel                    ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}   ${YELLOW}3)${NC} Java version                    ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}   ${DIM}4)${NC} Exit                            ${CYAN}║${NC}"
-  echo -e "  ${CYAN}║${NC}                                      ${CYAN}║${NC}"
-  echo -e "  ${CYAN}╚══════════════════════════════════════╝${NC}"
+  echo "  +---------------------------------------+"
+  echo "  |  _____ _     __  __ _                |"
+  echo "  | |  ___(_)___|  \/  (_)_ __   ___    |"
+  echo "  | | |_  | |_  / |\/| | | '_ \ / _ \   |"
+  echo "  | |  _| | |/ /| |  | | | | | |  __/   |"
+  echo "  | |_|   |_/___|_|  |_|_|_| |_|\___|   |"
+  echo "  |         Control Panel v2.0           |"
+  echo "  +---------------------------------------+"
+  echo "  |                                       |"
+  echo "  |   1) Change port                      |"
+  echo "  |   2) Delete panel                     |"
+  echo "  |   3) Java version                     |"
+  echo "  |   4) Exit                             |"
+  echo "  |                                       |"
+  echo "  +---------------------------------------+"
   echo ""
 }
 
 change_port() {
   echo ""
-  echo -e "  ${CYAN}Port Settings${NC}"
-  echo -e "  ${DIM}─────────────${NC}"
-  echo -e "  Current: ${BOLD}$PANEL_PORT${NC}"
+  echo "  Port Settings"
+  echo "  -------------"
+  echo "  Current: $PANEL_PORT"
   read -rp "  New port: " NEW_PORT
   if [ -n "$NEW_PORT" ]; then
     sed -i "s/^PANEL_PORT=.*/PANEL_PORT=$NEW_PORT/" "$ENV_FILE" 2>/dev/null || echo "PANEL_PORT=$NEW_PORT" >> "$ENV_FILE"
-    echo -e "  ${GREEN}✓ Port changed to $NEW_PORT${NC}"
+    echo "  Done! Port changed to $NEW_PORT"
     read -rp "  Restart panel? (y/n) [y]: " RESTART
     RESTART="${RESTART:-y}"
     if [ "$RESTART" = "y" ] || [ "$RESTART" = "Y" ]; then
@@ -59,55 +51,55 @@ change_port() {
 
 delete_panel() {
   echo ""
-  echo -e "  ${RED}╔═══════════════════════════════════╗${NC}"
-  echo -e "  ${RED}║${NC}   ⚠  WARNING: Delete all files?  ${RED}║${NC}"
-  echo -e "  ${RED}╚═══════════════════════════════════╝${NC}"
-  echo -e "  ${DIM}Path: $SCRIPT_DIR${NC}"
+  echo "  +-----------------------------------+"
+  echo "  |   WARNING: Delete all files?      |"
+  echo "  +-----------------------------------+"
+  echo "  Path: $SCRIPT_DIR"
   echo ""
   read -rp "  Type 'DELETE' to confirm: " CONFIRM
   if [ "$CONFIRM" = "DELETE" ]; then
     pkill -f "panel.py" 2>/dev/null
     rm -rf "$SCRIPT_DIR"
-    echo -e "  ${RED}Panel deleted.${NC}"
+    echo "  Panel deleted."
     exit 0
   else
-    echo -e "  ${GREEN}Cancelled.${NC}"
+    echo "  Cancelled."
   fi
 }
 
 check_java() {
   echo ""
-  echo -e "  ${CYAN}Java${NC}"
-  echo -e "  ${DIM}────${NC}"
+  echo "  Java"
+  echo "  ----"
   if command -v java &>/dev/null; then
     java -version 2>&1 | head -1 | sed 's/^/  /'
-    echo -e "  ${GREEN}✓ Java found${NC}"
+    echo "  Java found"
   else
-    echo -e "  ${RED}✗ Java not found!${NC}"
+    echo "  Java not found!"
   fi
 }
 
 start_panel() {
   if pgrep -f "panel.py" > /dev/null; then
-    echo -e "  ${YELLOW}⚠ Panel is already running${NC}"
+    echo "  Panel is already running"
     return
   fi
   cd "$SCRIPT_DIR"
   nohup python3 panel.py > /tmp/mcpanel.log 2>&1 &
   sleep 1
   if pgrep -f "panel.py" > /dev/null; then
-    echo -e "  ${GREEN}✓ Panel started${NC} → http://0.0.0.0:$PANEL_PORT"
+    echo "  Panel started -> http://0.0.0.0:$PANEL_PORT"
   else
-    echo -e "  ${RED}✗ Failed to start${NC}"
+    echo "  Failed to start"
   fi
 }
 
 stop_panel() {
   if pgrep -f "panel.py" > /dev/null; then
     pkill -f "panel.py"
-    echo -e "  ${GREEN}✓ Panel stopped${NC}"
+    echo "  Panel stopped"
   else
-    echo -e "  ${YELLOW}⚠ Panel is not running${NC}"
+    echo "  Panel is not running"
   fi
 }
 
@@ -124,9 +116,9 @@ if [ -n "$1" ]; then
     restart) restart_panel ;;
     status)
       if pgrep -f "panel.py" > /dev/null; then
-        echo -e "  ${GREEN}● Running${NC} (PID: $(pgrep -f panel.py))"
+        echo "  Running (PID: $(pgrep -f panel.py))"
       else
-        echo -e "  ${RED}● Stopped${NC}"
+        echo "  Stopped"
       fi
       ;;
     log) tail -50 /tmp/mcpanel.log ;;
@@ -142,8 +134,8 @@ while true; do
     1) change_port ;;
     2) delete_panel ;;
     3) check_java ;;
-    4) echo -e "\n  ${DIM}Bye!${NC}"; exit 0 ;;
-    *) echo -e "  ${RED}Invalid choice${NC}" ;;
+    4) echo "  Bye!"; exit 0 ;;
+    *) echo "  Invalid choice" ;;
   esac
   echo ""
   read -rp "  Press Enter..."

@@ -15,51 +15,42 @@ $PanelPort = if ($env:PANEL_PORT) { $env:PANEL_PORT } else { "8080" }
 function Show-Menu {
     Clear-Host
     Write-Host ""
-    Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor DarkCyan
-    Write-Host "  ║  _____ _     __  __ _                ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ |  ___(_)___|  \/  (_)_ __   ___    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ | |_  | |_  / |\/| | | '_ \ / _ \   ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ |  _| | |/ /| |  | | | | | |  __/   ║" -ForegroundColor DarkCyan
-    Write-Host "  ║ |_|   |_/___|_|  |_|_|_| |_|\___|   ║" -ForegroundColor DarkCyan
-    Write-Host "  ║         Control Panel v2.0           ║" -ForegroundColor DarkCyan
-    Write-Host "  ╠══════════════════════════════════════╣" -ForegroundColor DarkCyan
-    Write-Host "  ║                                      ║" -ForegroundColor DarkCyan
-    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "1)" -ForegroundColor Green -NoNewline
-    Write-Host " Change port                     ║" -ForegroundColor DarkCyan
-    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "2)" -ForegroundColor Red -NoNewline
-    Write-Host " Delete panel                    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "3)" -ForegroundColor Yellow -NoNewline
-    Write-Host " Java version                    ║" -ForegroundColor DarkCyan
-    Write-Host "  ║   " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "4)" -ForegroundColor Gray -NoNewline
-    Write-Host " Exit                            ║" -ForegroundColor DarkCyan
-    Write-Host "  ║                                      ║" -ForegroundColor DarkCyan
-    Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor DarkCyan
+    Write-Host "  +---------------------------------------+"
+    Write-Host "  |  _____ _     __  __ _                |"
+    Write-Host "  | |  ___(_)___|  \/  (_)_ __   ___    |"
+    Write-Host "  | | |_  | |_  / |\/| | | '_ \ / _ \   |"
+    Write-Host "  | |  _| | |/ /| |  | | | | | |  __/   |"
+    Write-Host "  | |_|   |_/___|_|  |_|_|_| |_|\___|   |"
+    Write-Host "  |         Control Panel v2.0           |"
+    Write-Host "  +---------------------------------------+"
+    Write-Host "  |                                       |"
+    Write-Host "  |   1) Change port                      |"
+    Write-Host "  |   2) Delete panel                     |"
+    Write-Host "  |   3) Java version                     |"
+    Write-Host "  |   4) Exit                             |"
+    Write-Host "  |                                       |"
+    Write-Host "  +---------------------------------------+"
     Write-Host ""
 }
 
 function Start-Panel {
     $proc = Get-Process -Name python* -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*panel.py*" }
     if ($proc) {
-        Write-Host "  " -NoNewline; Write-Host "⚠ Panel is already running" -ForegroundColor Yellow
+        Write-Host "  Panel is already running"
         return
     }
     Start-Process python -ArgumentList "panel.py" -WorkingDirectory $ScriptDir -WindowStyle Minimized
     Start-Sleep 1
-    Write-Host "  " -NoNewline; Write-Host "✓ Panel started" -ForegroundColor Green -NoNewline
-    Write-Host " → http://0.0.0.0:$PanelPort"
+    Write-Host "  Panel started -> http://0.0.0.0:$PanelPort"
 }
 
 function Stop-Panel {
     $proc = Get-Process -Name python* -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*panel.py*" }
     if ($proc) {
         Stop-Process -Name python* -Force -ErrorAction SilentlyContinue
-        Write-Host "  " -NoNewline; Write-Host "✓ Panel stopped" -ForegroundColor Green
+        Write-Host "  Panel stopped"
     } else {
-        Write-Host "  " -NoNewline; Write-Host "⚠ Panel is not running" -ForegroundColor Yellow
+        Write-Host "  Panel is not running"
     }
 }
 
@@ -71,10 +62,9 @@ function Restart-Panel {
 
 function Change-Port {
     Write-Host ""
-    Write-Host "  " -NoNewline; Write-Host "Port Settings" -ForegroundColor Cyan
-    Write-Host "  " -NoNewline; Write-Host "─────────────" -ForegroundColor DarkGray
-    Write-Host "  Current: " -NoNewline; Write-Host "$PanelPort" -ForegroundColor White -NoNewline
-    Write-Host ""
+    Write-Host "  Port Settings"
+    Write-Host "  -------------"
+    Write-Host "  Current: $PanelPort"
     $newPort = Read-Host "  New port"
     if ($newPort) {
         $content = if (Test-Path $EnvFile) { Get-Content $EnvFile -Raw } else { "" }
@@ -84,7 +74,7 @@ function Change-Port {
             $content += "`nPANEL_PORT=$newPort"
         }
         Set-Content -Path $EnvFile -Value $content
-        Write-Host "  " -NoNewline; Write-Host "✓ Port changed to $newPort" -ForegroundColor Green
+        Write-Host "  Done! Port changed to $newPort"
         $restart = Read-Host "  Restart panel? (y/n) [y]"
         if (-not $restart -or $restart -eq "y" -or $restart -eq "Y") {
             Restart-Panel
@@ -94,31 +84,31 @@ function Change-Port {
 
 function Delete-Panel {
     Write-Host ""
-    Write-Host "  ╔═══════════════════════════════════╗" -ForegroundColor Red
-    Write-Host "  ║   ⚠  WARNING: Delete all files?  ║" -ForegroundColor Red
-    Write-Host "  ╚═══════════════════════════════════╝" -ForegroundColor Red
-    Write-Host "  " -NoNewline; Write-Host "Path: $ScriptDir" -ForegroundColor DarkGray
+    Write-Host "  +-----------------------------------+"
+    Write-Host "  |   WARNING: Delete all files?      |"
+    Write-Host "  +-----------------------------------+"
+    Write-Host "  Path: $ScriptDir"
     Write-Host ""
     $confirm = Read-Host "  Type 'DELETE' to confirm"
     if ($confirm -eq "DELETE") {
         Stop-Panel
         Remove-Item -Path $ScriptDir -Recurse -Force
-        Write-Host "  " -NoNewline; Write-Host "Panel deleted." -ForegroundColor Red
+        Write-Host "  Panel deleted."
         exit
     } else {
-        Write-Host "  " -NoNewline; Write-Host "Cancelled." -ForegroundColor Green
+        Write-Host "  Cancelled."
     }
 }
 
 function Check-Java {
     Write-Host ""
-    Write-Host "  " -NoNewline; Write-Host "Java" -ForegroundColor Cyan
-    Write-Host "  " -NoNewline; Write-Host "────" -ForegroundColor DarkGray
+    Write-Host "  Java"
+    Write-Host "  ----"
     try {
         java -version 2>&1 | Select-Object -First 1 | ForEach-Object { Write-Host "  $_" }
-        Write-Host "  " -NoNewline; Write-Host "✓ Java found" -ForegroundColor Green
+        Write-Host "  Java found"
     } catch {
-        Write-Host "  " -NoNewline; Write-Host "✗ Java not found!" -ForegroundColor Red
+        Write-Host "  Java not found!"
     }
 }
 
@@ -129,12 +119,8 @@ if ($args.Count -gt 0) {
         "restart" { Restart-Panel }
         "status"  {
             $proc = Get-Process -Name python* -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*panel.py*" }
-            if ($proc) {
-                Write-Host "  " -NoNewline; Write-Host "● Running" -ForegroundColor Green -NoNewline
-                Write-Host " (PID: $($proc.Id))"
-            } else {
-                Write-Host "  " -NoNewline; Write-Host "● Stopped" -ForegroundColor Red
-            }
+            if ($proc) { Write-Host "  Running (PID: $($proc.Id))" }
+            else { Write-Host "  Stopped" }
         }
         "log"     {
             $logPath = Join-Path $ScriptDir "..\logs\latest.log"
@@ -153,8 +139,8 @@ while ($true) {
         "1" { Change-Port }
         "2" { Delete-Panel }
         "3" { Check-Java }
-        "4" { Write-Host "`n  $($PSStyle.Foreground.BrightBlack)Bye!$($PSStyle.Reset)"; exit }
-        default { Write-Host "  " -NoNewline; Write-Host "Invalid choice" -ForegroundColor Red }
+        "4" { Write-Host "  Bye!"; exit }
+        default { Write-Host "  Invalid choice" }
     }
     Write-Host ""
     Read-Host "  Press Enter"
