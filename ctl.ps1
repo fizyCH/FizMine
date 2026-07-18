@@ -112,7 +112,12 @@ if ($args.Count -gt 0) {
             if ($proc) { Write-Host "Panel is running (PID: $($proc.Id))" }
             else { Write-Host "Panel is not running" }
         }
-        default   { Write-Host "Usage: .\ctl.ps1 {start|stop|restart|status}" }
+        "log"     {
+            $logPath = Join-Path $ScriptDir "..\logs\latest.log"
+            if (Test-Path $logPath) { Get-Content $logPath -Tail 50 }
+            else { Write-Host "No log file found" }
+        }
+        default   { Write-Host "Usage: .\ctl.ps1 {start|stop|restart|status|log}" }
     }
     exit
 }
