@@ -4072,6 +4072,24 @@ class _WerkzeugFilter:
 
 def main():
     MC_DIR.mkdir(parents=True, exist_ok=True)
+    
+    java_bin = find_java()
+    java_ver = 0
+    try:
+        r = subprocess.run([java_bin, "-version"], capture_output=True, text=True, timeout=5)
+        m = re.search(r'"(\d+)', (r.stderr + r.stdout))
+        if m:
+            java_ver = int(m.group(1))
+    except Exception:
+        pass
+    
+    if java_ver == 0:
+        print("WARNING: Java not found! Server cores may not work.")
+    elif java_ver < 17:
+        print(f"WARNING: Java {java_ver} found, but 17+ recommended for modern versions.")
+    else:
+        print(f"Java {java_ver} detected")
+    
     print(f"FizMine Panel starting on http://0.0.0.0:{PANEL_PORT}")
     print(f"Minecraft directory: {MC_DIR}")
     import logging
