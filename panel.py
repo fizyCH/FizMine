@@ -1984,11 +1984,24 @@ function applyTranslations(){
  const dl=document.getElementById('chart-disk-label');if(dl)dl.textContent=t('disk_usage');
  const cl=document.getElementById('chart-cpu-label');if(cl)cl.textContent=t('cpu_load');
  const ct=document.getElementById('chart-title');if(ct)ct.textContent=t('status');
+ if(lastUpdateResult)renderUpdateResult(lastUpdateResult);
  if(currentTab==='dashboard')refreshDashboard();
  else if(currentTab==='players')loadPlayers();
  else if(currentTab==='plugins')loadPlugins();
  else if(currentTab==='setup')loadSetup();
  else if(currentTab==='settings')loadSettingsPage();
+}
+
+let lastUpdateResult=null;
+function renderUpdateResult(data){
+ const result=document.getElementById('update-result');
+ if(!result||!data)return;
+ result.style.display='block';
+ if(data.update){
+  result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px"><p style="margin:0 0 8px;font-size:13px">'+t('update_available')+': <b>v'+data.local+'</b> -> <b>v'+data.remote+'</b></p><button class="btn btn-accent btn-sm" onclick="doUpdate()">'+t('install_update')+'</button></div>';
+ }else{
+  result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--green);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--green)">'+t('up_to_date')+' (v'+data.local+')</p></div>';
+ }
 }
 
 function showTab(tab){
@@ -3160,13 +3173,10 @@ async function saveAuthState(enabled){
   btn.innerHTML='<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" class="spin"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> '+t('check_update')+'...';
   try{
    const data=await api('check-update');
-   result.style.display='block';
-   if(data.update){
-    result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px"><p style="margin:0 0 8px;font-size:13px">'+t('update_available')+': <b>v'+data.local+'</b> -> <b>v'+data.remote+'</b></p><button class="btn btn-accent btn-sm" onclick="doUpdate()">'+t('install_update')+'</button></div>';
-   }else{
-    result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--green);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--green)">'+t('up_to_date')+' (v'+data.local+')</p></div>';
-   }
+   lastUpdateResult=data;
+   renderUpdateResult(data);
   }catch(e){
+   lastUpdateResult={error:true};
    result.style.display='block';
    result.innerHTML='<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--red)">'+t('update_error')+'</p></div>';
   }
