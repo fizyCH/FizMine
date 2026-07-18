@@ -2305,10 +2305,11 @@ async function loadSetup(){
     <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2337,10 +2338,11 @@ async function loadSetup(){
     <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px">
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
-      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoForge</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2424,11 +2426,21 @@ const CORE_VERSIONS={
   mohist:{
    name:'Mohist',
    versions:[
-    {v:'1.20.1 (build 66)',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/b562929a2a69aed40a99293d84d7c210bc811705/download'},
-    {v:'1.20.1 (build 65)',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/84c037f94beae281a4baa2813c6a716db86a4bdf/download'},
-    {v:'1.20.1 (build 64)',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/10090b816a1014823bc2c0f2864df56e1c7085a0/download'},
+    {v:'1.20.1',java:17,url:'https://mohistmc.com/api/v2/projects/mohist/1.20.1/builds/b562929a2a69aed40a99293d84d7c210bc811705/download'},
     {v:'1.16.5',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.16.5/builds/latest/download'},
     {v:'1.12.2',java:8,url:'https://mohistmc.com/api/v2/projects/mohist/1.12.2/builds/latest/download'},
+   ]
+  },
+  paper:{
+   name:'Paper',
+   versions:[
+    {v:'1.21.1',java:21,url:'https://api.papermc.io/v2/projects/paper/versions/1.21.1/builds/132/downloads/paper-1.21.1-132.jar'},
+    {v:'1.20.4',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/218/downloads/paper-1.20.4-218.jar'},
+    {v:'1.20.2',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.20.2/builds/200/downloads/paper-1.20.2-200.jar'},
+    {v:'1.20.1',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/196/downloads/paper-1.20.1-196.jar'},
+    {v:'1.19.4',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.19.4/builds/170/downloads/paper-1.19.4-170.jar'},
+    {v:'1.18.2',java:17,url:'https://api.papermc.io/v2/projects/paper/versions/1.18.2/builds/176/downloads/paper-1.18.2-176.jar'},
+    {v:'1.16.5',java:8,url:'https://api.papermc.io/v2/projects/paper/versions/1.16.5/builds/794/downloads/paper-1.16.5-794.jar'},
    ]
   }
 };
