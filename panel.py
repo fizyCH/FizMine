@@ -3798,46 +3798,63 @@ def api_download_core():
         is_forge_installer = ("forge" in url.lower() or "neoforge" in url.lower()) and "installer" in url.lower()
         
         if is_forge_installer:
-            installer_path = MC_DIR / "forge-installer.jar"
+            installer_path = MC_DIR / "installer.jar"
             installer_path.write_bytes(data)
             java_bin = find_java()
+            
+            install_args = [java_bin, "-jar", str(installer_path), "--installServer", str(MC_DIR)]
+            if "neoforge" in url.lower():
+                install_args = [java_bin, "-jar", str(installer_path), str(MC_DIR)]
+            
             r = subprocess.run(
-                [java_bin, "-jar", str(installer_path), "--installServer", str(MC_DIR)],
-                cwd=str(MC_DIR), capture_output=True, text=True, timeout=300
+                install_args,
+                cwd=str(MC_DIR), capture_output=True, text=True, timeout=600
             )
+            
+            stdout_text = r.stdout if r.stdout else ""
+            stderr_text = r.stderr if r.stderr else ""
+            
             installer_path.unlink(missing_ok=True)
+            
             if r.returncode != 0:
-                return jsonify({"error": f"Installer failed: {r.stderr[:300]}"}), 500
-            for script in ["run.sh", "run.bat", "user_jvm_args.txt"]:
+                return jsonify({"error": f"Installer failed (code {r.returncode}): {(stderr_text+stdout_text)[:500]}"}), 500
+            
+            for script in ["run.sh", "run.bat", "user_jvm_args.txt", "start.sh", "start.bat"]:
                 sp = MC_DIR / script
                 if sp.exists():
                     sp.unlink()
+            
             eula_path = MC_DIR / "eula.txt"
             if not eula_path.exists():
                 eula_path.write_text("eula=true\n")
+            
             forge_jars = list(MC_DIR.glob("forge-*-server.jar"))
-            if not forge_jars:
-                forge_jars = list(MC_DIR.glob("**/forge-*-server.jar"))
-            if not forge_jars:
-                forge_jars = list(MC_DIR.glob("**/forge-*-universal.jar"))
-            if not forge_jars:
-                forge_jars = list(MC_DIR.glob("**/forge-*.jar"))
             if not forge_jars:
                 forge_jars = list(MC_DIR.glob("neoforge-*-server.jar"))
             if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/forge-*-server.jar"))
+            if not forge_jars:
                 forge_jars = list(MC_DIR.glob("**/neoforge-*-server.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/forge-*-universal.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/neoforge-*-universal.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/libraries/**/neoforge-*-server.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/libraries/**/forge-*-server.jar"))
             if not forge_jars:
                 forge_jars = list(MC_DIR.glob("**/neoforge-*.jar"))
             if not forge_jars:
-                forge_jars = list(MC_DIR.glob("libraries/**/neoforge-*.jar"))
-            if not forge_jars:
-                forge_jars = list(MC_DIR.glob("**/libraries/**/neoforge-*.jar"))
+                forge_jars = list(MC_DIR.glob("**/forge-*.jar"))
             if forge_jars:
                 target = forge_jars[0]
                 if target != MC_DIR / "server.jar":
                     target.rename(MC_DIR / "server.jar")
             else:
-                return jsonify({"error": "Installer did not produce a server jar"}), 500
+                all_jars = list(MC_DIR.glob("**/*.jar"))
+                jar_names = [j.name for j in all_jars[:10]]
+                return jsonify({"error": f"No server jar found. Found: {jar_names}"}), 500
         else:
             fpath = MC_DIR / "server.jar"
             fpath.write_bytes(data)
