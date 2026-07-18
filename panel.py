@@ -83,6 +83,10 @@ def _set_panel_token(token):
         lines.append(f"PANEL_TOKEN={token}")
     env_path.write_text("\n".join(lines) + "\n")
     _env["PANEL_TOKEN"] = token
+    if token:
+        os.environ["PANEL_TOKEN"] = token
+    elif "PANEL_TOKEN" in os.environ:
+        del os.environ["PANEL_TOKEN"]
 
 
 LOGIN_HTML = r"""<!DOCTYPE html>
@@ -191,7 +195,7 @@ def check_auth():
     token = _get_panel_token()
     if not token:
         return
-    if request.path in ("/login",):
+    if request.path in ("/login", "/logout"):
         return
     if request.path.startswith("/static/"):
         return
@@ -206,7 +210,7 @@ _login_attempts = {}
 _lockout_until = {}
 
 WEAK_PASSWORDS = [
-    "123456", "12345678", "1234567890", "qwerty", "qwerty123",
+    "123", "123456", "12345678", "1234567890", "qwerty", "qwerty123",
     "admin", "password", "password1", "111111", "abc123",
     "letmein", "welcome", "monkey", "dragon", "master",
     "login", "princess", "football", "shadow", "sunshine",
@@ -280,7 +284,38 @@ def login():
     return redirect("/login?error=1")
 
 _default_mcdir = "C:\\minecraft" if IS_WINDOWS else "/minecraft"
-MC_DIR = Path(os.environ.get("MC_DIR", _env.get("MC_DIR", _default_mcdir)))
+
+
+def _find_mc_dir():
+    env_mcdir = os.environ.get("MC_DIR") or _env.get("MC_DIR")
+    if env_mcdir and Path(env_mcdir).exists():
+        return Path(env_mcdir)
+    script_dir = Path(__file__).parent
+    if (script_dir / "server.jar").exists():
+        return script_dir
+    candidates = []
+    if IS_WINDOWS:
+        candidates = [
+            Path("C:/minecraft"), Path("D:/minecraft"), Path("E:/minecraft"),
+            Path.home() / "minecraft", Path.home() / "Desktop" / "minecraft",
+            Path(os.environ.get("USERPROFILE", "")) / "minecraft",
+        ]
+    else:
+        candidates = [
+            Path("/minecraft"), Path("/home/minecraft"), Path("/opt/minecraft"),
+            Path.home() / "minecraft", Path("/srv/minecraft"),
+            Path("/var/minecraft"),
+        ]
+    for p in candidates:
+        if (p / "server.jar").exists():
+            return p
+    for p in candidates:
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+    return Path(_default_mcdir)
+
+
+MC_DIR = _find_mc_dir()
 LOG_FILE = MC_DIR / "logs" / "latest.log"
 PANEL_PORT = int(os.environ.get("PANEL_PORT", _env.get("PANEL_PORT", "8080")))
 JAVA_ENCODING = _env.get("JAVA_ENCODING", "")
@@ -1041,7 +1076,7 @@ TRANSLATIONS = {
         "upload_replace": "Upload & Replace", "upload_create": "Upload & Create Server",
         "setup_welcome": "Setup Minecraft Server",
         "setup_desc": "Upload a server .jar file to get started. EULA will be accepted automatically.",
-        "drop_jar_here": "Drop server.jar here", "supported": "Spigot, Paper, Purpur, Forge, etc.",
+        "drop_jar_here": "Drop server.jar here", "supported": "Spigot, Paper, Purpur, Mohist, etc.",
         "quick_actions": "Quick Actions", "start": "Start", "restart": "Restart", "stop": "Stop",
         "server_properties": "server.properties", "save_properties": "Save Properties",
         "server_files": "Server Files", "plugins_tab": "Plugins", "mods_tab": "Mods",
@@ -1060,7 +1095,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Delete", "uploading": "Uploading...", "uploaded": "Uploaded",
         "confirm": "Confirm", "edit_file": "Edit File", "warning_title": "Warning!",
         "confirm_replace_core": "Replace server core",
-        "backup_panel": "Backup Panel", "backup_panel_desc": "Download a zip archive of all panel files", "download_backup": "backup",
+        "backup_panel": "Backup Panel", "backup_panel_desc": "Download a zip archive of all panel files", "download_backup": "backup", "check_updates": "Check for updates", "check_update": "Check Update",
         "backup_server": "server backup",
         "login_password": "Password", "login_btn": "Login", "login_error": "Invalid password", "login_locked": "Too many attempts. Try again later.",
         "auth_settings": "Authorization", "auth_settings_desc": "Set or change access password", "auth_token": "Password",
@@ -1073,7 +1108,10 @@ TRANSLATIONS = {
         "server_crashed": "Server crashed!",
         "sort_by_name": "Name", "sort_by_size": "Size",
         "search_files": "Search files...", "search_recursive": "Include subfolders",
-        "upload_file": "Upload",
+        "upload_file": "Upload", "create_folder": "New Folder",
+        "download_core": "Download a ready server core:",
+        "logout": "Logout",
+        "install_core": "Install",
     },
     "ru": {
         "dashboard": "Главная", "setup": "Настройки ядра", "console": "Консоль",
@@ -1095,7 +1133,7 @@ TRANSLATIONS = {
         "upload_replace": "Загрузить и заменить", "upload_create": "Загрузить и создать сервер",
         "setup_welcome": "Настройка Minecraft сервера",
         "setup_desc": "Загрузите .jar файл сервера для начала. EULA примется автоматически.",
-        "drop_jar_here": "Перетащите server.jar сюда", "supported": "Spigot, Paper, Purpur, Forge и др.",
+        "drop_jar_here": "Перетащите server.jar сюда", "supported": "Spigot, Paper, Purpur, Mohist и др.",
         "quick_actions": "Быстрые действия", "start": "Старт", "restart": "Перезапуск", "stop": "Стоп",
         "server_properties": "server.properties", "save_properties": "Сохранить",
         "server_files": "Файлы сервера", "plugins_tab": "Плагины", "mods_tab": "Моды",
@@ -1114,7 +1152,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Удалить", "uploading": "Загрузка...", "uploaded": "Загружено",
         "confirm": "Подтвердить", "edit_file": "Редактировать файл", "warning_title": "Внимание!",
         "confirm_replace_core": "Заменить ядро сервера",
-        "backup_panel": "Резервная копия", "backup_panel_desc": "Скачать архив со всеми файлами панели", "download_backup": "backup",
+        "backup_panel": "Резервная копия", "backup_panel_desc": "Скачать архив со всеми файлами панели", "download_backup": "backup", "check_updates": "Проверить обновления", "check_update": "Проверить",
         "backup_server": "бэкап сервера",
         "login_password": "Пароль", "login_btn": "Войти", "login_error": "Неверный пароль", "login_locked": "Слишком много попыток. Попробуйте позже.",
         "auth_settings": "Авторизация", "auth_settings_desc": "Установить или сменить пароль доступа", "auth_token": "Пароль",
@@ -1128,7 +1166,10 @@ TRANSLATIONS = {
         "server_crashed": "Сервер упал!",
         "sort_by_name": "Имя", "sort_by_size": "Размер",
         "search_files": "Поиск файлов...", "search_recursive": "Включая подпапки",
-        "upload_file": "Загрузить",
+        "upload_file": "Загрузить", "create_folder": "Новая папка",
+        "download_core": "Скачать готовое ядро сервера:",
+        "logout": "Выйти",
+        "install_core": "Установить",
     },
     "de": {
         "dashboard": "Dashboard", "setup": "Kerneinstellungen", "console": "Konsole",
@@ -1150,7 +1191,7 @@ TRANSLATIONS = {
         "upload_replace": "Hochladen & Ersetzen", "upload_create": "Hochladen & Server erstellen",
         "setup_welcome": "Minecraft Server einrichten",
         "setup_desc": "Laden Sie eine .jar Datei hoch. EULA wird automatisch akzeptiert.",
-        "drop_jar_here": "server.jar hier ablegen", "supported": "Spigot, Paper, Purpur, Forge usw.",
+        "drop_jar_here": "server.jar hier ablegen", "supported": "Spigot, Paper, Purpur, Mohist usw.",
         "quick_actions": "Schnellaktionen", "start": "Start", "restart": "Neustart", "stop": "Stopp",
         "server_properties": "server.properties", "save_properties": "Speichern",
         "server_files": "Serverdateien", "plugins_tab": "Plugins", "mods_tab": "Mods",
@@ -1169,7 +1210,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Löschen", "uploading": "Hochladen...", "uploaded": "Hochgeladen",
         "confirm": "Bestätigen", "edit_file": "Datei bearbeiten", "warning_title": "Achtung!",
         "confirm_replace_core": "Server-Kern ersetzen",
-        "backup_panel": "Backup", "backup_panel_desc": "Alle Panel-Dateien als ZIP herunterladen", "download_backup": "backup",
+        "backup_panel": "Backup", "backup_panel_desc": "Alle Panel-Dateien als ZIP herunterladen", "download_backup": "backup", "check_updates": "Nach Updates suchen", "check_update": "Prüfen",
         "backup_server": "Server-Backup",
         "login_password": "Passwort", "login_btn": "Anmelden", "login_error": "Falsches Passwort", "login_locked": "Zu viele Versuche. Bitte später versuchen.",
         "auth_settings": "Autorisierung", "auth_settings_desc": "Zugangspasswort setzen oder ändern", "auth_token": "Zugangstoken",
@@ -1182,7 +1223,10 @@ TRANSLATIONS = {
         "server_crashed": "Server abgestürzt!",
         "sort_by_name": "Name", "sort_by_size": "Größe",
         "search_files": "Dateien suchen...", "search_recursive": "Unterverzeichnisse einbeziehen",
-        "upload_file": "Hochladen",
+        "upload_file": "Hochladen", "create_folder": "Neuer Ordner",
+        "download_core": "Fertigen Server-Kern herunterladen:",
+        "logout": "Abmelden",
+        "install_core": "Installieren",
     },
     "fr": {
         "dashboard": "Tableau de bord", "setup": "Paramètres du noyau", "console": "Console",
@@ -1204,7 +1248,7 @@ TRANSLATIONS = {
         "upload_replace": "Télécharger et remplacer", "upload_create": "Télécharger et créer le serveur",
         "setup_welcome": "Configurer le serveur Minecraft",
         "setup_desc": "Téléchargez un fichier .jar pour commencer. L'EULA sera acceptée automatiquement.",
-        "drop_jar_here": "Déposez server.jar ici", "supported": "Spigot, Paper, Purpur, Forge, etc.",
+        "drop_jar_here": "Déposez server.jar ici", "supported": "Spigot, Paper, Purpur, Mohist, etc.",
         "quick_actions": "Actions rapides", "start": "Démarrer", "restart": "Redémarrer", "stop": "Arrêter",
         "server_properties": "server.properties", "save_properties": "Enregistrer",
         "server_files": "Fichiers serveur", "plugins_tab": "Plugins", "mods_tab": "Mods",
@@ -1224,7 +1268,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "Supprimer", "uploading": "Téléchargement...", "uploaded": "Téléchargé",
         "confirm": "Confirmer", "edit_file": "Modifier le fichier", "warning_title": "Attention !",
         "confirm_replace_core": "Remplacer le noyau du serveur",
-        "backup_panel": "Sauvegarde", "backup_panel_desc": "Télécharger une archive ZIP de tous les fichiers du panneau", "download_backup": "backup",
+        "backup_panel": "Sauvegarde", "backup_panel_desc": "Télécharger une archive ZIP de tous les fichiers du panneau", "download_backup": "backup", "check_updates": "Vérifier les mises à jour", "check_update": "Vérifier",
         "backup_server": "sauvegarde serveur",
         "login_password": "Mot de passe", "login_btn": "Connexion", "login_error": "Mot de passe incorrect", "login_locked": "Trop de tentatives. Réessayez plus tard.",
         "auth_settings": "Autorisation", "auth_settings_desc": "Définir ou changer le mot de passe", "auth_token": "Jeton d'accès",
@@ -1237,7 +1281,10 @@ TRANSLATIONS = {
         "server_crashed": "Serveur en panne !",
         "sort_by_name": "Nom", "sort_by_size": "Taille",
         "search_files": "Rechercher des fichiers...", "search_recursive": "Inclure les sous-dossiers",
-        "upload_file": "Téléverser",
+        "upload_file": "Téléverser", "create_folder": "Nouveau dossier",
+        "download_core": "Télécharger un noyau de serveur prêt :",
+        "logout": "Déconnexion",
+        "install_core": "Installer",
     },
     "zh": {
         "dashboard": "仪表盘", "setup": "核心设置", "console": "控制台",
@@ -1259,7 +1306,7 @@ TRANSLATIONS = {
         "upload_replace": "上传并替换", "upload_create": "上传并创建服务器",
         "setup_welcome": "设置Minecraft服务器",
         "setup_desc": "上传.jar文件开始。EULA将自动接受。",
-        "drop_jar_here": "拖放server.jar到此处", "supported": "Spigot, Paper, Purpur, Forge等",
+        "drop_jar_here": "拖放server.jar到此处", "supported": "Spigot, Paper, Purpur, Mohist等",
         "quick_actions": "快捷操作", "start": "启动", "restart": "重启", "stop": "停止",
         "server_properties": "server.properties", "save_properties": "保存",
         "server_files": "服务器文件", "plugins_tab": "插件", "mods_tab": "Mod",
@@ -1279,7 +1326,7 @@ TRANSLATIONS = {
         "confirm_delete_file": "删除", "uploading": "上传中...", "uploaded": "已上传",
         "confirm": "确认", "edit_file": "编辑文件", "warning_title": "注意！",
         "confirm_replace_core": "替换服务器核心",
-        "backup_panel": "备份面板", "backup_panel_desc": "下载包含所有面板文件的ZIP压缩包", "download_backup": "backup",
+        "backup_panel": "备份面板", "backup_panel_desc": "下载包含所有面板文件的ZIP压缩包", "download_backup": "backup", "check_updates": "检查更新", "check_update": "检查",
         "backup_server": "服务器备份",
         "login_password": "密码", "login_btn": "登录", "login_error": "密码错误", "login_locked": "尝试次数过多，请稍后再试。",
         "auth_settings": "授权", "auth_settings_desc": "设置或修改访问密码", "auth_token": "密碼",
@@ -1292,7 +1339,10 @@ TRANSLATIONS = {
         "server_crashed": "服务器崩溃了！",
         "sort_by_name": "名称", "sort_by_size": "大小",
         "search_files": "搜索文件...", "search_recursive": "包含子目录",
-        "upload_file": "上传",
+        "upload_file": "上传", "create_folder": "新建文件夹",
+        "download_core": "下载现成的服务器核心：",
+        "logout": "退出登录",
+        "install_core": "安装",
     }
 }
 
@@ -1521,7 +1571,13 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 
 #fireflies-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.5s}
 #fireflies-canvas.active{opacity:1}
-#fireflies-bg{display:none}
+#core-versions-panel{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.5);z-index:50;margin-top:8px;overflow:hidden}
+#core-versions-panel h4{margin:0;font-size:14px;color:var(--text)}
+#core-versions-panel .cv-item{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);transition:background .15s}
+#core-versions-panel .cv-item:last-child{border-bottom:none}
+#core-versions-panel .cv-item:hover{background:rgba(var(--accent-rgb),.08)}
+#core-versions-panel .cv-item.disabled{opacity:.4;cursor:default}
+#core-versions-panel .cv-item.disabled:hover{background:none}
 @keyframes rotateBg{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .main{position:relative;z-index:1}
 .sidebar{position:fixed;z-index:10}
@@ -1533,6 +1589,8 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .grid-2,.grid-3{grid-template-columns:1fr}
 .status-bar{flex-direction:column}
 }
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
 </style>
 </head>
 <body>
@@ -1585,8 +1643,9 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
    <a href="#" onclick="showTab('files')" id="nav-files"><span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span data-i18n="properties">Properties</span></a>
    <a href="#" onclick="showTab('filebrowser')" id="nav-filebrowser"><span class="icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span><span data-i18n="files">Files</span></a>
    <a href="#" onclick="showTab('plugins')" id="nav-plugins"><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></span><span data-i18n="plugins">Plugins & Mods</span></a>
-   <a href="#" onclick="showTab('settings')" id="nav-settings"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span data-i18n="settings">Settings</span></a>
-  </nav>
+    <a href="#" onclick="showTab('settings')" id="nav-settings"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span data-i18n="settings">Settings</span></a>
+    <a href="/logout" style="margin-top:auto;display:flex;align-items:center;gap:12px;padding:11px 16px;color:var(--red);border-radius:10px;font-size:13.5px;font-weight:500;transition:all .25s;text-decoration:none" onmouseover="this.style.background='rgba(239,68,68,.1)'" onmouseout="this.style.background='transparent'"><span class="icon"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span data-i18n="logout">Logout</span></a>
+   </nav>
 </div>
 
 <div class="main">
@@ -1678,8 +1737,9 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
   <div class="panel">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
      <h3 style="margin:0;flex:1"><svg class="ico" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> <span data-i18n="files">Files</span></h3>
-     <button class="btn btn-accent btn-sm" onclick="document.getElementById('file-upload-input').click()"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> <span data-i18n="upload_file">Upload</span></button>
-     <input type="file" id="file-upload-input" style="display:none" onchange="uploadFileToDir(this.files[0]);this.value=''">
+      <button class="btn btn-accent btn-sm" onclick="document.getElementById('file-upload-input').click()"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> <span data-i18n="upload_file">Upload</span></button>
+      <button class="btn btn-green btn-sm" onclick="createFolder()"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg> <span data-i18n="create_folder">New Folder</span></button>
+      <input type="file" id="file-upload-input" style="display:none" onchange="uploadFileToDir(this.files[0]);this.value=''">
     </div>
    <div id="file-breadcrumb" style="margin-bottom:12px;font-size:13px;color:var(--text2)"></div>
    <div style="position:relative;margin-bottom:12px">
@@ -1718,15 +1778,15 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
   </div>
   </div>
 
-  <div class="modal-overlay" id="chart-overlay" onclick="if(event.target===this)closeChartModal()">
-   <div class="modal" style="width:480px">
-    <h3 id="chart-title" style="margin-bottom:20px"></h3>
-    <div class="chart-modal-grid" id="chart-content"></div>
-    <div style="text-align:right;margin-top:20px">
-     <button class="btn btn-outline" onclick="closeChartModal()"><span data-i18n="cancel">Cancel</span></button>
+   <div class="modal-overlay" id="chart-overlay" onclick="if(event.target===this)closeChartModal()">
+    <div class="modal" style="width:480px">
+     <h3 id="chart-title" style="margin-bottom:20px"></h3>
+     <div class="chart-modal-grid" id="chart-content"></div>
+     <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-outline" onclick="closeChartModal()"><span data-i18n="cancel">Cancel</span></button>
+     </div>
     </div>
    </div>
-  </div>
 
   <div id="tab-plugins" style="display:none">
   <div class="grid-2">
@@ -1814,6 +1874,14 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
      <div class="form-group"><label>Platform</label><input type="text" id="set-screen" disabled style="opacity:.5"></div>
      <div class="form-group"><label>Java</label><input type="text" id="set-java" disabled style="opacity:.5"></div>
      <div class="form-group"><label>RCON</label><input type="text" id="set-rcon" disabled style="opacity:.5"></div>
+     <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+      <p style="color:var(--text2);font-size:12px;margin-bottom:8px" data-i18n="check_updates">Check for updates</p>
+      <button class="btn btn-accent btn-sm" onclick="checkForUpdates()" id="btn-check-update">
+       <svg class="ico ico-sm" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9"/></svg>
+       <span data-i18n="check_update">Check Update</span>
+      </button>
+      <div id="update-result" style="margin-top:10px;display:none"></div>
+     </div>
     </div>
     <div class="panel">
      <h3><svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg> <span data-i18n="backup_panel">Backup Panel</span></h3>
@@ -2217,8 +2285,22 @@ async function loadSetup(){
      <h3 style="margin-bottom:4px">${t('keep_on_replace')}</h3>
      <p style="color:var(--text2);font-size:11px;margin-bottom:10px">${t('toggle_off_delete')}</p>
      ${togglesHtml}
+     <button class="btn btn-accent" onclick="doDownloadCore()" style="margin-top:14px">${t('install_core')}</button>
     </div>
     <button class="btn btn-accent" onclick="uploadCoreConfirm()" id="btn-core-upload" style="display:none;margin-top:14px">${t('upload_replace')}</button>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
+     <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
+     <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoMohist</button>
+      <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
+       <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
+       <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
+      </div>
+     </div>
+    </div>
    </div>
    <div class="panel">
      <h3><svg class="ico" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> ${t('server_files')}</h3>
@@ -2227,19 +2309,32 @@ async function loadSetup(){
   </div>`;
   loadSetupFiles();
  }else{
-  el.innerHTML=`
-  <div class="setup-card">
-    <h3><svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> ${t('setup_welcome')}</h3>
-   <p>${t('setup_desc')}</p>
-   <div class="drop-zone" id="drop-core" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDropCore(event,this)" onclick="this.querySelector('input').click()">
-    <input type="file" accept=".jar" onchange="uploadCore(this.files[0]);this.value=''">
-    <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-    <div class="drop-text">${t('drop_jar_here')}</div>
-    <div class="drop-hint">${t('supported')}</div>
-   </div>
-   <button class="btn btn-accent" onclick="uploadCoreConfirm()" id="btn-core-upload" style="display:none;margin-top:12px">${t('upload_create')}</button>
-  </div>`;
- }
+   el.innerHTML=`
+   <div class="setup-card">
+     <h3><svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> ${t('setup_welcome')}</h3>
+    <p>${t('setup_desc')}</p>
+    <div class="drop-zone" id="drop-core" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDropCore(event,this)" onclick="this.querySelector('input').click()">
+     <input type="file" accept=".jar" onchange="uploadCore(this.files[0]);this.value=''">
+     <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+     <div class="drop-text">${t('drop_jar_here')}</div>
+     <div class="drop-hint">${t('supported')}</div>
+    </div>
+    <button class="btn btn-accent" onclick="uploadCoreConfirm()" id="btn-core-upload" style="display:none;margin-top:12px">${t('upload_create')}</button>
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px">
+     <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
+     <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
+      <button class="btn btn-accent btn-sm" onclick="showCoreVersions('neoforge',this)">NeoMohist</button>
+      <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
+       <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
+       <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
+      </div>
+     </div>
+    </div>
+   </div>`;
+  }
 }
 
 let pendingCoreFile=null;
@@ -2257,6 +2352,144 @@ async function uploadCore(file){
 async function uploadCoreConfirm(){
  if(!pendingCoreFile){toast('Select a file first');return;}
   confirmAction(t('confirm_replace_core')+': '+pendingCoreFile.name+'?','doUploadCore','','','true');
+}
+
+const CORE_VERSIONS={
+ vanilla:{
+  name:'Vanilla',
+  versions:[
+   {v:'1.21.5',java:25,url:'https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar'},
+   {v:'1.21.4',java:21,url:'https://piston-data.mojang.com/v1/objects/4707d00eb834b446575d89a61a11b5d548d8c001/server.jar'},
+   {v:'1.21.3',java:21,url:'https://piston-data.mojang.com/v1/objects/45810d238246d90e811d896f87b14695b7fb6839/server.jar'},
+   {v:'1.21.2',java:21,url:'https://piston-data.mojang.com/v1/objects/7bf95409b0d9b5388bfea3704ec92012d273c14c/server.jar'},
+   {v:'1.21.1',java:21,url:'https://piston-data.mojang.com/v1/objects/59353fb40c36d304f2035d51e7d6e6baa98dc05c/server.jar'},
+   {v:'1.20.6',java:21,url:'https://piston-data.mojang.com/v1/objects/145ff0858209bcfc164859ba735d4199aafa1eea/server.jar'},
+   {v:'1.20.4',java:17,url:'https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b50b7b4fc76e594d/server.jar'},
+   {v:'1.20.2',java:17,url:'https://piston-data.mojang.com/v1/objects/5b868151bd02b41319f54c8d4061b8cae84e665c/server.jar'},
+   {v:'1.20.1',java:17,url:'https://piston-data.mojang.com/v1/objects/84194a2f286ef7c14ed7ce0090dba59902951553/server.jar'},
+   {v:'1.19.4',java:17,url:'https://piston-data.mojang.com/v1/objects/8f3112a1049751cc472ec13e397eade5336ca7ae/server.jar'},
+   {v:'1.19.2',java:17,url:'https://piston-data.mojang.com/v1/objects/f69c284232d7c7580bd89a5a4931c3581eae1378/server.jar'},
+   {v:'1.18.2',java:17,url:'https://piston-data.mojang.com/v1/objects/c8f83c5655308435b3dcf03c06d9fe8740a77469/server.jar'},
+   {v:'1.17.1',java:16,url:'https://piston-data.mojang.com/v1/objects/a16d67e5807f57fc4e550299cf20226194497dc2/server.jar'},
+   {v:'1.16.5',java:8,url:'https://piston-data.mojang.com/v1/objects/1b557e7b033b583cd9f66746b7a9ab1ec1673ced/server.jar'},
+   {v:'1.12.2',java:8,url:'https://piston-data.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar'},
+  ]
+ },
+ fabric:{
+  name:'Fabric',
+  versions:[
+   {v:'1.21.5',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.5/0.16.14/1.0.1/server/jar'},
+   {v:'1.21.4',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.4/0.16.10/1.0.1/server/jar'},
+   {v:'1.21.3',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.3/0.16.9/1.0.1/server/jar'},
+   {v:'1.21.2',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.2/0.16.7/1.0.1/server/jar'},
+   {v:'1.21.1',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.16.5/1.0.1/server/jar'},
+   {v:'1.20.6',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.6/0.16.3/1.0.1/server/jar'},
+   {v:'1.20.4',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.4/0.15.11/1.0.1/server/jar'},
+   {v:'1.20.2',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.2/0.14.25/1.0.1/server/jar'},
+   {v:'1.20.1',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.1/0.14.22/1.0.1/server/jar'},
+   {v:'1.19.4',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.19.4/0.14.21/1.0.1/server/jar'},
+   {v:'1.18.2',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.18.2/0.14.8/1.0.1/server/jar'},
+   {v:'1.17.1',java:16,url:'https://meta.fabricmc.net/v2/versions/loader/1.17.1/0.14.8/1.0.1/server/jar'},
+   {v:'1.16.5',java:8,url:'https://meta.fabricmc.net/v2/versions/loader/1.16.5/0.14.8/1.0.1/server/jar'},
+  ]
+ },
+ neoforge:{
+  name:'NeoMohist',
+  versions:[
+   {v:'1.21.5-21.1.2',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.2/neoforge-21.1.2-installer.jar'},
+   {v:'1.21.4-21.1.1',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.1/neoforge-21.1.1-installer.jar'},
+   {v:'1.21.3-21.1.0',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.0/neoforge-21.1.0-installer.jar'},
+   {v:'1.21.1-21.0.167',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/21.0.167/neoforge-21.0.167-installer.jar'},
+   {v:'1.20.6-20.6.119',java:21,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.6.119/neoforge-20.6.119-installer.jar'},
+   {v:'1.20.4-20.4.235',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.4.235/neoforge-20.4.235-installer.jar'},
+   {v:'1.20.2-20.2.155',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.2.155/neoforge-20.2.155-installer.jar'},
+   {v:'1.20.1-20.1.76',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/20.1.76/neoforge-20.1.76-installer.jar'},
+    {v:'1.19.4-19.4.84',java:17,url:'https://maven.neoforged.net/releases/net/neoforged/neoforge/19.4.84/neoforge-19.4.84-installer.jar'},
+   ]
+ },
+  mohist:{
+   name:'Mohist',
+   versions:[
+    {v:'1.20.4-489',java:17,url:'https://api.mohistmc.com/v2/versions/1.20.4/489/download'},
+    {v:'1.20.2-463',java:17,url:'https://api.mohistmc.com/v2/versions/1.20.2/463/download'},
+    {v:'1.20.1-459',java:17,url:'https://api.mohistmc.com/v2/versions/1.20.1/459/download'},
+    {v:'1.19.4-392',java:17,url:'https://api.mohistmc.com/v2/versions/1.19.4/392/download'},
+    {v:'1.18.2-375',java:17,url:'https://api.mohistmc.com/v2/versions/1.18.2/375/download'},
+    {v:'1.16.5-323',java:8,url:'https://api.mohistmc.com/v2/versions/1.16.5/323/download'},
+   ]
+  }
+};
+
+let javaVersion=0;
+
+function showCoreVersions(core,btn){
+ const panel=document.getElementById('core-versions-panel');
+ if(panel.style.display==='block'){panel.style.display='none';return;}
+ const data=CORE_VERSIONS[core];
+ if(!data)return;
+ javaVersion=parseInt(document.getElementById('set-java')?.value?.match(/v(\d+)/)?.[1]||'0');
+ document.getElementById('core-versions-title').textContent=data.name;
+ document.getElementById('core-versions-java').textContent='Java: v'+javaVersion+' ('+(javaVersion>=21?'supports all versions':javaVersion>=17?'1.17.1 - 1.20.4, some 1.20.5+':javaVersion>=8?'1.12.2 - 1.16.5 only':'Java not detected')+')';
+ let html='';
+ data.versions.forEach(v=>{
+  const ok=javaVersion>=v.java;
+  html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);${ok?'cursor:pointer;':'opacity:0.4;'}" ${ok?`onclick="downloadCore('${v.url}','${data.name} ${v.v}');document.getElementById('core-versions-panel').style.display='none'"`:''}>`;
+  html+=`<span style="font-size:13px;font-weight:500">${data.name} ${v.v}</span>`;
+  html+=`<span style="font-size:11px;color:${ok?'var(--green)':'var(--red)'}">Java ${v.java}+</span>`;
+  html+=`</div>`;
+ });
+ document.getElementById('core-versions-list').innerHTML=html;
+ panel.style.display='block';
+}
+
+function closeCoreVersions(){
+ document.getElementById('core-versions-panel').style.display='none';
+}
+
+document.addEventListener('click',function(e){
+ var panel=document.getElementById('core-versions-panel');
+ if(panel&&panel.style.display==='block'&&!e.target.closest('#core-versions-panel')&&!e.target.closest('[onclick*="showCoreVersions"]')){
+  panel.style.display='none';
+ }
+});
+
+let pendingCoreUrl='';
+let pendingCoreName='';
+
+function showKeepToggles(callback){
+ const panel=document.getElementById('core-replace-opts');
+ panel.style.display='block';
+ panel.dataset.callback=callback;
+}
+
+async function downloadCore(url,name){
+ pendingCoreUrl=url;
+ pendingCoreName=name;
+ const info=await api('status');
+ if(info.has_jar){
+  showKeepToggles('doDownloadCore');
+ }else{
+  doDownloadCore();
+ }
+}
+
+async function doDownloadCore(){
+ const opts=document.getElementById('core-replace-opts');
+ if(opts)opts.style.display='none';
+ if(!confirm(t('download_core')+': '+pendingCoreName+'?'))return;
+ toast(t('uploading')+' '+pendingCoreName+'...');
+ try{
+  const keepMap={'keep-world':['world','world_nether','world_the_end'],'keep-mods':['mods'],'keep-plugins':['plugins'],'keep-ops':['ops.json'],'keep-bans':['banned-players.json'],'keep-bansip':['banned-ips.json'],'keep-wl':['whitelist.json'],'keep-props':['server.properties']};
+  const dels={};
+  for(const[key,paths]of Object.entries(keepMap)){
+   const el=document.getElementById(key);
+   if(el&&!el.disabled&&!el.checked){paths.forEach(p=>{dels[p]=true;});}
+  }
+  const r=await api('download-core',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:pendingCoreUrl,keep_data:dels})});
+  if(r.error){toast(r.error);return;}
+  toast(r.message||t('uploaded'));
+  loadSetup();
+ }catch(e){toast('Error: '+e.message);}
 }
 
 async function doUploadCore(){
@@ -2643,6 +2876,15 @@ function closeFileEditor(){
  currentEditFile='';
 }
 
+async function createFolder(){
+ const name=prompt(t('enter_name'));
+ if(!name)return;
+ const r=await api('file-mkdir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,path:currentDir||''})});
+ if(r.error){toast(r.error);return;}
+ toast(r.message||t('saved'));
+ loadFiles(currentDir);
+}
+
 async function uploadFileToDir(file){
  if(!file)return;
  const fd=new FormData();
@@ -2911,6 +3153,44 @@ async function saveAuthState(enabled){
   toast(t('saved'));
  }
 
+ async function checkForUpdates(){
+  const btn=document.getElementById('btn-check-update');
+  const result=document.getElementById('update-result');
+  btn.disabled=true;
+  btn.innerHTML='<svg class="ico ico-sm" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2" class="spin"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg> Checking...';
+  try{
+   const data=await api('check-update');
+   result.style.display='block';
+   if(data.update){
+    result.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px"><p style="margin:0 0 8px;font-size:13px">Update available: <b>${data.local}</b> → <b>${data.remote}</b></p><button class="btn btn-accent btn-sm" onclick="doUpdate()">Install Update</button></div>`;
+   }else{
+    result.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--green);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--green)">Up to date (v${data.local})</p></div>`;
+   }
+  }catch(e){
+   result.style.display='block';
+   result.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px"><p style="margin:0;font-size:13px;color:var(--red)">Error checking updates</p></div>`;
+  }
+  btn.disabled=false;
+  btn.innerHTML='<svg class="ico ico-sm" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg> Check Update';
+ }
+
+ async function doUpdate(){
+  if(!confirm('Update panel? It will restart.'))return;
+  const result=document.getElementById('update-result');
+  result.innerHTML='<p style="font-size:13px;color:var(--accent)">Updating...</p>';
+  try{
+   const data=await api('do-update',{method:'POST'});
+   if(data.ok){
+    result.innerHTML='<p style="font-size:13px;color:var(--green)">Updated! Restarting...</p>';
+    setTimeout(()=>location.reload(),3000);
+   }else{
+    result.innerHTML=`<p style="font-size:13px;color:var(--red)">Error: ${data.error}</p>`;
+   }
+  }catch(e){
+   result.innerHTML='<p style="font-size:13px;color:var(--red)">Update failed</p>';
+  }
+ }
+
 let savedAccent='%ACCENT%';
 let firefliesOn=%FIREFLIES%;
 let panelOpacity=%OPACITY%;
@@ -2995,7 +3275,13 @@ function setPanelOpacity(val){
  document.documentElement.style.setProperty('--panel-bg',`rgba(21,25,34,${a})`);
 }
 
-window.addEventListener('resize',()=>{if(firefliesOn)initFireflies();});
+window.addEventListener('resize',()=>{
+ const c=document.getElementById('fireflies-canvas');
+ if(!c)return;
+ c.width=window.innerWidth;
+ c.height=window.innerHeight;
+ if(firefliesOn&&!fireflyAnim)animateFireflies();
+});
 
 refreshDashboard();
 loadLang();
@@ -3466,8 +3752,124 @@ def api_file_upload():
     base = MC_DIR / target_dir if target_dir else MC_DIR
     base.mkdir(parents=True, exist_ok=True)
     fpath = base / file_item.filename
-    fpath.write_bytes(file_item.read())
+    fpath.write_bytes(file_item.file.read())
     return jsonify({"message": f"Uploaded {file_item.filename}", "ok": True})
+
+
+@app.route("/api/download-core", methods=["POST"])
+def api_download_core():
+    body = request.get_json(force=True)
+    url = body.get("url", "")
+    keep_str = body.get("keep_data", "{}")
+    if not url:
+        return jsonify({"error": "No URL"}), 400
+    try:
+        import urllib.request
+        req = urllib.request.Request(url, headers={"User-Agent": "FizMinePanel/1.0"})
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = resp.read()
+
+        is_installer = "forge" in url.lower() and "installer" in url.lower()
+
+        old_jar = list(MC_DIR.glob("*.jar"))
+        for j in old_jar:
+            j.unlink()
+
+        if is_installer:
+            installer_path = MC_DIR / "forge-installer.jar"
+            installer_path.write_bytes(data)
+            java_bin = find_java()
+            r = subprocess.run(
+                [java_bin, "-jar", str(installer_path), "--installServer", str(MC_DIR)],
+                cwd=str(MC_DIR), capture_output=True, text=True, timeout=300
+            )
+            installer_path.unlink(missing_ok=True)
+            if r.returncode != 0:
+                return jsonify({"error": f"Mohist installer failed: {r.stderr[:300]}"}), 500
+            for script in ["run.sh", "run.bat", "user_jvm_args.txt"]:
+                sp = MC_DIR / script
+                if sp.exists():
+                    sp.unlink()
+            eula_path = MC_DIR / "eula.txt"
+            if not eula_path.exists():
+                eula_path.write_text("eula=true\n")
+            forge_jars = list(MC_DIR.glob("forge-*-server.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/forge-*-server.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/forge-*-universal.jar"))
+            if not forge_jars:
+                forge_jars = list(MC_DIR.glob("**/forge-*.jar"))
+            if forge_jars:
+                target = forge_jars[0]
+                if target != MC_DIR / "server.jar":
+                    target.rename(MC_DIR / "server.jar")
+            else:
+                return jsonify({"error": "Mohist installer did not produce a server jar"}), 500
+        else:
+            fpath = MC_DIR / "server.jar"
+            fpath.write_bytes(data)
+
+        del_paths = set()
+        try:
+            del_paths = set(json.loads(keep_str).keys())
+        except Exception:
+            pass
+
+        keep_map = {
+            "world": ["world", "world_nether", "world_the_end"],
+            "mods": ["mods"],
+            "plugins": ["plugins"],
+            "ops.json": ["ops.json"],
+            "banned-players.json": ["banned-players.json"],
+            "banned-ips.json": ["banned-ips.json"],
+            "whitelist.json": ["whitelist.json"],
+            "server.properties": ["server.properties"],
+        }
+        keep_paths = set()
+        for path_key, targets in keep_map.items():
+            if path_key not in del_paths:
+                keep_paths.update(targets)
+
+        protected = {"panel", ".git", "__pycache__", "server.jar", "eula.txt", "panel.tar"}
+        deleted = []
+        for item in MC_DIR.iterdir():
+            name = item.name
+            if name in protected or name in keep_paths:
+                continue
+            if item.is_dir():
+                shutil.rmtree(item)
+                deleted.append(name + "/")
+            elif item.is_file():
+                item.unlink()
+                deleted.append(name)
+
+        setup_server()
+        msg = f"Core downloaded: {url.split('/')[-1]}. EULA accepted."
+        if deleted:
+            msg += f" Deleted: {', '.join(deleted)}"
+        return jsonify({"message": msg, "ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+def api_file_mkdir():
+    body = request.get_json(force=True)
+    name = body.get("name", "").strip()
+    subpath = body.get("path", "")
+    if not name:
+        return jsonify({"error": "Folder name required"}), 400
+    if ".." in name or "/" in name or name.startswith("."):
+        return jsonify({"error": "Invalid folder name"}), 400
+    if ".." in subpath or subpath.startswith("/"):
+        return jsonify({"error": "Invalid path"}), 400
+    base = MC_DIR / subpath if subpath else MC_DIR
+    fpath = base / name
+    if fpath.exists():
+        return jsonify({"error": "Already exists"}), 400
+    try:
+        fpath.mkdir(parents=True, exist_ok=True)
+        return jsonify({"message": f"Created {name}", "ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/file-download")
@@ -3555,6 +3957,12 @@ def api_remove_token():
     return jsonify({"message": "Token removed"})
 
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
+
 @app.route("/api/file-delete", methods=["POST"])
 def api_file_delete():
     body = request.get_json(force=True)
@@ -3577,6 +3985,61 @@ def api_file_delete():
         else:
             fpath.unlink()
         return jsonify({"message": f"Deleted {name}", "ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/check-update")
+def api_check_update():
+    import urllib.request
+    try:
+        with open(Path(__file__), "r", errors="replace") as f:
+            content = f.read(10000)
+        local_ver = re.search(r'FizMine Panel v([\d.]+)', content)
+        local_ver = local_ver.group(1) if local_ver else "0"
+        
+        req = urllib.request.Request(
+            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py",
+            headers={"User-Agent": "FizMine-Panel"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            remote = resp.read(10000).decode("utf-8", errors="replace")
+        remote_ver = re.search(r'FizMine Panel v([\d.]+)', remote)
+        remote_ver = remote_ver.group(1) if remote_ver else "0"
+        
+        if remote_ver > local_ver:
+            return jsonify({"update": True, "local": local_ver, "remote": remote_ver})
+        return jsonify({"update": False, "local": local_ver, "remote": remote_ver})
+    except Exception as e:
+        return jsonify({"update": False, "error": str(e)})
+
+
+@app.route("/api/do-update", methods=["POST"])
+def api_do_update():
+    import urllib.request
+    try:
+        with open(Path(__file__), "r", errors="replace") as f:
+            content = f.read(10000)
+        local_ver = re.search(r'FizMine Panel v([\d.]+)', content)
+        local_ver = local_ver.group(1) if local_ver else "0"
+        
+        req = urllib.request.Request(
+            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py",
+            headers={"User-Agent": "FizMine-Panel"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            remote = resp.read().decode("utf-8", errors="replace")
+        
+        panel_path = Path(__file__).resolve()
+        shutil.copy2(str(panel_path), str(panel_path) + ".bak")
+        panel_path.write_text(remote, encoding="utf-8")
+        
+        def restart():
+            time.sleep(1)
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        threading.Thread(target=restart, daemon=True).start()
+        
+        return jsonify({"ok": True, "message": "Updated! Restarting..."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
