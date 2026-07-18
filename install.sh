@@ -3,6 +3,34 @@ set -e
 
 echo ""
 echo "  _____ _     __  __ _            "
+echo " |  ___(_)___|  \\/  (_)_ __   ___ "
+echo " | |_  | |_  / |\\/| | | '_ \\ / _ \\"
+echo " |  _| | |/ /| |  | | | | | |  __/"
+echo " |_|   |_/___|_|  |_|_|_| |_|\___| "
+echo "          Panel Installer"
+echo ""
+
+# Check for updates
+if [ -f "$HOME/minecraft/panel.py" ]; then
+  LOCAL_VER=$(grep -o "FizMine Panel v[0-9.]*" "$HOME/minecraft/panel.py" 2>/dev/null | head -1 | grep -o "[0-9.]*" || echo "0")
+  REMOTE_VER=$(curl -sL "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py" 2>/dev/null | grep -o "FizMine Panel v[0-9.]*" | head -1 | grep -o "[0-9.]*" || echo "0")
+  if [ -n "$LOCAL_VER" ] && [ -n "$REMOTE_VER" ] && [ "$LOCAL_VER" != "$REMOTE_VER" ]; then
+    echo "Update available: $LOCAL_VER -> $REMOTE_VER"
+    read -rp "Update now? (y/n) [y]: " UPDATE_CHOICE
+    UPDATE_CHOICE="${UPDATE_CHOICE:-y}"
+    if [ "$UPDATE_CHOICE" = "y" ] || [ "$UPDATE_CHOICE" = "Y" ]; then
+      echo "Updating..."
+      cd "$HOME/minecraft"
+      sudo wget -q "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar" -O /tmp/panel-update.tar
+      sudo tar xf /tmp/panel-update.tar -C "$HOME/minecraft" --strip-components=0
+      rm -f /tmp/panel-update.tar
+      chmod +x ctl.sh panel.py 2>/dev/null
+      echo "Updated to $REMOTE_VER!"
+      exit 0
+    fi
+  fi
+fi
+echo "  _____ _     __  __ _            "
 echo " |  ___(_)___|  \/  (_)_ __   ___ "
 echo " | |_  | |_  / |\/| | | '_ \ / _ \\"
 echo " |  _| | |/ /| |  | | | | | |  __/"
