@@ -1,16 +1,41 @@
 #!/bin/bash
 set -e
 
-C='\033[0;36m'
-R='\033[0m'
-
 echo ""
-printf "${C}  _____ _     __  __ _            ${R}\n"
-printf "${C} |  ___(_)___|  \\/  (_)_ __   ___ ${R}\n"
-printf "${C} | |_  | |_  / |\\/| | | '_ \\ / _ \\${R}\n"
-printf "${C} |  _| | |/ /| |  | | | | | |  __/${R}\n"
-printf "${C} |_|   |_/___|_|  |_|_|_| |_|\\___| ${R}\n"
-printf "${C}          Panel Installer${R}\n"
+echo "  _____ _     __  __ _            "
+echo " |  ___(_)___|  \\/  (_)_ __   ___ "
+echo " | |_  | |_  / |\\/| | | '_ \\ / _ \\"
+echo " |  _| | |/ /| |  | | | | | |  __/"
+echo " |_|   |_/___|_|  |_|_|_| |_|\___| "
+echo "          Panel Installer"
+echo ""
+
+# Check for updates
+if [ -f "$HOME/minecraft/panel.py" ]; then
+  LOCAL_VER=$(grep -o "FizMine Panel v[0-9.]*" "$HOME/minecraft/panel.py" 2>/dev/null | head -1 | grep -o "[0-9.]*" || echo "0")
+  REMOTE_VER=$(curl -sL "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py" 2>/dev/null | grep -o "FizMine Panel v[0-9.]*" | head -1 | grep -o "[0-9.]*" || echo "0")
+  if [ -n "$LOCAL_VER" ] && [ -n "$REMOTE_VER" ] && [ "$LOCAL_VER" != "$REMOTE_VER" ]; then
+    echo "Update available: $LOCAL_VER -> $REMOTE_VER"
+    read -rp "Update now? (y/n) [y]: " UPDATE_CHOICE
+    UPDATE_CHOICE="${UPDATE_CHOICE:-y}"
+    if [ "$UPDATE_CHOICE" = "y" ] || [ "$UPDATE_CHOICE" = "Y" ]; then
+      echo "Updating..."
+      cd "$HOME/minecraft"
+      sudo wget -q "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar" -O /tmp/panel-update.tar
+      sudo tar xf /tmp/panel-update.tar -C "$HOME/minecraft" --strip-components=0
+      rm -f /tmp/panel-update.tar
+      chmod +x ctl.sh panel.py 2>/dev/null
+      echo "Updated to $REMOTE_VER!"
+      exit 0
+    fi
+  fi
+fi
+echo "  _____ _     __  __ _            "
+echo " |  ___(_)___|  \/  (_)_ __   ___ "
+echo " | |_  | |_  / |\/| | | '_ \ / _ \\"
+echo " |  _| | |/ /| |  | | | | | |  __/"
+echo " |_|   |_/___|_|  |_|_|_| |_|\___| "
+echo "          Panel Installer"
 echo ""
 
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
@@ -28,7 +53,7 @@ echo "Auth: $AUTH_CHOICE"
 echo "Port: $PANEL_PORT"
 echo ""
 
-for cmd in curl tar; do
+for cmd in wget tar; do
   if ! command -v "$cmd" &>/dev/null; then
     echo "Installing $cmd..."
     if command -v apt-get &>/dev/null; then
@@ -69,17 +94,20 @@ fi
 echo "Downloading FizMine Panel..."
 mkdir -p "$INSTALL_DIR"
 cd /tmp
-curl -sL "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar" -o fizmine-panel.tar
+rm -f fizmine-panel.tar
 
-if [ ! -s fizmine-panel.tar ] || ! file fizmine-panel.tar | grep -q gzip; then
-  echo "Download failed. Please download manually from:"
-  echo "https://github.com/fizyCH/FizMine/releases"
-  rm -f fizmine-panel.tar
+DOWNLOAD_URL="https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar"
+wget -q "$DOWNLOAD_URL" -O fizmine-panel.tar
+
+if [ ! -s fizmine-panel.tar ]; then
+  echo "Download failed."
+  echo "Download manually: wget \"$DOWNLOAD_URL\" -O panel.tar"
+  echo "Then: tar xf panel.tar -C $INSTALL_DIR && cd $INSTALL_DIR && ./ctl.sh start"
   exit 1
 fi
 
 echo "Extracting to $INSTALL_DIR..."
-sudo tar xzf fizmine-panel.tar -C "$INSTALL_DIR" --strip-components=0
+sudo tar xf fizmine-panel.tar -C "$INSTALL_DIR" --strip-components=0
 rm -f fizmine-panel.tar
 
 chmod +x "$INSTALL_DIR/ctl.sh" 2>/dev/null || true
@@ -97,9 +125,9 @@ PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
-printf "${C}  Installation complete!${R}\n"
-echo "  ======================"
-echo "  cd $INSTALL_DIR"
-echo "  ./ctl.sh start"
-echo "  Panel: http://localhost:$PANEL_PORT"
+echo "Installation complete!"
+echo "======================"
+echo "cd $INSTALL_DIR"
+echo "./ctl.sh start"
+echo "Panel: http://localhost:$PANEL_PORT"
 echo ""
