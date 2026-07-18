@@ -3798,6 +3798,17 @@ def api_download_core():
         is_forge_installer = ("forge" in url.lower() or "neoforge" in url.lower()) and "installer" in url.lower()
         
         if is_forge_installer:
+            for item in MC_DIR.iterdir():
+                if item.name in ("libraries", "versions", "neoforge", "forge"):
+                    if item.is_dir():
+                        shutil.rmtree(item)
+                    else:
+                        item.unlink()
+            for f in MC_DIR.glob("run.*"):
+                f.unlink(missing_ok=True)
+            for f in MC_DIR.glob("user_jvm_args.txt"):
+                f.unlink(missing_ok=True)
+            
             installer_path = MC_DIR / "installer.jar"
             installer_path.write_bytes(data)
             java_bin = find_java()
