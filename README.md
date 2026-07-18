@@ -4,9 +4,11 @@ Minecraft server management panel.
 
 ## Screenshots
 
-![Dashboard](assets/screen1.png)
-![Players](assets/screen2.png)
-![Settings](assets/screen3.png)
+<img src="assets/screen1.png" width="800">
+
+<img src="assets/screen2.png" width="800">
+
+<img src="assets/screen3.png" width="800">
 
 ## Quick Install
 
