@@ -51,8 +51,12 @@ for cmd in wget tar; do
     echo "Installing $cmd..."
     if command -v apt-get &>/dev/null; then
       sudo apt-get update -qq && sudo apt-get install -y -qq "$cmd"
+    elif command -v dnf &>/dev/null; then
+      sudo dnf install -y "$cmd"
     elif command -v yum &>/dev/null; then
       sudo yum install -y "$cmd"
+    elif command -v pacman &>/dev/null; then
+      sudo pacman -S --noconfirm "$cmd"
     elif command -v apk &>/dev/null; then
       sudo apk add "$cmd"
     else
@@ -66,8 +70,12 @@ if ! command -v python3 &>/dev/null; then
   echo "Installing Python3..."
   if command -v apt-get &>/dev/null; then
     sudo apt-get update -qq && sudo apt-get install -y -qq python3 python3-pip
+  elif command -v dnf &>/dev/null; then
+    sudo dnf install -y python3 python3-pip
   elif command -v yum &>/dev/null; then
     sudo yum install -y python3 python3-pip
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm python python-pip
   elif command -v apk &>/dev/null; then
     sudo apk add python3 py3-pip
   fi
@@ -77,8 +85,12 @@ if ! command -v java &>/dev/null; then
   echo "Installing Java 17..."
   if command -v apt-get &>/dev/null; then
     sudo apt-get update -qq && sudo apt-get install -y -qq openjdk-17-jre-headless 2>/dev/null || sudo apt-get install -y -qq default-jre-headless
+  elif command -v dnf &>/dev/null; then
+    sudo dnf install -y java-17-openjdk-headless 2>/dev/null || sudo dnf install -y java-latest-openjdk-headless
   elif command -v yum &>/dev/null; then
     sudo yum install -y java-17-openjdk-headless 2>/dev/null || sudo yum install -y java-latest-openjdk-headless
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm jdk17-openjdk
   elif command -v apk &>/dev/null; then
     sudo apk add openjdk17-jre-headless
   fi
