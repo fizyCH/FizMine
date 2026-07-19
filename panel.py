@@ -2443,8 +2443,6 @@ function showCoreVersions(core,btn){
  if(!data)return;
  javaVersion=parseInt(document.getElementById('set-java')?.value?.match(/v(\d+)/)?.[1]||'0');
  document.getElementById('core-versions-java').textContent='Java: v'+javaVersion+(javaVersion>=21?' (all versions)':' (1.17+ needed for modern cores)');
- document.getElementById('core-versions-title').textContent=data.name;
- document.getElementById('core-versions-java').textContent='Java: v'+javaVersion+' ('+(javaVersion>=21?'supports all versions':javaVersion>=17?'1.17.1 - 1.20.4, some 1.20.5+':javaVersion>=8?'1.12.2 - 1.16.5 only':'Java not detected')+')';
  let html='';
  data.versions.forEach(v=>{
   const ok=javaVersion>=v.java;
