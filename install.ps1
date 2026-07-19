@@ -30,17 +30,47 @@ Write-Host ""
 
 # Check Python
 if (-not (Get-Command python -ErrorAction SilentlyContinue) -and -not (Get-Command python3 -ErrorAction SilentlyContinue)) {
-    Write-Host "Python not found. Install from https://www.python.org/downloads/" -ForegroundColor Yellow
-    $answer = Read-Host "Open Python download page? (y/n)"
-    if ($answer -eq "y") { Start-Process "https://www.python.org/downloads/" }
-    exit 1
+    Write-Host "Python not found. Installing..." -ForegroundColor Yellow
+    $hasWinget = Get-Command winget -ErrorAction SilentlyContinue
+    if ($hasWinget) {
+        winget install Python.Python.3.12 --silent --accept-package-agreements --accept-source-agreements
+    } else {
+        Write-Host "Please install Python from https://www.python.org/downloads/" -ForegroundColor Yellow
+        Start-Process "https://www.python.org/downloads/"
+        exit 1
+    }
 }
 
-# Check Java
+# Check Java - install if missing
 if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
-    Write-Host "Java 17+ not found. Install from https://adoptium.net/" -ForegroundColor Yellow
-    $answer = Read-Host "Open Java download page? (y/n)"
-    if ($answer -eq "y") { Start-Process "https://adoptium.net/temurin/releases/?version=17" }
+    Write-Host "Java not found. Installing Java 17..." -ForegroundColor Yellow
+    $hasWinget = Get-Command winget -ErrorAction SilentlyContinue
+    if ($hasWinget) {
+        winget install EclipseAdoptium.Temurin.17.JDK --silent --accept-package-agreements --accept-source-agreements
+        # Refresh PATH
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+    } else {
+        Write-Host "Downloading Java 17 manually..." -ForegroundColor Yellow
+        $javaUrl = "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.12_7.msi"
+        $javaInstaller = "$env:TEMP\java17.msi"
+        try {
+            Invoke-WebRequest -Uri $javaUrl -OutFile $javaInstaller -UseBasicParsing
+            Start-Process msiexec.exe -ArgumentList "/i `"$javaInstaller`" /quiet /norestart ADDLOCAL=FeatureMain,FeatureEnvironment,FeatureJarFileRunWith,FeatureJavaHome" -Wait
+            Remove-Item $javaInstaller -ErrorAction SilentlyContinue
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+        } catch {
+            Write-Host "Failed to install Java. Download manually from: https://adoptium.net/" -ForegroundColor Red
+            Start-Process "https://adoptium.net/temurin/releases/?version=17"
+            exit 1
+        }
+    }
+}
+
+# Verify Java
+if (Get-Command java -ErrorAction SilentlyContinue) {
+    java -version 2>&1 | Select-Object -First 1 | ForEach-Object { Write-Host "  $_" -ForegroundColor Green }
+} else {
+    Write-Host "Java installation failed. Please install manually." -ForegroundColor Red
     exit 1
 }
 
