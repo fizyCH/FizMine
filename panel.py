@@ -2442,7 +2442,7 @@ function showCoreVersions(core,btn){
  const data=CORE_VERSIONS[core];
  if(!data)return;
  javaVersion=parseInt(document.getElementById('set-java')?.value?.match(/v(\d+)/)?.[1]||'0');
- document.getElementById('core-versions-java').textContent='Java: v'+javaVersion+(javaVersion>=21?' (all versions)':' (1.17+ needed for modern cores)');
+ document.getElementById('core-versions-java').textContent='Java: v'+javaVersion;
  let html='';
  data.versions.forEach(v=>{
   const ok=javaVersion>=v.java;
