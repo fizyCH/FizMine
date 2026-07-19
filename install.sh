@@ -66,7 +66,10 @@ for cmd in wget tar; do
   fi
 done
 
-if ! command -v python3 &>/dev/null; then
+if command -v python3 &>/dev/null; then
+  python3 --version | sed 's/^/  /'
+  echo "  Python found, skipping install"
+else
   echo "Installing Python3..."
   if command -v apt-get &>/dev/null; then
     sudo apt-get update -qq && sudo apt-get install -y -qq python3 python3-pip
@@ -81,7 +84,10 @@ if ! command -v python3 &>/dev/null; then
   fi
 fi
 
-if ! command -v java &>/dev/null; then
+if command -v java &>/dev/null; then
+  java -version 2>&1 | head -1 | sed 's/^/  /'
+  echo "  Java found, skipping install"
+else
   echo "Installing Java 17..."
   if command -v apt-get &>/dev/null; then
     sudo apt-get update -qq && sudo apt-get install -y -qq openjdk-17-jre-headless 2>/dev/null || sudo apt-get install -y -qq default-jre-headless
