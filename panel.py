@@ -2416,13 +2416,13 @@ const CORE_VERSIONS={
   purpur:{
    name:'Purpur',
    versions:[
-    {v:'1.21.1',java:21,url:'https://api.purpurmc.org/v2/purpur/1.21.1/builds/2329/downloads/purpur-1.21.1-2329.jar'},
-    {v:'1.20.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.4/builds/2204/downloads/purpur-1.20.4-2204.jar'},
-    {v:'1.20.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.2/builds/2082/downloads/purpur-1.20.2-2082.jar'},
-    {v:'1.20.1',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.1/builds/2069/downloads/purpur-1.20.1-2069.jar'},
-    {v:'1.19.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.19.4/builds/1993/downloads/purpur-1.19.4-1993.jar'},
-    {v:'1.18.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.18.2/builds/1687/downloads/purpur-1.18.2-1687.jar'},
-    {v:'1.16.5',java:8,url:'https://api.purpurmc.org/v2/purpur/1.16.5/builds/1001/downloads/purpur-1.16.5-1001.jar'},
+    {v:'1.21.1',java:21,url:'https://api.purpurmc.org/v2/purpur/1.21.1/2329/download'},
+    {v:'1.20.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.4/2176/download'},
+    {v:'1.20.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.2/2095/download'},
+    {v:'1.20.1',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.1/2062/download'},
+    {v:'1.19.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.19.4/1985/download'},
+    {v:'1.18.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.18.2/1632/download'},
+    {v:'1.16.5',java:8,url:'https://api.purpurmc.org/v2/purpur/1.16.5/1171/download'},
    ]
   },
   magma:{
