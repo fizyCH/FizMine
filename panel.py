@@ -23,13 +23,16 @@ except ImportError:
         [sys.executable, "-m", "pip", "install", "flask"],
         [sys.executable, "-m", "pip", "install", "--break-system-packages", "flask"],
         [sys.executable, "-m", "pip", "install", "--user", "flask"],
+        ["sudo", sys.executable, "-m", "pip", "install", "flask"],
+        ["sudo", sys.executable, "-m", "pip", "install", "--break-system-packages", "flask"],
     ]:
         try:
             r = subprocess.run(args, capture_output=True, text=True, timeout=120)
-            print(r.stdout.strip())
             if r.returncode == 0:
+                print("Flask installed successfully")
                 break
-            print(r.stderr.strip())
+            if r.stderr:
+                print(r.stderr.strip()[:200])
         except Exception as e:
             print(f"Error: {e}")
     try:
@@ -39,7 +42,11 @@ except ImportError:
         user_site = site.getusersitepackages()
         if user_site not in sys.path:
             sys.path.insert(0, user_site)
-        from flask import Flask, request, jsonify, Response, abort, send_file
+        try:
+            from flask import Flask, request, jsonify, Response, abort, send_file
+        except ImportError:
+            print("ERROR: Failed to install Flask. Try: pip3 install flask")
+            sys.exit(1)
 
 from flask import Flask, request, jsonify, Response, abort, send_file, session, redirect, url_for
 
