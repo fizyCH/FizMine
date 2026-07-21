@@ -42,7 +42,33 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue) -and -not (Get-Comma
 }
 
 # Check Java - install if missing
-if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
+$javaFound = $false
+if (Get-Command java -ErrorAction SilentlyContinue) {
+    $javaFound = $true
+} else {
+    # Check common Java paths
+    $javaPaths = @(
+        "$env:ProgramFiles\Eclipse Adoptium",
+        "$env:ProgramFiles\Java",
+        "$env:ProgramFiles\Microsoft",
+        "$env:ProgramFiles\Zulu",
+        "$env:ProgramFiles\Amazon Corretto",
+        "$env:ProgramFiles\BellSoft",
+        "$env:ProgramFiles(x86)\Eclipse Adoptium"
+    )
+    foreach ($p in $javaPaths) {
+        if (Test-Path $p) {
+            $found = Get-ChildItem -Path $p -Recurse -Filter "java.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($found) {
+                $env:Path += ";" + $found.DirectoryName
+                $javaFound = $true
+                break
+            }
+        }
+    }
+}
+
+if (-not $javaFound) {
     Write-Host "Java not found. Installing Java 17..." -ForegroundColor Yellow
     $hasWinget = Get-Command winget -ErrorAction SilentlyContinue
     if ($hasWinget) {
