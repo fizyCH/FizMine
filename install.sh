@@ -30,16 +30,12 @@ if [ -f "$HOME/minecraft/panel.py" ]; then
     fi
   fi
 fi
-echo "  _____ _     __  __ _            "
-echo " |  ___(_)___|  \/  (_)_ __   ___ "
-echo " | |_  | |_  / |\/| | | '_ \ / _ \\"
-echo " |  _| | |/ /| |  | | | | | |  __/"
-echo " |_|   |_/___|_|  |_|_|_| |_|\___| "
-echo "          Panel Installer"
-echo ""
 
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
 INSTALL_DIR="${INSTALL_DIR:-$HOME/minecraft}"
+
+# Expand ~ to home directory
+INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
 
 read -rp "Enable authentication? (y/n) [n]: " AUTH_CHOICE
 AUTH_CHOICE="${AUTH_CHOICE:-n}"
@@ -58,8 +54,12 @@ for cmd in wget tar; do
     echo "Installing $cmd..."
     if command -v apt-get &>/dev/null; then
       sudo apt-get update -qq && sudo apt-get install -y -qq "$cmd"
+    elif command -v dnf &>/dev/null; then
+      sudo dnf install -y "$cmd"
     elif command -v yum &>/dev/null; then
       sudo yum install -y "$cmd"
+    elif command -v pacman &>/dev/null; then
+      sudo pacman -S --noconfirm "$cmd"
     elif command -v apk &>/dev/null; then
       sudo apk add "$cmd"
     else
@@ -69,25 +69,54 @@ for cmd in wget tar; do
   fi
 done
 
-if ! command -v python3 &>/dev/null; then
+if command -v python3 &>/dev/null; then
+  python3 --version | sed 's/^/  /'
+  echo "  Python found, skipping install"
+else
   echo "Installing Python3..."
   if command -v apt-get &>/dev/null; then
     sudo apt-get update -qq && sudo apt-get install -y -qq python3 python3-pip
+  elif command -v dnf &>/dev/null; then
+    sudo dnf install -y python3 python3-pip
   elif command -v yum &>/dev/null; then
     sudo yum install -y python3 python3-pip
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm python python-pip
   elif command -v apk &>/dev/null; then
     sudo apk add python3 py3-pip
   fi
 fi
 
-if ! command -v java &>/dev/null; then
-  echo "Installing Java 17..."
+# Check if Java exists
+HAS_JAVA=0
+for JAVA_CHECK in java /usr/bin/java /usr/lib/jvm/*/bin/java; do
+  if [ -x "$JAVA_CHECK" ] 2>/dev/null || command -v java &>/dev/null; then
+    HAS_JAVA=1
+    break
+  fi
+done
+
+if [ "$HAS_JAVA" -eq 1 ]; then
+  JAVA_VER=$(java -version 2>&1 | head -1 | sed -n 's/.*version "\([0-9]*\).*/\1/p')
+  echo "  Java v${JAVA_VER:-?} found, skipping install"
+else
+  echo "Java not found. Installing Java 17..."
   if command -v apt-get &>/dev/null; then
     sudo apt-get update -qq && sudo apt-get install -y -qq openjdk-17-jre-headless 2>/dev/null || sudo apt-get install -y -qq default-jre-headless
+  elif command -v dnf &>/dev/null; then
+    sudo dnf install -y java-17-openjdk-headless 2>/dev/null || sudo dnf install -y java-latest-openjdk-headless
   elif command -v yum &>/dev/null; then
     sudo yum install -y java-17-openjdk-headless 2>/dev/null || sudo yum install -y java-latest-openjdk-headless
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm jdk17-openjdk
   elif command -v apk &>/dev/null; then
     sudo apk add openjdk17-jre-headless
+  fi
+  if command -v java &>/dev/null || [ -x /usr/bin/java ]; then
+    JAVA_VER=$(java -version 2>&1 | head -1 | sed -n 's/.*version "\([0-9]*\).*/\1/p')
+    echo "  Java v${JAVA_VER:-?} installed"
+  else
+    echo "  ERROR: Java not installed!"
   fi
 fi
 
@@ -96,7 +125,7 @@ mkdir -p "$INSTALL_DIR"
 cd /tmp
 rm -f fizmine-panel.tar
 
-DOWNLOAD_URL="https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar"
+DOWNLOAD_URL="https://github.com/fizyCH/FizMine/releases/latest/download/panel.tar"
 wget -q "$DOWNLOAD_URL" -O fizmine-panel.tar
 
 if [ ! -s fizmine-panel.tar ]; then

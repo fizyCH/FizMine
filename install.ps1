@@ -30,24 +30,80 @@ Write-Host ""
 
 # Check Python
 if (-not (Get-Command python -ErrorAction SilentlyContinue) -and -not (Get-Command python3 -ErrorAction SilentlyContinue)) {
-    Write-Host "Python not found. Install from https://www.python.org/downloads/" -ForegroundColor Yellow
-    $answer = Read-Host "Open Python download page? (y/n)"
-    if ($answer -eq "y") { Start-Process "https://www.python.org/downloads/" }
-    exit 1
+    Write-Host "Python not found. Installing..." -ForegroundColor Yellow
+    $hasWinget = Get-Command winget -ErrorAction SilentlyContinue
+    if ($hasWinget) {
+        winget install Python.Python.3.12 --silent --accept-package-agreements --accept-source-agreements
+    } else {
+        Write-Host "Please install Python from https://www.python.org/downloads/" -ForegroundColor Yellow
+        Start-Process "https://www.python.org/downloads/"
+        exit 1
+    }
 }
 
-# Check Java
-if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
-    Write-Host "Java 17+ not found. Install from https://adoptium.net/" -ForegroundColor Yellow
-    $answer = Read-Host "Open Java download page? (y/n)"
-    if ($answer -eq "y") { Start-Process "https://adoptium.net/temurin/releases/?version=17" }
+# Check Java - install if missing
+$javaFound = $false
+if (Get-Command java -ErrorAction SilentlyContinue) {
+    $javaFound = $true
+} else {
+    # Check common Java paths
+    $javaPaths = @(
+        "$env:ProgramFiles\Eclipse Adoptium",
+        "$env:ProgramFiles\Java",
+        "$env:ProgramFiles\Microsoft",
+        "$env:ProgramFiles\Zulu",
+        "$env:ProgramFiles\Amazon Corretto",
+        "$env:ProgramFiles\BellSoft",
+        "$env:ProgramFiles(x86)\Eclipse Adoptium"
+    )
+    foreach ($p in $javaPaths) {
+        if (Test-Path $p) {
+            $found = Get-ChildItem -Path $p -Recurse -Filter "java.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($found) {
+                $env:Path += ";" + $found.DirectoryName
+                $javaFound = $true
+                break
+            }
+        }
+    }
+}
+
+if (-not $javaFound) {
+    Write-Host "Java not found. Installing Java 17..." -ForegroundColor Yellow
+    $hasWinget = Get-Command winget -ErrorAction SilentlyContinue
+    if ($hasWinget) {
+        winget install EclipseAdoptium.Temurin.17.JDK --silent --accept-package-agreements --accept-source-agreements
+        # Refresh PATH
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+    } else {
+        Write-Host "Downloading Java 17 manually..." -ForegroundColor Yellow
+        $javaUrl = "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.12_7.msi"
+        $javaInstaller = "$env:TEMP\java17.msi"
+        try {
+            Invoke-WebRequest -Uri $javaUrl -OutFile $javaInstaller -UseBasicParsing
+            Start-Process msiexec.exe -ArgumentList "/i `"$javaInstaller`" /quiet /norestart ADDLOCAL=FeatureMain,FeatureEnvironment,FeatureJarFileRunWith,FeatureJavaHome" -Wait
+            Remove-Item $javaInstaller -ErrorAction SilentlyContinue
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+        } catch {
+            Write-Host "Failed to install Java. Download manually from: https://adoptium.net/" -ForegroundColor Red
+            Start-Process "https://adoptium.net/temurin/releases/?version=17"
+            exit 1
+        }
+    }
+}
+
+# Verify Java
+if (Get-Command java -ErrorAction SilentlyContinue) {
+    java -version 2>&1 | Select-Object -First 1 | ForEach-Object { Write-Host "  $_" -ForegroundColor Green }
+} else {
+    Write-Host "Java installation failed. Please install manually." -ForegroundColor Red
     exit 1
 }
 
 Write-Host "Downloading FizMine Panel..."
 New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 $tempFile = "$env:TEMP\fizmine-panel.zip"
-Invoke-WebRequest -Uri "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.zip" -OutFile $tempFile
+Invoke-WebRequest -Uri "https://github.com/fizyCH/FizMine/releases/latest/download/panel.zip" -OutFile $tempFile
 
 Write-Host "Extracting to $installDir..."
 Expand-Archive -Path $tempFile -DestinationPath $installDir -Force
@@ -59,12 +115,15 @@ if ($authChoice -eq "y" -or $authChoice -eq "Y") {
     $authToken = Read-Host "Set authentication password"
 }
 
+# Remove trailing backslash
+$installDir = $installDir.TrimEnd('\')
+
 $envContent = @"
 PANEL_PORT=$panelPort
 MC_DIR=$installDir
 PANEL_TOKEN=$authToken
 "@
-Set-Content -Path "$installDir\.env" -Value $envContent
+Set-Content -Path "$installDir\.env" -Value $envContent -Encoding UTF8
 
 Write-Host ""
 Write-Host "  Installation complete!" -ForegroundColor Green
