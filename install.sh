@@ -34,6 +34,9 @@ fi
 read -rp "Install path [~/minecraft]: " INSTALL_DIR
 INSTALL_DIR="${INSTALL_DIR:-$HOME/minecraft}"
 
+# Expand ~ to home directory
+INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
+
 read -rp "Enable authentication? (y/n) [n]: " AUTH_CHOICE
 AUTH_CHOICE="${AUTH_CHOICE:-n}"
 
@@ -144,19 +147,16 @@ if [ "$AUTH_CHOICE" = "y" ] || [ "$AUTH_CHOICE" = "Y" ]; then
   read -rp "Set authentication password: " AUTH_TOKEN
 fi
 
-# Write .env with resolved absolute path
-REAL_DIR=$(cd "$INSTALL_DIR" && pwd)
-
-cat > "$REAL_DIR/.env" << ENVEOF
+cat > "$INSTALL_DIR/.env" << ENVEOF
 PANEL_PORT=$PANEL_PORT
-MC_DIR=$REAL_DIR
+MC_DIR=$INSTALL_DIR
 PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
 echo "Installation complete!"
 echo "======================"
-echo "cd $REAL_DIR"
+echo "cd $INSTALL_DIR"
 echo "./ctl.sh start"
 echo "Panel: http://localhost:$PANEL_PORT"
 echo ""
