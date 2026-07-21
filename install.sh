@@ -84,11 +84,17 @@ else
   fi
 fi
 
-if command -v java &>/dev/null && java -version &>/dev/null; then
+# Check if Java exists
+HAS_JAVA=0
+if command -v java &>/dev/null; then
+  HAS_JAVA=1
+fi
+
+if [ "$HAS_JAVA" -eq 1 ]; then
   JAVA_VER=$(java -version 2>&1 | head -1 | sed -n 's/.*version "\([0-9]*\).*/\1/p')
   echo "  Java v${JAVA_VER:-?} found, skipping install"
 else
-  echo "Installing Java 17..."
+  echo "Java not found. Installing Java 17..."
   if command -v apt-get &>/dev/null; then
     sudo apt-get update -qq && sudo apt-get install -y -qq openjdk-17-jre-headless 2>/dev/null || sudo apt-get install -y -qq default-jre-headless
   elif command -v dnf &>/dev/null; then
