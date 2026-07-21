@@ -84,9 +84,9 @@ else
   fi
 fi
 
-if command -v java &>/dev/null; then
-  JAVA_VER=$(java -version 2>&1 | head -1 | grep -oP '"[\d._]+"' | tr -d '"' | cut -d. -f1)
-  echo "  Java v$JAVA_VER found, skipping install"
+if command -v java &>/dev/null && java -version &>/dev/null; then
+  JAVA_VER=$(java -version 2>&1 | head -1 | sed -n 's/.*version "\([0-9]*\).*/\1/p')
+  echo "  Java v${JAVA_VER:-?} found, skipping install"
 else
   echo "Installing Java 17..."
   if command -v apt-get &>/dev/null; then
@@ -101,8 +101,8 @@ else
     sudo apk add openjdk17-jre-headless
   fi
   if command -v java &>/dev/null; then
-    JAVA_VER=$(java -version 2>&1 | head -1 | grep -oP '"[\d._]+"' | tr -d '"' | cut -d. -f1)
-    echo "  Java v$JAVA_VER installed"
+    JAVA_VER=$(java -version 2>&1 | head -1 | sed -n 's/.*version "\([0-9]*\).*/\1/p')
+    echo "  Java v${JAVA_VER:-?} installed"
   else
     echo "  ERROR: Java not installed!"
   fi
