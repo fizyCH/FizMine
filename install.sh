@@ -86,9 +86,12 @@ fi
 
 # Check if Java exists
 HAS_JAVA=0
-if command -v java &>/dev/null; then
-  HAS_JAVA=1
-fi
+for JAVA_CHECK in java /usr/bin/java /usr/lib/jvm/*/bin/java; do
+  if [ -x "$JAVA_CHECK" ] 2>/dev/null || command -v java &>/dev/null; then
+    HAS_JAVA=1
+    break
+  fi
+done
 
 if [ "$HAS_JAVA" -eq 1 ]; then
   JAVA_VER=$(java -version 2>&1 | head -1 | sed -n 's/.*version "\([0-9]*\).*/\1/p')
@@ -106,7 +109,7 @@ else
   elif command -v apk &>/dev/null; then
     sudo apk add openjdk17-jre-headless
   fi
-  if command -v java &>/dev/null; then
+  if command -v java &>/dev/null || [ -x /usr/bin/java ]; then
     JAVA_VER=$(java -version 2>&1 | head -1 | sed -n 's/.*version "\([0-9]*\).*/\1/p')
     echo "  Java v${JAVA_VER:-?} installed"
   else
