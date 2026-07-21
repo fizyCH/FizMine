@@ -3008,6 +3008,8 @@ let envData={};
 async function loadEnvInfo(){
  try{
   envData=await api('env-info');
+  if(envData.mc_dir&&document.getElementById('set-mcdir'))document.getElementById('set-mcdir').value=envData.mc_dir;
+  if(envData.port&&document.getElementById('set-port'))document.getElementById('set-port').value=envData.port;
   if(envData.java_path)document.getElementById('set-java').value=envData.java_path+' (v'+envData.java_version+')';
   if(envData.platform)document.getElementById('set-screen').value=envData.platform;
   const rconStatus=envData.rcon_enabled?'Enabled (port '+envData.rcon_port+')':'Disabled';
