@@ -4,11 +4,11 @@ Minecraft server management panel.
 
 ## Screenshots
 
-<img src="assets/screen1.jpg" width="500">
+<img src="assets/Screen1.jpg" width="500">
 
 <img src="assets/Screen2.jpg" width="500">
 
-<img src="assets/screen3.jpg" width="500">
+<img src="assets/Screen3.jpg" width="500">
 
 ## Quick Install
 
@@ -55,30 +55,11 @@ python panel.py     # All platforms
 
 ## What's New
 
-| Change | Description |
-|--------|-------------|
-| Authentication | Login with protection against settings tampering via /api/settings |
-| Anti-brute-force | 5 failed attempts = 5 minute lockout |
-| Password validation | Min 5 chars, common weak passwords rejected |
-| Memory/Disk/CPU | Usage in %; click to open ring chart diagrams |
-| Charts | Update in real-time; crash detection with sound alert |
-| File manager | Sort by name (all languages) and size |
-| File search | Recursive search across subdirectories |
-| File upload | Upload files to any directory |
-| File download | Download files; folders auto-zipped |
-| File delete | Delete with confirmation |
-| Server core | Replace core; choose files to keep; everything else deleted |
-| Accent color | Color picker with presets in settings |
-| Fireflies | Ambient particles with accent color breathing animation |
-| Panel opacity | Slider 0–100% for panel background transparency |
-| Auth settings | Toggle to enable/disable with collapsible panel |
-| Backup | Panel backup + server backup download |
-| Confirmation modals | Custom animated modals instead of browser `confirm()` |
-| File editor | Edit `.json`, `.yml`, `.txt`, `.properties` directly in panel |
-| Folder navigation | Browse server directories with breadcrumbs |
-| 5 languages | English, Russian, German, French, Chinese |
-| Crash detection | Sound notification when server crashes |
-| UI overhaul | Animations, Minecraft-style FizMine logo |
-| .env settings | Edit MC_DIR, PORT, JAVA_ARGS from the panel |
-| Bug fixes | TPS display, ban/unban UUIDs for premium & offline accounts |
-| Cross-platform | Linux + Windows, auto-install Flask, auto-detect Java |
+| Type | Feature | Description |
+|------|---------|-------------|
+| Fixed | Java Check on Startup | The panel now displays the installed Java version in the terminal during startup. |
+| New | GitHub Update Checker | Added a **Check for Updates** button in **Settings → System** to check for new releases on GitHub. |
+| New | Purpur Core Support | Added **Purpur** (Bukkit/Spigot hybrid) as a downloadable server core. |
+| New | Arclight Core Support | Added **Arclight** (Forge + Bukkit hybrid) as a downloadable server core. |
+| Fixed | Automatic Flask Installation | Improved automatic Flask installation with a `sudo pip` fallback and clearer error messages. |
+| Beta | Update Checker | Introduced the first beta version of the update checking system. |
