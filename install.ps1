@@ -115,12 +115,15 @@ if ($authChoice -eq "y" -or $authChoice -eq "Y") {
     $authToken = Read-Host "Set authentication password"
 }
 
+# Remove trailing backslash
+$installDir = $installDir.TrimEnd('\')
+
 $envContent = @"
 PANEL_PORT=$panelPort
 MC_DIR=$installDir
 PANEL_TOKEN=$authToken
 "@
-Set-Content -Path "$installDir\.env" -Value $envContent
+Set-Content -Path "$installDir\.env" -Value $envContent -Encoding UTF8
 
 Write-Host ""
 Write-Host "  Installation complete!" -ForegroundColor Green
