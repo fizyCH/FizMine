@@ -85,8 +85,8 @@ else
 fi
 
 if command -v java &>/dev/null; then
-  java -version 2>&1 | head -1 | sed 's/^/  /'
-  echo "  Java found, skipping install"
+  JAVA_VER=$(java -version 2>&1 | head -1 | grep -oP '"[\d._]+"' | tr -d '"' | cut -d. -f1)
+  echo "  Java v$JAVA_VER found, skipping install"
 else
   echo "Installing Java 17..."
   if command -v apt-get &>/dev/null; then
@@ -99,6 +99,12 @@ else
     sudo pacman -S --noconfirm jdk17-openjdk
   elif command -v apk &>/dev/null; then
     sudo apk add openjdk17-jre-headless
+  fi
+  if command -v java &>/dev/null; then
+    JAVA_VER=$(java -version 2>&1 | head -1 | grep -oP '"[\d._]+"' | tr -d '"' | cut -d. -f1)
+    echo "  Java v$JAVA_VER installed"
+  else
+    echo "  ERROR: Java not installed!"
   fi
 fi
 
@@ -129,16 +135,19 @@ if [ "$AUTH_CHOICE" = "y" ] || [ "$AUTH_CHOICE" = "Y" ]; then
   read -rp "Set authentication password: " AUTH_TOKEN
 fi
 
-cat > "$INSTALL_DIR/.env" << ENVEOF
+# Write .env with resolved absolute path
+REAL_DIR=$(cd "$INSTALL_DIR" && pwd)
+
+cat > "$REAL_DIR/.env" << ENVEOF
 PANEL_PORT=$PANEL_PORT
-MC_DIR=$INSTALL_DIR
+MC_DIR=$REAL_DIR
 PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
 echo "Installation complete!"
 echo "======================"
-echo "cd $INSTALL_DIR"
+echo "cd $REAL_DIR"
 echo "./ctl.sh start"
 echo "Panel: http://localhost:$PANEL_PORT"
 echo ""
