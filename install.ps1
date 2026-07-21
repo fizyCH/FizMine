@@ -103,7 +103,7 @@ if (Get-Command java -ErrorAction SilentlyContinue) {
 Write-Host "Downloading FizMine Panel..."
 New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 $tempFile = "$env:TEMP\fizmine-panel.zip"
-Invoke-WebRequest -Uri "https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.zip" -OutFile $tempFile
+Invoke-WebRequest -Uri "https://github.com/fizyCH/FizMine/releases/latest/download/panel.zip" -OutFile $tempFile
 
 Write-Host "Extracting to $installDir..."
 Expand-Archive -Path $tempFile -DestinationPath $installDir -Force

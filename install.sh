@@ -125,7 +125,7 @@ mkdir -p "$INSTALL_DIR"
 cd /tmp
 rm -f fizmine-panel.tar
 
-DOWNLOAD_URL="https://github.com/fizyCH/FizMine/releases/download/FizMine_Login_and_Play%21/panel.tar"
+DOWNLOAD_URL="https://github.com/fizyCH/FizMine/releases/latest/download/panel.tar"
 wget -q "$DOWNLOAD_URL" -O fizmine-panel.tar
 
 if [ ! -s fizmine-panel.tar ]; then
