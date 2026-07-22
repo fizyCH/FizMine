@@ -2959,15 +2959,6 @@ async function loadPlugins(){
   document.getElementById('mods-list').innerHTML=`<div class="empty">${t('no_mods')}</div>`;
  }
 }
- if(mods&&mods.length){
-  let html='';
-   if(mods.length>2)html+=`<div style="margin-bottom:10px"><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete_all')} mods?','deleteAll','mods','','true')">${t('delete_all')} (${mods.length})</button></div>`;
-    html+=mods.map(m=>`<div class="mod-item" data-name="${esc(m).toLowerCase()}"><span class="name">${esc(m)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(m).replace(/'/g,"\\'")}?','deleteItem','mods','${esc(m).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
-  document.getElementById('mods-list').innerHTML=html;
- }else{
-  document.getElementById('mods-list').innerHTML=`<div class="empty">${t('no_mods')}</div>`;
- }
-}
 
 function filterList(listId,query){
  const q=query.toLowerCase();
