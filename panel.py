@@ -1813,16 +1813,18 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
       <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
      </div>
      <div id="plugins-list"></div>
+     <input type="text" placeholder="Search plugins..." id="search-plugins" oninput="filterList('plugins-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-top:10px;box-sizing:border-box">
     </div>
     <div class="panel">
       <h3><svg class="ico" viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.5 2.5 0 010 5H2V20a2 2 0 002 2h3.8v-1.5a2.5 2.5 0 015 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 100-5z"/></svg> <span data-i18n="mods_tab">Mods</span></h3>
-     <div class="drop-zone" id="drop-mods" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDrop(event,'mods',this)" onclick="this.querySelector('input').click()">
-      <input type="file" accept=".jar" onchange="uploadFile('mods',this.files[0]);this.value=''">
-     <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-     <div class="drop-text" data-i18n="drop_jar_files">Drop .jar files here</div>
-     <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
-    </div>
-    <div id="mods-list"></div>
+      <div class="drop-zone" id="drop-mods" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDrop(event,'mods',this)" onclick="this.querySelector('input').click()">
+       <input type="file" accept=".jar" onchange="uploadFile('mods',this.files[0]);this.value=''">
+      <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <div class="drop-text" data-i18n="drop_jar_files">Drop .jar files here</div>
+      <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
+     </div>
+     <div id="mods-list"></div>
+     <input type="text" placeholder="Search mods..." id="search-mods" oninput="filterList('mods-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-top:10px;box-sizing:border-box">
    </div>
   </div>
  </div>
@@ -2402,22 +2404,21 @@ const CORE_VERSIONS={
    {v:'1.12.2',java:8,url:'https://piston-data.mojang.com/v1/objects/886945bfb2b978778c3a0288fd7fab09d315b25f/server.jar'},
   ]
  },
- fabric:{
-  name:'Fabric',
-  versions:[
-   {v:'1.21.5',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.5/0.16.14/1.0.1/server/jar'},
-   {v:'1.21.4',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.4/0.16.10/1.0.1/server/jar'},
-   {v:'1.21.3',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.3/0.16.9/1.0.1/server/jar'},
-   {v:'1.21.2',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.2/0.16.7/1.0.1/server/jar'},
-   {v:'1.21.1',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.16.5/1.0.1/server/jar'},
-   {v:'1.20.6',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.6/0.16.3/1.0.1/server/jar'},
-   {v:'1.20.4',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.4/0.15.11/1.0.1/server/jar'},
-   {v:'1.20.2',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.2/0.14.25/1.0.1/server/jar'},
-   {v:'1.20.1',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.1/0.14.22/1.0.1/server/jar'},
-   {v:'1.19.4',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.19.4/0.14.21/1.0.1/server/jar'},
-   {v:'1.18.2',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.18.2/0.14.8/1.0.1/server/jar'},
-   {v:'1.17.1',java:16,url:'https://meta.fabricmc.net/v2/versions/loader/1.17.1/0.14.8/1.0.1/server/jar'},
-   {v:'1.16.5',java:8,url:'https://meta.fabricmc.net/v2/versions/loader/1.16.5/0.14.8/1.0.1/server/jar'},
+  fabric:{
+   name:'Fabric',
+   versions:[
+    {v:'1.21.5',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.5/0.19.3/1.0.1/server/jar'},
+    {v:'1.21.4',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.4/0.19.3/1.0.1/server/jar'},
+    {v:'1.21.3',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.3/0.19.3/1.0.1/server/jar'},
+    {v:'1.21.2',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.2/0.19.3/1.0.1/server/jar'},
+    {v:'1.21.1',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.19.3/1.0.1/server/jar'},
+    {v:'1.20.6',java:21,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.6/0.19.3/1.0.1/server/jar'},
+    {v:'1.20.4',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.4/0.19.3/1.0.1/server/jar'},
+    {v:'1.20.2',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.2/0.19.3/1.0.1/server/jar'},
+    {v:'1.20.1',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.20.1/0.19.3/1.0.1/server/jar'},
+    {v:'1.19.4',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.19.4/0.19.3/1.0.1/server/jar'},
+    {v:'1.18.2',java:17,url:'https://meta.fabricmc.net/v2/versions/loader/1.18.2/0.19.3/1.0.1/server/jar'},
+    {v:'1.16.5',java:8,url:'https://meta.fabricmc.net/v2/versions/loader/1.16.5/0.19.3/1.0.1/server/jar'},
    ]
   },
   purpur:{
@@ -2942,7 +2943,7 @@ async function loadPlugins(){
  if(plugins&&plugins.length){
   let html='';
    if(plugins.length>2)html+=`<div style="margin-bottom:10px"><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete_all')} plugins?','deleteAll','plugins','','true')">${t('delete_all')} (${plugins.length})</button></div>`;
-    html+=plugins.map(p=>`<div class="plugin-item"><span class="name">${esc(p)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(p).replace(/'/g,"\\'")}?','deleteItem','plugins','${esc(p).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
+    html+=plugins.map(p=>`<div class="plugin-item" data-name="${esc(p).toLowerCase()}"><span class="name">${esc(p)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(p).replace(/'/g,"\\'")}?','deleteItem','plugins','${esc(p).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
   document.getElementById('plugins-list').innerHTML=html;
  }else{
   document.getElementById('plugins-list').innerHTML=`<div class="empty">${t('no_plugins')}</div>`;
@@ -2950,11 +2951,18 @@ async function loadPlugins(){
  if(mods&&mods.length){
   let html='';
    if(mods.length>2)html+=`<div style="margin-bottom:10px"><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete_all')} mods?','deleteAll','mods','','true')">${t('delete_all')} (${mods.length})</button></div>`;
-    html+=mods.map(m=>`<div class="mod-item"><span class="name">${esc(m)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(m).replace(/'/g,"\\'")}?','deleteItem','mods','${esc(m).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
+    html+=mods.map(m=>`<div class="mod-item" data-name="${esc(m).toLowerCase()}"><span class="name">${esc(m)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(m).replace(/'/g,"\\'")}?','deleteItem','mods','${esc(m).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
   document.getElementById('mods-list').innerHTML=html;
  }else{
   document.getElementById('mods-list').innerHTML=`<div class="empty">${t('no_mods')}</div>`;
  }
+}
+
+function filterList(listId,query){
+ const q=query.toLowerCase();
+ document.querySelectorAll('#'+listId+' > div[data-name]').forEach(el=>{
+  el.style.display=el.dataset.name.includes(q)?'':'none';
+ });
 }
 
 function handleDrag(e,el){e.preventDefault();e.stopPropagation();el.classList.add('dragover');}
@@ -4058,7 +4066,7 @@ def api_check_update():
             headers={"User-Agent": "FizMine-Panel"}
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
-            remote = resp.read(10000).decode("utf-8", errors="replace")
+            remote = resp.read(50000).decode("utf-8", errors="replace")
         remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([\d.]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
