@@ -50,7 +50,7 @@ except ImportError:
 
 from flask import Flask, request, jsonify, Response, abort, send_file, session, redirect, url_for
 
-PANEL_VERSION = "2.2"
+PANEL_VERSION = "1.9"
 app = Flask(__name__)
 app.secret_key = os.urandom(32).hex()
 
@@ -4105,7 +4105,10 @@ def api_do_update():
         def restart():
             time.sleep(2)
             subprocess.Popen([sys.executable] + sys.argv, cwd=str(Path(__file__).parent))
-            os._exit(0)
+            if IS_WINDOWS:
+                os.kill(os.getpid(), signal.SIGTERM)
+            else:
+                os._exit(0)
         threading.Thread(target=restart, daemon=True).start()
         
         return jsonify({"ok": True, "message": "Updated! Restarting..."})
