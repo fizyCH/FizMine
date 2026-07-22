@@ -50,7 +50,7 @@ except ImportError:
 
 from flask import Flask, request, jsonify, Response, abort, send_file, session, redirect, url_for
 
-PANEL_VERSION = "2.1"
+PANEL_VERSION = "2.2"
 app = Flask(__name__)
 app.secret_key = os.urandom(32).hex()
 
