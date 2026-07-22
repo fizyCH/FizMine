@@ -1813,7 +1813,6 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
        <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
       </div>
      <div id="plugins-list"></div>
-     <input type="text" placeholder="Search plugins..." id="search-plugins" oninput="filterList('plugins-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-top:10px;box-sizing:border-box">
     </div>
     <div class="panel">
       <h3><svg class="ico" viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.5 2.5 0 010 5H2V20a2 2 0 002 2h3.8v-1.5a2.5 2.5 0 015 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 100-5z"/></svg> <span data-i18n="mods_tab">Mods</span></h3>
@@ -1824,8 +1823,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
       <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
      </div>
      <div id="mods-list"></div>
-     <input type="text" placeholder="Search mods..." id="search-mods" oninput="filterList('mods-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-top:10px;box-sizing:border-box">
-   </div>
+    </div>
   </div>
  </div>
 
@@ -2941,13 +2939,26 @@ async function loadPlugins(){
  const plugins=await api('plugins');
  const mods=await api('mods');
  if(plugins&&plugins.length){
-  let html='';
-   if(plugins.length>2)html+=`<div style="margin-bottom:10px"><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete_all')} plugins?','deleteAll','plugins','','true')">${t('delete_all')} (${plugins.length})</button></div>`;
-    html+=plugins.map(p=>`<div class="plugin-item" data-name="${esc(p).toLowerCase()}"><span class="name">${esc(p)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(p).replace(/'/g,"\\'")}?','deleteItem','plugins','${esc(p).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
+  let html=`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">`;
+  if(plugins.length>2)html+=`<button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete_all')} plugins?','deleteAll','plugins','','true')">${t('delete_all')} (${plugins.length})</button>`;
+  html+=`<input type="text" placeholder="Search..." oninput="filterList('plugins-list',this.value)" style="flex:1;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;box-sizing:border-box">`;
+  html+=`</div>`;
+  html+=plugins.map(p=>`<div class="plugin-item" data-name="${esc(p).toLowerCase()}"><span class="name">${esc(p)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(p).replace(/'/g,"\\'")}?','deleteItem','plugins','${esc(p).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
   document.getElementById('plugins-list').innerHTML=html;
  }else{
   document.getElementById('plugins-list').innerHTML=`<div class="empty">${t('no_plugins')}</div>`;
  }
+ if(mods&&mods.length){
+  let html=`<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">`;
+  if(mods.length>2)html+=`<button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete_all')} mods?','deleteAll','mods','','true')">${t('delete_all')} (${mods.length})</button>`;
+  html+=`<input type="text" placeholder="Search..." oninput="filterList('mods-list',this.value)" style="flex:1;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;box-sizing:border-box">`;
+  html+=`</div>`;
+  html+=mods.map(m=>`<div class="mod-item" data-name="${esc(m).toLowerCase()}"><span class="name">${esc(m)}</span><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete')}: ${esc(m).replace(/'/g,"\\'")}?','deleteItem','mods','${esc(m).replace(/'/g,"\\'")}','true')"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></div>`).join('');
+  document.getElementById('mods-list').innerHTML=html;
+ }else{
+  document.getElementById('mods-list').innerHTML=`<div class="empty">${t('no_mods')}</div>`;
+ }
+}
  if(mods&&mods.length){
   let html='';
    if(mods.length>2)html+=`<div style="margin-bottom:10px"><button class="btn btn-red btn-sm" onclick="confirmAction('${t('confirm_delete_all')} mods?','deleteAll','mods','','true')">${t('delete_all')} (${mods.length})</button></div>`;
@@ -4067,7 +4078,7 @@ def api_check_update():
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
             remote = resp.read(200000).decode("utf-8", errors="replace")
-        remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([\d.]+)"', remote)
+        remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
         if remote_ver > local_ver:
