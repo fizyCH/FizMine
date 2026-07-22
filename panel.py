@@ -1806,25 +1806,25 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
   <div class="grid-2">
    <div class="panel">
      <h3><svg class="ico" viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.5 2.5 0 010 5H2V20a2 2 0 002 2h3.8v-1.5a2.5 2.5 0 015 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 100-5z"/></svg> <span data-i18n="plugins_tab">Plugins</span></h3>
-    <div class="drop-zone" id="drop-plugins" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDrop(event,'plugins',this)" onclick="this.querySelector('input').click()">
-     <input type="file" accept=".jar" onchange="uploadFile('plugins',this.files[0]);this.value=''">
-      <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-      <div class="drop-text" data-i18n="drop_jar_files">Drop .jar files here</div>
-      <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
-     </div>
+     <input type="text" placeholder="Search plugins..." id="search-plugins" oninput="filterList('plugins-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-bottom:10px;box-sizing:border-box">
+     <div class="drop-zone" id="drop-plugins" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDrop(event,'plugins',this)" onclick="this.querySelector('input').click()">
+      <input type="file" accept=".jar" onchange="uploadFile('plugins',this.files[0]);this.value=''">
+       <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+       <div class="drop-text" data-i18n="drop_jar_files">Drop .jar files here</div>
+       <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
+      </div>
      <div id="plugins-list"></div>
-     <input type="text" placeholder="Search plugins..." id="search-plugins" oninput="filterList('plugins-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-top:10px;box-sizing:border-box">
     </div>
     <div class="panel">
       <h3><svg class="ico" viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.5 2.5 0 010 5H2V20a2 2 0 002 2h3.8v-1.5a2.5 2.5 0 015 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 100-5z"/></svg> <span data-i18n="mods_tab">Mods</span></h3>
-      <div class="drop-zone" id="drop-mods" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDrop(event,'mods',this)" onclick="this.querySelector('input').click()">
+      <input type="text" placeholder="Search mods..." id="search-mods" oninput="filterList('mods-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-bottom:10px;box-sizing:border-box">
+     <div class="drop-zone" id="drop-mods" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDrop(event,'mods',this)" onclick="this.querySelector('input').click()">
        <input type="file" accept=".jar" onchange="uploadFile('mods',this.files[0]);this.value=''">
       <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
       <div class="drop-text" data-i18n="drop_jar_files">Drop .jar files here</div>
       <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
      </div>
      <div id="mods-list"></div>
-     <input type="text" placeholder="Search mods..." id="search-mods" oninput="filterList('mods-list',this.value)" style="width:100%;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;margin-top:10px;box-sizing:border-box">
    </div>
   </div>
  </div>
@@ -4066,7 +4066,7 @@ def api_check_update():
             headers={"User-Agent": "FizMine-Panel"}
         )
         with urllib.request.urlopen(req, timeout=10) as resp:
-            remote = resp.read(50000).decode("utf-8", errors="replace")
+            remote = resp.read(200000).decode("utf-8", errors="replace")
         remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([\d.]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
