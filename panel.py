@@ -4103,8 +4103,9 @@ def api_do_update():
         panel_path.write_text(remote, encoding="utf-8")
         
         def restart():
-            time.sleep(1)
-            os.execv(sys.executable, [sys.executable] + sys.argv)
+            time.sleep(2)
+            subprocess.Popen([sys.executable] + sys.argv, cwd=str(Path(__file__).parent))
+            os._exit(0)
         threading.Thread(target=restart, daemon=True).start()
         
         return jsonify({"ok": True, "message": "Updated! Restarting..."})
