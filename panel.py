@@ -4064,15 +4064,15 @@ def api_check_update():
         local_ver = PANEL_VERSION
         
         req = urllib.request.Request(
-            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py",
+            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py?t=" + str(int(time.time())),
             headers={"User-Agent": "FizMine-Panel"}
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=15) as resp:
             remote = resp.read(200000).decode("utf-8", errors="replace")
         remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
-        if remote_ver > local_ver:
+        if remote_ver != local_ver:
             return jsonify({"update": True, "local": local_ver, "remote": remote_ver})
         return jsonify({"update": False, "local": local_ver, "remote": remote_ver})
     except Exception as e:
@@ -4083,17 +4083,20 @@ def api_check_update():
 def api_do_update():
     import urllib.request
     try:
-        with open(Path(__file__), "r", errors="replace") as f:
-            content = f.read(10000)
-        local_ver = re.search(r'FizMine Panel v([\d.]+)', content)
-        local_ver = local_ver.group(1) if local_ver else "0"
+        local_ver = PANEL_VERSION
         
         req = urllib.request.Request(
-            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py",
+            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py?t=" + str(int(time.time())),
             headers={"User-Agent": "FizMine-Panel"}
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             remote = resp.read().decode("utf-8", errors="replace")
+        
+        remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', remote)
+        remote_ver = remote_ver.group(1) if remote_ver else "0"
+        
+        if remote_ver == local_ver:
+            return jsonify({"ok": True, "message": "Already up to date"})
         
         panel_path = Path(__file__).resolve()
         shutil.copy2(str(panel_path), str(panel_path) + ".bak")
