@@ -50,7 +50,7 @@ except ImportError:
 
 from flask import Flask, request, jsonify, Response, abort, send_file, session, redirect, url_for
 
-PANEL_VERSION = "1.9"
+PANEL_VERSION = "2.1"
 app = Flask(__name__)
 app.secret_key = os.urandom(32).hex()
 
@@ -4062,6 +4062,14 @@ def api_check_update():
     import urllib.request
     try:
         local_ver = PANEL_VERSION
+        try:
+            with open(Path(__file__), "r", errors="replace") as f:
+                content = f.read(50000)
+            m = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', content)
+            if m:
+                local_ver = m.group(1)
+        except:
+            pass
         
         req = urllib.request.Request(
             "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py?t=" + str(int(time.time())),
