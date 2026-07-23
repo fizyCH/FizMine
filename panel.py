@@ -2438,8 +2438,11 @@ const CORE_VERSIONS={
    versions:[
     {v:'Forge 1.21.1',java:21,url:'https://github.com/IzzelAliz/Arclight/releases/download/FeudalKings/1.0.1/arclight-forge-1.21.1-1.0.1-8ec9529.jar'},
     {v:'Forge 1.20.4',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Whisper/1.0.4/arclight-forge-1.20.4-1.0.4-80ec5df.jar'},
+    {v:'Forge 1.20.2',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Net/1.0.3/arclight-forge-1.20.2-1.0.3.jar'},
     {v:'Forge 1.20.1',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Trials/1.0.6/arclight-forge-1.20.1-1.0.6.jar'},
+    {v:'Forge 1.19.4',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Executions/1.0.8/arclight-forge-1.19.4-1.0.8.jar'},
     {v:'Forge 1.18.2',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/1.18/1.0.12/arclight-forge-1.18.2-1.0.12.jar'},
+    {v:'Forge 1.16.5',java:8,url:'https://github.com/IzzelAliz/Arclight/releases/download/1.16/1.0.25/arclight-forge-1.16.5-1.0.25.jar'},
    ]
   },
   forge:{
