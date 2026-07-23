@@ -2277,11 +2277,11 @@ async function loadSetup(){
  const existsData=await api('file-exists');
  const exists=existsData.exists||{};
 
- let togglesHtml='';
- fileChecks.forEach(fc=>{
-  const has=exists[fc.path]||false;
-  const disabled=has?'':'disabled';
-  const checked=has?'checked':'';
+  let togglesHtml='';
+  fileChecks.forEach(fc=>{
+   const has=exists[fc.path]||false;
+   const disabled=has?'':'disabled';
+   const checked='';
   const hint=has?'':`<span style="color:var(--yellow);font-size:10px">${t('not_found')}</span>`;
   togglesHtml+=`
    <div class="toggle-row">
