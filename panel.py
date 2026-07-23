@@ -2322,7 +2322,6 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Arclight</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2355,7 +2354,6 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Arclight</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2431,18 +2429,6 @@ const CORE_VERSIONS={
     {v:'1.19.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.19.4/1985/download'},
     {v:'1.18.2',java:17,url:'https://api.purpurmc.org/v2/purpur/1.18.2/1632/download'},
     {v:'1.16.5',java:8,url:'https://api.purpurmc.org/v2/purpur/1.16.5/1171/download'},
-   ]
-  },
-  magma:{
-   name:'Arclight',
-   versions:[
-    {v:'Forge 1.21.1',java:21,url:'https://github.com/IzzelAliz/Arclight/releases/download/FeudalKings/1.0.1/arclight-forge-1.21.1-1.0.1-8ec9529.jar'},
-    {v:'Forge 1.20.4',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Whisper/1.0.4/arclight-forge-1.20.4-1.0.4-80ec5df.jar'},
-    {v:'Forge 1.20.2',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Net/1.0.3/arclight-forge-1.20.2-1.0.3.jar'},
-    {v:'Forge 1.20.1',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Trials/1.0.6/arclight-forge-1.20.1-1.0.6.jar'},
-    {v:'Forge 1.19.4',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Executions/1.0.8/arclight-forge-1.19.4-1.0.8.jar'},
-    {v:'Forge 1.18.2',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/1.18/1.0.12/arclight-forge-1.18.2-1.0.12.jar'},
-    {v:'Forge 1.16.5',java:8,url:'https://github.com/IzzelAliz/Arclight/releases/download/1.16/1.0.25/arclight-forge-1.16.5-1.0.25.jar'},
    ]
   },
   forge:{
@@ -3865,6 +3851,19 @@ def api_download_core():
             eula_path = MC_DIR / "eula.txt"
             if not eula_path.exists():
                 eula_path.write_text("eula=true\n")
+            
+            run_sh = MC_DIR / "run.sh"
+            if not run_sh.exists():
+                libs = list(MC_DIR.glob("libraries/**/*.jar"))
+                cp = ":".join([str(j) for j in libs]) + ":server.jar"
+                run_sh.write_text(f'#!/bin/bash\ncd "{MC_DIR}"\njava {java_args} -cp "{cp}" net.minecraft.server.Main "$@"\n')
+                run_sh.chmod(0o755)
+            
+            run_bat = MC_DIR / "run.bat"
+            if not run_bat.exists():
+                libs = list(MC_DIR.glob("libraries/**/*.jar"))
+                cp = ";".join([str(j) for j in libs]) + ";server.jar"
+                run_bat.write_text(f'@echo off\ncd /d "{MC_DIR}"\njava {java_args} -cp "{cp}" net.minecraft.server.Main %*\n')
             
             forge_jars = list(MC_DIR.glob("forge-*-server.jar"))
             if not forge_jars:
