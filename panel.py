@@ -2321,6 +2321,7 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Arclight</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
@@ -2353,6 +2354,7 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('magma',this)">Arclight</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
@@ -2435,7 +2437,24 @@ const CORE_VERSIONS={
    name:'Arclight',
    versions:[
     {v:'Forge 1.21.1',java:21,url:'https://github.com/IzzelAliz/Arclight/releases/download/FeudalKings/1.0.1/arclight-forge-1.21.1-1.0.1-8ec9529.jar'},
+    {v:'Forge 1.20.4',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Whisper/1.0.4/arclight-forge-1.20.4-1.0.4-80ec5df.jar'},
+    {v:'Forge 1.20.2',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Net/1.0.3/arclight-forge-1.20.2-1.0.3.jar'},
     {v:'Forge 1.20.1',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Trials/1.0.6/arclight-forge-1.20.1-1.0.6.jar'},
+    {v:'Forge 1.19.4',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/Executions/1.0.8/arclight-forge-1.19.4-1.0.8.jar'},
+    {v:'Forge 1.18.2',java:17,url:'https://github.com/IzzelAliz/Arclight/releases/download/1.18/1.0.12/arclight-forge-1.18.2-1.0.12.jar'},
+    {v:'Forge 1.16.5',java:8,url:'https://github.com/IzzelAliz/Arclight/releases/download/1.16/1.0.25/arclight-forge-1.16.5-1.0.25.jar'},
+   ]
+  },
+  forge:{
+   name:'Forge',
+   versions:[
+    {v:'1.21.1-52.1.0',java:21,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.1-52.1.0/forge-1.21.1-52.1.0-installer.jar'},
+    {v:'1.20.4-49.2.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.4-49.2.0/forge-1.20.4-49.2.0-installer.jar'},
+    {v:'1.20.2-48.1.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.2-48.1.0/forge-1.20.2-48.1.0-installer.jar'},
+    {v:'1.20.1-47.4.10',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.4.10/forge-1.20.1-47.4.10-installer.jar'},
+    {v:'1.19.4-45.4.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.19.4-45.4.0/forge-1.19.4-45.4.0-installer.jar'},
+    {v:'1.18.2-40.3.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.18.2-40.3.0/forge-1.18.2-40.3.0-installer.jar'},
+    {v:'1.16.5-36.2.34',java:8,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.16.5-36.2.34/forge-1.16.5-36.2.34-installer.jar'},
    ]
   }
 };
