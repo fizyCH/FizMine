@@ -45,7 +45,9 @@ function Start-Panel {
     }
     Start-Process python -ArgumentList "panel.py" -WorkingDirectory $ScriptDir -WindowStyle Minimized
     Start-Sleep 1
-    Write-Host "  Panel started -> http://0.0.0.0:$PanelPort"
+    $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -ne '127.0.0.1' } | Select-Object -First 1).IPAddress
+    if (-not $ip) { $ip = "localhost" }
+    Write-Host "  Panel started -> http://$ip`:$PanelPort"
 }
 
 function Stop-Panel {

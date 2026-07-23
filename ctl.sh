@@ -92,7 +92,7 @@ start_panel() {
   nohup python3 panel.py > /tmp/mcpanel.log 2>&1 &
   sleep 1
   if pgrep -f "panel.py" > /dev/null; then
-    echo "  Panel started -> http://0.0.0.0:$PANEL_PORT"
+    echo "  Panel started -> http://$(hostname -I | awk '{print $1}'):$PANEL_PORT"
   else
     echo "  Failed to start"
   fi
