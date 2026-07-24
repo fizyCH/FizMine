@@ -3835,8 +3835,6 @@ def api_download_core():
                         shutil.rmtree(item)
                     else:
                         item.unlink()
-            for f in MC_DIR.glob("run.*"):
-                f.unlink(missing_ok=True)
             for f in MC_DIR.glob("user_jvm_args.txt"):
                 f.unlink(missing_ok=True)
             
