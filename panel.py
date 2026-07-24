@@ -3865,13 +3865,12 @@ def api_download_core():
                 pass
             
             installer_path.unlink(missing_ok=True)
-            log_file.unlink(missing_ok=True)
             
             if r.returncode != 0:
-                return jsonify({"error": f"Installer failed (code {r.returncode}): {stdout_text[:500]}"}), 500
+                return jsonify({"error": f"Installer failed (code {r.returncode}): {stdout_text[:1000]}"}), 500
             
             if not (MC_DIR / "libraries").exists():
-                return jsonify({"error": "Installer did not create libraries folder. Check Java version."}), 500
+                return jsonify({"error": "Installer did not create libraries folder. Output: " + stdout_text[:500]}), 500
             
             eula_path = MC_DIR / "eula.txt"
             if not eula_path.exists():
