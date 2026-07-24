@@ -2319,9 +2319,10 @@ async function loadSetup(){
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2351,9 +2352,10 @@ async function loadSetup(){
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
@@ -2419,8 +2421,8 @@ const CORE_VERSIONS={
     {v:'1.16.5',java:8,url:'https://meta.fabricmc.net/v2/versions/loader/1.16.5/0.19.3/1.0.1/server/jar'},
    ]
   },
-  purpur:{
-   name:'Purpur',
+  paper:{
+   name:'Paper',
    versions:[
     {v:'1.21.1',java:21,url:'https://api.purpurmc.org/v2/purpur/1.21.1/2329/download'},
     {v:'1.20.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.4/2176/download'},
@@ -2431,6 +2433,17 @@ const CORE_VERSIONS={
     {v:'1.16.5',java:8,url:'https://api.purpurmc.org/v2/purpur/1.16.5/1171/download'},
    ]
   },
+  mohist:{
+   name:'Mohist',
+   versions:[
+    {v:'1.20.1 (build 54)',java:17,url:'https://api.mohistmc.com/project/mohist/1.20.1/builds/54/download'},
+    {v:'1.20.2 (build 88)',java:17,url:'https://api.mohistmc.com/project/mohist/1.20.2/builds/88/download'},
+    {v:'1.19.4 (build 90)',java:17,url:'https://api.mohistmc.com/project/mohist/1.19.4/builds/90/download'},
+    {v:'1.18.2 (build 87)',java:17,url:'https://api.mohistmc.com/project/mohist/1.18.2/builds/87/download'},
+    {v:'1.16.5 (build 65)',java:8,url:'https://api.mohistmc.com/project/mohist/1.16.5/builds/65/download'},
+    {v:'1.12.2 (build 61)',java:8,url:'https://api.mohistmc.com/project/mohist/1.12.2/builds/61/download'},
+   ]
+  },,
   forge:{
    name:'Forge',
    versions:[
@@ -3826,7 +3839,7 @@ def api_download_core():
             installer_path.write_bytes(data)
             java_bin = find_java()
             
-            install_args = [java_bin, "-jar", str(installer_path), "--installServer", str(MC_DIR)]
+            install_args = [java_bin, "-jar", str(installer_path), "--installServer"]
             
             log_file = MC_DIR / "installer.log"
             with open(log_file, "w") as lf:
