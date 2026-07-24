@@ -601,8 +601,6 @@ def start_server():
     global _server_proc
     if is_server_running():
         return "already running"
-    if not (MC_DIR / "server.jar").exists():
-        return "no server.jar found"
 
     java_args = os.environ.get("JAVA_ARGS") or _env.get("JAVA_ARGS", "-Xmx2G -Xms1G")
     java_bin = find_java()
@@ -617,24 +615,30 @@ def start_server():
         pass
 
     if java_ver > 0 and java_ver < 17:
-        return f"Java {java_ver} found but server requires Java 17+. Set JAVA_PATH in .env to a Java 17+ installation."
+        return f"Java {java_ver} found but server requires Java 17+."
 
     run_sh = MC_DIR / "run.sh"
-    user_jvm = MC_DIR / "user_jvm_args.txt"
+    run_bat = MC_DIR / "run.bat"
+    shim_jars = list(MC_DIR.glob("forge-*-shim.jar"))
+    shim_jars += list(MC_DIR.glob("neoforge-*-shim.jar"))
+    has_server_jar = (MC_DIR / "server.jar").exists()
 
-    if run_sh.exists() and not IS_WINDOWS:
-        user_jvm.write_text(f"-Xms1G\n-Xmx2G\n-Dterminal.jline=false\n")
+    if not run_sh.exists() and not run_bat.exists() and not shim_jars and not has_server_jar:
+        return "No server files found. Install a core first."
+
+    user_jvm = MC_DIR / "user_jvm_args.txt"
+    user_jvm.write_text(f"-Xms1G\n-Xmx2G\n-Dterminal.jline=false\n")
+
+    if IS_WINDOWS and run_bat.exists():
+        java_cmd = ["cmd", "/c", str(run_bat), "nogui"]
+    elif run_sh.exists():
         java_cmd = ["bash", str(run_sh), "nogui"]
-    elif IS_WINDOWS and (MC_DIR / "run.bat").exists():
-        java_cmd = ["cmd", "/c", str(MC_DIR / "run.bat"), "nogui"]
+    elif shim_jars:
+        java_cmd = java_bin.split() + java_args.split() + ["-jar", str(shim_jars[0]), "nogui"]
+    elif has_server_jar:
+        java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
     else:
-        libs = list(MC_DIR.glob("libraries/**/*.jar"))
-        if libs:
-            sep = ":" if not IS_WINDOWS else ";"
-            cp = sep.join([str(j) for j in libs]) + sep + str(MC_DIR / "server.jar")
-            java_cmd = java_bin.split() + java_args.split() + ["-cp", cp, "cpw.mods.bootstraplauncher.BootstrapLauncher", "--launchTarget", "forgeserver", "nogui"]
-        else:
-            java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
+        return "No server files found."
 
     if IS_WINDOWS:
         _server_proc = subprocess.Popen(
