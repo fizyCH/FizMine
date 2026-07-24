@@ -2369,36 +2369,12 @@ async function loadSetup(){
     <div class="panel">
      <h3><svg class="ico" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> <span data-i18n="server_files">Server Files</span></h3>
      <div id="setup-files"></div>
-    </div>
-   </div>`;
-   loadSetupFiles();
-  }else{
-   el.innerHTML=`
-   <div class="setup-card">
-     <h3><svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> ${t('setup_welcome')}</h3>
-    <p>${t('setup_desc')}</p>
-    <div class="drop-zone" id="drop-core" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDropCore(event,this)" onclick="this.querySelector('input').click()">
-     <input type="file" accept=".jar" onchange="uploadCore(this.files[0]);this.value=''">
-     <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-     <div class="drop-text">${t('drop_jar_here')}</div>
-     <div class="drop-hint">${t('supported')}</div>
-    </div>
-    <button class="btn btn-accent" onclick="uploadCoreConfirm()" id="btn-core-upload" style="display:none;margin-top:12px">${t('upload_create')}</button>
-    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px">
-     <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
-     <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
-      <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
-       <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
-       <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
+       </div>
       </div>
      </div>
-    </div>
-   </div>`;
-  }
+    </div>`;
+    loadSetupFiles();
+   }
 }
 
 let pendingCoreFile=null;
