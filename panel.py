@@ -2319,7 +2319,7 @@ async function loadSetup(){
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
@@ -2352,7 +2352,7 @@ async function loadSetup(){
      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('paper',this)">Paper</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
@@ -2421,8 +2421,8 @@ const CORE_VERSIONS={
     {v:'1.16.5',java:8,url:'https://meta.fabricmc.net/v2/versions/loader/1.16.5/0.19.3/1.0.1/server/jar'},
    ]
   },
-  paper:{
-   name:'Paper',
+  purpur:{
+   name:'Purpur',
    versions:[
     {v:'1.21.1',java:21,url:'https://api.purpurmc.org/v2/purpur/1.21.1/2329/download'},
     {v:'1.20.4',java:17,url:'https://api.purpurmc.org/v2/purpur/1.20.4/2176/download'},
