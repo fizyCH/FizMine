@@ -3879,10 +3879,16 @@ def api_download_core():
             
             run_sh = MC_DIR / "run.sh"
             if not run_sh.exists():
-                libs = list(MC_DIR.glob("libraries/**/*.jar"))
-                cp = ":".join([str(j) for j in libs]) + ":server.jar"
-                java_args_default = _env.get("JAVA_ARGS", "-Xmx2G -Xms1G")
-                run_sh.write_text(f'#!/bin/bash\ncd "{MC_DIR}"\njava {java_args_default} -cp "{cp}" net.minecraft.server.Main "$@"\n')
+                forge_args = MC_DIR / "user_jvm_args.txt"
+                unix_args = list(MC_DIR.glob("libraries/net/minecraftforge/forge/*/unix_args.txt"))
+                if unix_args:
+                    run_sh.write_text(f'#!/bin/bash\ncd "{MC_DIR}"\njava @user_jvm_args.txt @{unix_args[0]} "$@"\n')
+                else:
+                    libs = list(MC_DIR.glob("libraries/**/*.jar"))
+                    sep = ":" if not IS_WINDOWS else ";"
+                    cp = sep.join([str(j) for j in libs]) + sep + str(MC_DIR / "server.jar")
+                    java_args_default = _env.get("JAVA_ARGS", "-Xmx2G -Xms1G")
+                    run_sh.write_text(f'#!/bin/bash\ncd "{MC_DIR}"\njava {java_args_default} -cp "{cp}" net.minecraft.server.Main "$@"\n')
                 run_sh.chmod(0o755)
             
             run_bat = MC_DIR / "run.bat"
