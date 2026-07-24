@@ -3949,7 +3949,7 @@ def api_download_core():
             if path_key not in del_paths:
                 keep_paths.update(targets)
 
-        protected = {"panel", ".git", "__pycache__", "server.jar", "eula.txt", "panel.tar"}
+        protected = {"panel", ".git", "__pycache__", "server.jar", "eula.txt", "panel.tar", "libraries", "run.sh", "run.bat", "user_jvm_args.txt", "forge"}
         deleted = []
         for item in MC_DIR.iterdir():
             name = item.name
