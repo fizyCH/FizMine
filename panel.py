@@ -620,7 +620,10 @@ def start_server():
         return f"Java {java_ver} found but server requires Java 17+. Set JAVA_PATH in .env to a Java 17+ installation."
 
     run_sh = MC_DIR / "run.sh"
+    user_jvm = MC_DIR / "user_jvm_args.txt"
+
     if run_sh.exists() and not IS_WINDOWS:
+        user_jvm.write_text(f"-Xmx{java_args.split()[1] if len(java_args.split())>1 else '2G'}\n-Xms{java_args.split()[0].replace('-Xmx','') if java_args.split() else '1G'}\n")
         java_cmd = ["bash", str(run_sh), "nogui"]
     elif IS_WINDOWS and (MC_DIR / "run.bat").exists():
         java_cmd = ["cmd", "/c", str(MC_DIR / "run.bat"), "nogui"]
@@ -2458,6 +2461,7 @@ const CORE_VERSIONS={
   forge:{
    name:'Forge',
    versions:[
+    {v:'1.21.1-52.1.0',java:21,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.1-52.1.0/forge-1.21.1-52.1.0-installer.jar'},
     {v:'1.20.4-49.2.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.4-49.2.0/forge-1.20.4-49.2.0-installer.jar'},
     {v:'1.20.2-48.1.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.2-48.1.0/forge-1.20.2-48.1.0-installer.jar'},
     {v:'1.20.1-47.4.10',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.4.10/forge-1.20.1-47.4.10-installer.jar'},
