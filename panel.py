@@ -617,28 +617,37 @@ def start_server():
     if java_ver > 0 and java_ver < 17:
         return f"Java {java_ver} found but server requires Java 17+."
 
+    user_jvm = MC_DIR / "user_jvm_args.txt"
+    xmx = "2G"
+    xms = "1G"
+    for part in java_args.split():
+        if part.startswith("-Xmx"):
+            xmx = part[4:]
+        elif part.startswith("-Xms"):
+            xms = part[3:]
+    user_jvm.write_text(f"-Xms{xms}\n-Xmx{xmx}\n-Dterminal.jline=false\n-Dterminal.ansi=true\n")
+
     run_sh = MC_DIR / "run.sh"
     run_bat = MC_DIR / "run.bat"
-    shim_jars = list(MC_DIR.glob("forge-*-shim.jar"))
-    shim_jars += list(MC_DIR.glob("neoforge-*-shim.jar"))
-    has_server_jar = (MC_DIR / "server.jar").exists()
-
-    if not run_sh.exists() and not run_bat.exists() and not shim_jars and not has_server_jar:
-        return "No server files found. Install a core first."
-
-    user_jvm = MC_DIR / "user_jvm_args.txt"
-    user_jvm.write_text(f"-Xms1G\n-Xmx2G\n-Dterminal.jline=false\n")
 
     if IS_WINDOWS and run_bat.exists():
         java_cmd = ["cmd", "/c", str(run_bat), "nogui"]
     elif run_sh.exists():
         java_cmd = ["bash", str(run_sh), "nogui"]
-    elif shim_jars:
-        java_cmd = java_bin.split() + java_args.split() + ["-jar", str(shim_jars[0]), "nogui"]
-    elif has_server_jar:
-        java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
     else:
-        return "No server files found."
+        import glob
+        unix_args = glob.glob(str(MC_DIR / "libraries/net/minecraftforge/forge/*/unix_args.txt"))
+        if unix_args:
+            rel_args = os.path.relpath(unix_args[0], str(MC_DIR))
+            java_cmd = [java_bin, "@user_jvm_args.txt", f"@{rel_args}", "nogui"]
+        else:
+            shim_jars = list(MC_DIR.glob("forge-*-shim.jar")) + list(MC_DIR.glob("neoforge-*-shim.jar"))
+            if shim_jars:
+                java_cmd = [java_bin] + java_args.split() + ["-jar", str(shim_jars[0]), "nogui"]
+            elif (MC_DIR / "server.jar").exists():
+                java_cmd = [java_bin] + java_args.split() + ["-jar", str(MC_DIR / "server.jar"), "nogui"]
+            else:
+                return "No server files found."
 
     if IS_WINDOWS:
         _server_proc = subprocess.Popen(
