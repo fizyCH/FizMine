@@ -2353,9 +2353,8 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
       </div>
      </div>
-    </div>`;
+     </div>`;
    }
-}
 }
 
 let pendingCoreFile=null;
