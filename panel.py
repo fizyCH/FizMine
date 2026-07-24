@@ -617,16 +617,6 @@ def start_server():
     if java_ver > 0 and java_ver < 17:
         return f"Java {java_ver} found but server requires Java 17+."
 
-    user_jvm = MC_DIR / "user_jvm_args.txt"
-    xmx = "2G"
-    xms = "1G"
-    for part in java_args.split():
-        if part.startswith("-Xmx"):
-            xmx = part[4:]
-        elif part.startswith("-Xms"):
-            xms = part[3:]
-    user_jvm.write_text(f"-Xms{xms}\n-Xmx{xmx}\n-Dterminal.jline=false\n-Dterminal.ansi=true\n")
-
     run_sh = MC_DIR / "run.sh"
     run_bat = MC_DIR / "run.bat"
 
@@ -634,20 +624,10 @@ def start_server():
         java_cmd = ["cmd", "/c", str(run_bat), "nogui"]
     elif run_sh.exists():
         java_cmd = ["bash", str(run_sh), "nogui"]
+    elif (MC_DIR / "server.jar").exists():
+        java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
     else:
-        import glob
-        unix_args = glob.glob(str(MC_DIR / "libraries/net/minecraftforge/forge/*/unix_args.txt"))
-        if unix_args:
-            rel_args = os.path.relpath(unix_args[0], str(MC_DIR))
-            java_cmd = [java_bin, "@user_jvm_args.txt", f"@{rel_args}", "nogui"]
-        else:
-            shim_jars = list(MC_DIR.glob("forge-*-shim.jar")) + list(MC_DIR.glob("neoforge-*-shim.jar"))
-            if shim_jars:
-                java_cmd = [java_bin] + java_args.split() + ["-jar", str(shim_jars[0]), "nogui"]
-            elif (MC_DIR / "server.jar").exists():
-                java_cmd = [java_bin] + java_args.split() + ["-jar", str(MC_DIR / "server.jar"), "nogui"]
-            else:
-                return "No server files found."
+        return "No server.jar found. Install a core first."
 
     if IS_WINDOWS:
         _server_proc = subprocess.Popen(
@@ -2381,7 +2361,37 @@ async function loadSetup(){
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('forge',this)">Forge</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
+      <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
+       <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
+       <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
+      </div>
+     </div>
+    </div>
+    <div class="panel">
+     <h3><svg class="ico" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> <span data-i18n="server_files">Server Files</span></h3>
+     <div id="setup-files"></div>
+    </div>
+   </div>`;
+   loadSetupFiles();
+  }else{
+   el.innerHTML=`
+   <div class="setup-card">
+     <h3><svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> ${t('setup_welcome')}</h3>
+    <p>${t('setup_desc')}</p>
+    <div class="drop-zone" id="drop-core" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDropCore(event,this)" onclick="this.querySelector('input').click()">
+     <input type="file" accept=".jar" onchange="uploadCore(this.files[0]);this.value=''">
+     <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+     <div class="drop-text">${t('drop_jar_here')}</div>
+     <div class="drop-hint">${t('supported')}</div>
+    </div>
+    <button class="btn btn-accent" onclick="uploadCoreConfirm()" id="btn-core-upload" style="display:none;margin-top:12px">${t('upload_create')}</button>
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px">
+     <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
+     <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
+       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
@@ -2469,17 +2479,6 @@ const CORE_VERSIONS={
     {v:'1.18.2 (build 87)',java:17,url:'https://api.mohistmc.com/project/mohist/1.18.2/builds/87/download'},
     {v:'1.16.5 (build 65)',java:8,url:'https://api.mohistmc.com/project/mohist/1.16.5/builds/65/download'},
     {v:'1.12.2 (build 61)',java:8,url:'https://api.mohistmc.com/project/mohist/1.12.2/builds/61/download'},
-   ]
-  },
-  forge:{
-   name:'Forge',
-   versions:[
-    {v:'1.20.4-49.2.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.4-49.2.0/forge-1.20.4-49.2.0-installer.jar'},
-    {v:'1.20.2-48.1.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.2-48.1.0/forge-1.20.2-48.1.0-installer.jar'},
-    {v:'1.20.1-47.4.10',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.4.10/forge-1.20.1-47.4.10-installer.jar'},
-    {v:'1.19.4-45.4.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.19.4-45.4.0/forge-1.19.4-45.4.0-installer.jar'},
-    {v:'1.18.2-40.3.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.18.2-40.3.0/forge-1.18.2-40.3.0-installer.jar'},
-    {v:'1.16.5-36.2.34',java:8,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.16.5-36.2.34/forge-1.16.5-36.2.34-installer.jar'},
    ]
   }
 };
