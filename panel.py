@@ -2443,7 +2443,7 @@ const CORE_VERSIONS={
     {v:'1.16.5 (build 65)',java:8,url:'https://api.mohistmc.com/project/mohist/1.16.5/builds/65/download'},
     {v:'1.12.2 (build 61)',java:8,url:'https://api.mohistmc.com/project/mohist/1.12.2/builds/61/download'},
    ]
-  },,
+  },
   forge:{
    name:'Forge',
    versions:[
