@@ -2458,7 +2458,6 @@ const CORE_VERSIONS={
   forge:{
    name:'Forge',
    versions:[
-    {v:'1.21.1-52.1.0',java:21,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.21.1-52.1.0/forge-1.21.1-52.1.0-installer.jar'},
     {v:'1.20.4-49.2.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.4-49.2.0/forge-1.20.4-49.2.0-installer.jar'},
     {v:'1.20.2-48.1.0',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.2-48.1.0/forge-1.20.2-48.1.0-installer.jar'},
     {v:'1.20.1-47.4.10',java:17,url:'https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.4.10/forge-1.20.1-47.4.10-installer.jar'},
