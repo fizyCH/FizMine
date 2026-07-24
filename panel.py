@@ -623,7 +623,7 @@ def start_server():
     user_jvm = MC_DIR / "user_jvm_args.txt"
 
     if run_sh.exists() and not IS_WINDOWS:
-        user_jvm.write_text(f"-Xmx{java_args.split()[1] if len(java_args.split())>1 else '2G'}\n-Xms{java_args.split()[0].replace('-Xmx','') if java_args.split() else '1G'}\n")
+        user_jvm.write_text(f"-Xms1G\n-Xmx2G\n-Dterminal.jline=false\n")
         java_cmd = ["bash", str(run_sh), "nogui"]
     elif IS_WINDOWS and (MC_DIR / "run.bat").exists():
         java_cmd = ["cmd", "/c", str(MC_DIR / "run.bat"), "nogui"]
@@ -3931,7 +3931,12 @@ def api_download_core():
             if path_key not in del_paths:
                 keep_paths.update(targets)
 
-        protected = {"panel", ".git", "__pycache__", "server.jar", "eula.txt", "panel.tar", "libraries", "run.sh", "run.bat", "user_jvm_args.txt", "forge"}
+        forge_names = set()
+        for item in MC_DIR.iterdir():
+            if item.name.startswith("forge-") or item.name.startswith("neoforge-") or item.name.startswith("minecraft_server"):
+                forge_names.add(item.name)
+
+        protected = {"panel", ".git", "__pycache__", "server.jar", "eula.txt", "panel.tar", "libraries", "run.sh", "run.bat", "user_jvm_args.txt", "forge"} | forge_names
         deleted = []
         for item in MC_DIR.iterdir():
             name = item.name
