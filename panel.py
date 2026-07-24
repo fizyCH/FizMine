@@ -2108,8 +2108,13 @@ async function executeAction(action,type,name){
   const r=await api('server?action=stop');toast(r.message||'Stopped');setTimeout(refreshDashboard,2000);
  }else if(action==='start'){
   const r=await api('server?action=start');toast(r.message||'Started');setTimeout(refreshDashboard,2000);
-  }else if(action==='restart'){
-   await api('server?action=stop');setTimeout(async()=>{await api('server?action=start');toast(t('server_restarting'));setTimeout(refreshDashboard,3000);},2000);
+   }else if(action==='restart'){
+    await api('server?action=stop');
+    setTimeout(async()=>{
+     await api('server?action=start');
+     toast(t('server_restarting'));
+     setTimeout(refreshDashboard,5000);
+    },3000);
   }else if(action==='doUploadCore'){
    doUploadCore();
   }else if(action==='deleteFileItemConfirm'){
