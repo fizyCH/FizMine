@@ -625,7 +625,13 @@ def start_server():
     elif IS_WINDOWS and (MC_DIR / "run.bat").exists():
         java_cmd = ["cmd", "/c", str(MC_DIR / "run.bat"), "nogui"]
     else:
-        java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
+        libs = list(MC_DIR.glob("libraries/**/*.jar"))
+        if libs:
+            sep = ":" if not IS_WINDOWS else ";"
+            cp = sep.join([str(j) for j in libs]) + sep + str(MC_DIR / "server.jar")
+            java_cmd = java_bin.split() + java_args.split() + ["-cp", cp, "cpw.mods.bootstraplauncher.BootstrapLauncher", "--launchTarget", "forgeserver", "nogui"]
+        else:
+            java_cmd = java_bin.split() + java_args.split() + ["-jar", "server.jar", "nogui"]
 
     if IS_WINDOWS:
         _server_proc = subprocess.Popen(
@@ -3863,6 +3869,9 @@ def api_download_core():
             
             if r.returncode != 0:
                 return jsonify({"error": f"Installer failed (code {r.returncode}): {stdout_text[:500]}"}), 500
+            
+            if not (MC_DIR / "libraries").exists():
+                return jsonify({"error": "Installer did not create libraries folder. Check Java version."}), 500
             
             eula_path = MC_DIR / "eula.txt"
             if not eula_path.exists():
