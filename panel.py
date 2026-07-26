@@ -1576,6 +1576,7 @@ body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;backgroun
 .panel h3 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;transition:background .3s}
 .ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
 .ico-sm{width:14px;height:14px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;transition:all .2s}.icon-btn:hover,.icon-btn.active{color:var(--accent);border-color:rgba(var(--accent-rgb),.35);background:rgba(var(--accent-rgb),.1)}
 
 .console-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-family:'JetBrains Mono','Cascadia Code','Fira Code',monospace;font-size:12px;height:420px;overflow-y:auto;line-height:1.7;word-wrap:break-word}
 .console-box .line{white-space:pre-wrap}
@@ -2259,9 +2260,11 @@ async function createUser(){
 async function loadUsers(){
  const data=await api('users'); const out=document.getElementById('users-list');if(!out)return;
  if(data.error){out.innerHTML='<div class="empty">'+esc(data.error)+'</div>';return;}
- out.innerHTML=data.users.map(u=>{const perms=Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+' '+(u.role==='admin'?'disabled':'')+'> '+t(labelKey)+'</label>').join('');return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b>'+esc(u.username)+'</b><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+esc(u.username)+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+esc(u.username)+'\')">'+t('save_permissions')+'</button>'+(u.username==='admin'?'':'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+esc(u.username)+'\')">'+t('delete_user')+'</button>')+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
+ out.innerHTML=data.users.map(u=>{const perms=Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+' '+(u.role==='admin'?'disabled':'')+'> '+t(labelKey)+'</label>').join('');const name=esc(u.username);return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px;min-width:0"><b class="user-name" data-user="'+name+'">'+name+'</b><button class="icon-btn" title="Edit username" onclick="editUsername(\''+name+'\')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L8 18l-4 1 1-4Z"/></svg></button></div><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div style="display:flex;align-items:center;gap:8px;margin:10px 0;max-width:340px"><input class="user-password" data-user="'+name+'" type="password" placeholder="'+t('password')+'" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px"><button class="icon-btn" title="Show or hide password" onclick="toggleUserPassword(this)"><svg class="ico ico-sm eye-icon" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div><div class="user-perms" data-user="'+name+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+name+'\')">'+t('save_permissions')+'</button>'+(u.username==='admin'?'':'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+name+'\')">'+t('delete_user')+'</button>')+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
 }
-async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();}
+function toggleUserPassword(button){const input=button.parentElement.querySelector('.user-password');if(!input)return;input.type=input.type==='password'?'text':'password';button.classList.toggle('active',input.type==='text');}
+function editUsername(username){showInputModal(t('username'),t('username'),async newUsername=>{const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,new_username:newUsername})});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();});}
+async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const passwordInput=document.querySelector('.user-password[data-user="'+CSS.escape(username)+'"]');const body={username,permissions};if(passwordInput&&passwordInput.value)body.password=passwordInput.value;const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();}
 function deleteUser(username){confirmAction(t('confirm_delete_user')+': '+username+'?','deleteUserConfirm',username,'','true');}
 async function deleteUserConfirm(username){const r=await api('users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});if(r.error){toast(r.error);return;}toast(t('user_deleted'));loadUsers();}
 
@@ -3769,6 +3772,16 @@ async def api_users(request: Request):
     if username not in users:
         return JSONResponse({"error": "User not found"}, status_code=404)
     if request.method == "PUT":
+        new_username = str(body.get("new_username", "")).strip().lower()
+        if new_username and new_username != username:
+            if not re.fullmatch(r"[a-z0-9_.-]{3,32}", new_username):
+                return JSONResponse({"error": "Username: 3–32 Latin letters, digits, ., _ or -"}, status_code=400)
+            if new_username in users:
+                return JSONResponse({"error": "User already exists"}, status_code=409)
+            users[new_username] = users.pop(username)
+            if request.session.get("username") == username:
+                request.session["username"] = new_username
+            username = new_username
         if "role" in body:
             users[username]["role"] = "admin" if body["role"] == "admin" else "user"
         if "permissions" in body and isinstance(body["permissions"], list):
