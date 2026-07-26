@@ -3773,6 +3773,7 @@ async def api_users(request: Request):
     if username not in users:
         return JSONResponse({"error": "User not found"}, status_code=404)
     if request.method == "PUT":
+        renamed_from = None
         new_username = str(body.get("new_username", "")).strip().lower()
         if new_username and new_username != username:
             if not re.fullmatch(r"[a-z0-9_.-]{3,32}", new_username):
@@ -3780,8 +3781,7 @@ async def api_users(request: Request):
             if new_username in users:
                 return JSONResponse({"error": "User already exists"}, status_code=409)
             users[new_username] = users.pop(username)
-            if request.session.get("username") == username:
-                request.session["username"] = new_username
+            renamed_from = username
             username = new_username
         if "role" in body:
             users[username]["role"] = "admin" if body["role"] == "admin" else "user"
@@ -3793,6 +3793,9 @@ async def api_users(request: Request):
                 return JSONResponse({"error": "Password too weak (min 5 chars, no common words)"}, status_code=400)
             users[username]["password_hash"] = _password_hash(password)
         save_users(users)
+        if renamed_from and request.session.get("username") == renamed_from:
+            request.session["username"] = username
+            request.session["authenticated"] = True
         return JSONResponse({"message": "User updated"})
 
     if username == request.session.get("username"):
