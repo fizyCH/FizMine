@@ -3366,6 +3366,7 @@ async function saveAuthState(enabled){
    if(ff&&!fireflyAnim){initFireflies();document.getElementById('fireflies-canvas').classList.add('active');animateFireflies();}
    else if(!ff&&fireflyAnim){document.getElementById('fireflies-canvas').classList.remove('active');cancelAnimationFrame(fireflyAnim);fireflyAnim=null;}
    T=await (await fetch('/api/lang',{credentials:'same-origin'})).json();
+  if(!T.password_hint)T.password_hint=(EXTRA_TRANSLATIONS[currentLang]||EXTRA_TRANSLATIONS.en).password_hint;
   applyTranslations();
   showTab(currentTab);
   // Account name and other async UI fragments need an explicit refresh too;
