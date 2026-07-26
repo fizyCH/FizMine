@@ -1711,7 +1711,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .sidebar{position:fixed;z-index:10}
 
 @media(max-width:768px){
-.sidebar{width:58px}.sidebar .logo{padding:12px 8px}.sidebar .logo-icon{width:40px;height:40px;margin-bottom:0}.sidebar .logo-icon svg{width:28px;height:28px}.sidebar .logo h1,.sidebar .logo span,.sidebar nav a span{display:none}
+.sidebar{width:58px}.sidebar .logo{padding:12px 7px}.sidebar .logo-icon{width:44px;height:44px;margin:0 auto;box-sizing:border-box}.sidebar .logo-icon svg{width:30px!important;height:30px!important}.sidebar .logo h1,.sidebar .logo span,.sidebar .logo>div:last-child,.sidebar nav a span{display:none}
 .sidebar nav{padding:10px 7px;overflow-y:auto}.sidebar nav a{justify-content:center;padding:11px 8px;margin-bottom:4px}.sidebar nav a .icon{width:22px}.sidebar #account-badge{display:none}
 .main{margin-left:58px;padding:16px 12px;min-width:0}.header{gap:10px;margin-bottom:18px;align-items:flex-start}.header h2{font-size:19px;line-height:1.3}.header #header-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}
 .grid-2,.grid-3{grid-template-columns:1fr}.status-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px}.status-card{min-width:0;padding:13px 12px;border-radius:11px}.status-card .value{font-size:19px}
