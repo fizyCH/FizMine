@@ -1868,6 +1868,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
      <h3 style="margin:0;flex:1"><svg class="ico" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> <span data-i18n="files">Files</span></h3>
       <button class="btn btn-accent btn-sm" onclick="document.getElementById('file-upload-input').click()"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> <span data-i18n="upload_file">Upload</span></button>
       <button class="btn btn-green btn-sm" onclick="createFolder()"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg> <span data-i18n="create_folder">New Folder</span></button>
+      <button class="btn btn-accent btn-sm" id="create-file-btn" onclick="createFile()">Create File</button>
       <input type="file" id="file-upload-input" style="display:none" onchange="uploadFileToDir(this.files[0]);this.value=''">
     </div>
    <div id="file-breadcrumb" style="margin-bottom:12px;font-size:13px;color:var(--text2)"></div>
@@ -3044,6 +3045,7 @@ function toggleSort(field){
 
 async function loadFiles(path){
  currentDir=path||'';
+ updateCreateFileLabel();
  if(document.getElementById('file-search'))document.getElementById('file-search').value='';
  const url=currentDir?'files?path='+encodeURIComponent(currentDir):'files';
  const data=await api(url);
@@ -3082,6 +3084,25 @@ async function createFolder(){
  const name=prompt(t('enter_name'));
  if(!name)return;
  const r=await api('file-mkdir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,path:currentDir||''})});
+ if(r.error){toast(r.error);return;}
+ toast(r.message||t('saved'));
+ loadFiles(currentDir);
+}
+
+function updateCreateFileLabel(){
+ const labels={en:'Create File',ru:'Создать файл',de:'Datei erstellen',fr:'Créer un fichier',zh:'创建文件'};
+ const el=document.getElementById('create-file-btn');
+ if(el)el.textContent=labels[currentLang]||labels.en;
+}
+
+async function createFile(){
+ const labels={en:'File name',ru:'Имя файла',de:'Dateiname',fr:'Nom du fichier',zh:'文件名'};
+ const name=prompt(labels[currentLang]||labels.en);
+ if(!name)return;
+ const clean=name.trim();
+ if(!clean)return;
+ const fileName=currentDir?currentDir+'/'+clean:clean;
+ const r=await api('file-write',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:fileName,content:''})});
  if(r.error){toast(r.error);return;}
  toast(r.message||t('saved'));
  loadFiles(currentDir);
