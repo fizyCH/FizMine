@@ -15,44 +15,42 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 try:
-    from flask import Flask, request, jsonify, Response, abort, send_file
+    from fastapi import FastAPI, Request, UploadFile, Form as FastAPIForm, Query
+    from fastapi.responses import JSONResponse, HTMLResponse, FileResponse, RedirectResponse
+    from starlette.middleware.sessions import SessionMiddleware
+    import uvicorn
 except ImportError:
     import subprocess
-    print("Installing Flask...")
+    print("Installing FastAPI + uvicorn...")
     for args in [
-        [sys.executable, "-m", "pip", "install", "flask"],
-        [sys.executable, "-m", "pip", "install", "--break-system-packages", "flask"],
-        [sys.executable, "-m", "pip", "install", "--user", "flask"],
-        ["sudo", sys.executable, "-m", "pip", "install", "flask"],
-        ["sudo", sys.executable, "-m", "pip", "install", "--break-system-packages", "flask"],
+        [sys.executable, "-m", "pip", "install", "fastapi", "uvicorn", "python-multipart"],
+        [sys.executable, "-m", "pip", "install", "--break-system-packages", "fastapi", "uvicorn", "python-multipart"],
+        [sys.executable, "-m", "pip", "install", "--user", "fastapi", "uvicorn", "python-multipart"],
     ]:
         try:
             r = subprocess.run(args, capture_output=True, text=True, timeout=120)
             if r.returncode == 0:
-                print("Flask installed successfully")
+                print("FastAPI installed successfully")
                 break
-            if r.stderr:
-                print(r.stderr.strip()[:200])
         except Exception as e:
             print(f"Error: {e}")
     try:
-        from flask import Flask, request, jsonify, Response, abort, send_file
+        from fastapi import FastAPI, Request, UploadFile, Form as FastAPIForm, Query
+        from fastapi.responses import JSONResponse, HTMLResponse, FileResponse, RedirectResponse
+        from starlette.middleware.sessions import SessionMiddleware
+        import uvicorn
     except ImportError:
-        import site
-        user_site = site.getusersitepackages()
-        if user_site not in sys.path:
-            sys.path.insert(0, user_site)
-        try:
-            from flask import Flask, request, jsonify, Response, abort, send_file
-        except ImportError:
-            print("ERROR: Failed to install Flask. Try: pip3 install flask")
-            sys.exit(1)
+        print("ERROR: Failed to install FastAPI. Try: pip3 install fastapi uvicorn python-multipart")
+        sys.exit(1)
 
-from flask import Flask, request, jsonify, Response, abort, send_file, session, redirect, url_for
+from fastapi import FastAPI, Request, UploadFile, Form as FastAPIForm, Query, Body
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse, RedirectResponse
+from starlette.middleware.sessions import SessionMiddleware
+import uvicorn
 
 PANEL_VERSION = "2.1"
-app = Flask(__name__)
-app.secret_key = os.urandom(32).hex()
+app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key=os.urandom(32).hex())
 
 IS_WINDOWS = platform.system() == "Windows"
 
@@ -195,23 +193,24 @@ if(params.get('locked')){
 </html>"""
 
 
-@app.before_request
-def check_auth():
+@app.middleware("http")
+async def check_auth(request: Request, call_next):
     settings = load_settings()
     if not settings.get("auth_enabled"):
-        return
+        return await call_next(request)
     token = _get_panel_token()
     if not token:
-        return
-    if request.path in ("/login", "/logout"):
-        return
-    if request.path.startswith("/static/"):
-        return
-    if session.get("authenticated"):
-        return
-    if request.path.startswith("/api/"):
-        return jsonify({"error": "Unauthorized"}), 401
-    return redirect("/login")
+        return await call_next(request)
+    path = request.url.path
+    if path in ("/login", "/logout"):
+        return await call_next(request)
+    if path.startswith("/static/"):
+        return await call_next(request)
+    if request.request.session.get("authenticated"):
+        return await call_next(request)
+    if path.startswith("/api/"):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    return RedirectResponse("/login")
 
 
 _login_attempts = {}
@@ -253,15 +252,15 @@ def _validate_password(pw):
     return True
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
+@app.api_route("/login", methods=["GET", "POST"])
+async def login(request: Request):
     token = _get_panel_token()
     if not token:
-        return redirect("/")
-    ip = request.remote_addr
+        return RedirectResponse("/")
+    ip = request.client.host
     if request.method == "GET":
-        if session.get("authenticated"):
-            return redirect("/")
+        if request.session.get("authenticated"):
+            return RedirectResponse("/")
         remaining = _check_lockout(ip)
         settings = load_settings()
         accent = settings.get("accent", "#6c5ce7")
@@ -279,17 +278,18 @@ def login():
         page = page.replace("%LOGIN_BTN%", tr.get("login_btn", "Login"))
         page = page.replace("%LOGIN_ERR%", tr.get("login_error", "Invalid password"))
         page = page.replace("%LOGIN_LOCK%", tr.get("login_locked", "Too many attempts. Try again later."))
-        return page
+        return HTMLResponse(page)
     if _check_lockout(ip) > 0:
-        return redirect("/login?locked=1")
-    entered = request.form.get("token", "")
+        return RedirectResponse("/login?locked=1")
+    form_data = await request.form()
+    entered = form_data.get("token", "")
     if entered == token:
-        session["authenticated"] = True
+        request.session["authenticated"] = True
         _login_attempts.pop(ip, None)
         _lockout_until.pop(ip, None)
-        return redirect("/")
+        return RedirectResponse("/")
     _record_failed(ip)
-    return redirect("/login?error=1")
+    return RedirectResponse("/login?error=1")
 
 _default_mcdir = "C:\\minecraft" if IS_WINDOWS else "/minecraft"
 
@@ -3364,80 +3364,80 @@ def _dir_entries(base):
     return entries
 
 
-@app.route("/")
-def index():
+@app.api_route("/")
+async def index(request: Request):
     settings = load_settings()
     accent = settings.get("accent", "#6c5ce7")
     fireflies = "true" if settings.get("fireflies") else "false"
     opacity = str(settings.get("panel_opacity", 100))
     page = HTML_TEMPLATE.replace("%ACCENT%", accent).replace("%FIREFLIES%", fireflies).replace("%OPACITY%", opacity)
-    return Response(page, content_type="text/html")
+    return HTMLResponse(page)
 
 
-@app.route("/api/status")
-def api_status():
+@app.api_route("/api/status")
+async def api_status(request: Request):
     info = get_server_info()
     jar_files = list(MC_DIR.glob("*.jar"))
     if jar_files:
         info["server_jar"] = jar_files[0].name
-    return jsonify(info)
+    return JSONResponse(info)
 
 
-@app.route("/api/console")
-def api_console():
-    n = int(request.args.get("lines", 100))
-    return jsonify({"lines": get_console_lines(n)})
+@app.api_route("/api/console")
+async def api_console(request: Request):
+    n = int(request.query_params.get("lines", 100))
+    return JSONResponse({"lines": get_console_lines(n)})
 
 
-@app.route("/api/server")
-def api_server():
-    action = request.args.get("action", "status")
+@app.api_route("/api/server")
+async def api_server(request: Request):
+    action = request.query_params.get("action", "status")
     if action == "start":
         setup_server()
         msg = start_server()
-        return jsonify({"message": msg})
+        return JSONResponse({"message": msg})
     elif action == "stop":
         msg = stop_server()
-        return jsonify({"message": msg})
-    return jsonify({"running": is_server_running()})
+        return JSONResponse({"message": msg})
+    return JSONResponse({"running": is_server_running()})
 
 
-@app.route("/api/json")
-def api_json():
-    file = request.args.get("file", "")
+@app.api_route("/api/json")
+async def api_json(request: Request):
+    file = request.query_params.get("file", "")
     if file:
-        return jsonify(read_json_file(file))
-    return jsonify([])
+        return JSONResponse(read_json_file(file))
+    return JSONResponse([])
 
 
-@app.route("/api/properties", methods=["GET", "POST"])
-def api_properties():
+@app.api_route("/api/properties", methods=["GET", "POST"])
+async def api_properties(request: Request):
     if request.method == "POST":
-        body = request.get_json(force=True)
+        body = await request.json()
         props = read_properties()
         props.update(body)
         write_properties(props)
-        return jsonify({"message": "Properties saved. Restart server to apply."})
-    return jsonify(read_properties())
+        return JSONResponse({"message": "Properties saved. Restart server to apply."})
+    return JSONResponse(read_properties())
 
 
-@app.route("/api/plugins")
-def api_plugins():
-    return jsonify(list_plugins())
+@app.api_route("/api/plugins")
+async def api_plugins(request: Request):
+    return JSONResponse(list_plugins())
 
 
-@app.route("/api/mods")
-def api_mods():
-    return jsonify(list_mods())
+@app.api_route("/api/mods")
+async def api_mods(request: Request):
+    return JSONResponse(list_mods())
 
 
-@app.route("/api/online")
-def api_online():
-    return jsonify(get_online_players())
+@app.api_route("/api/online")
+async def api_online(request: Request):
+    return JSONResponse(get_online_players())
 
 
-@app.route("/api/file-exists")
-def api_file_exists():
+@app.api_route("/api/file-exists")
+async def api_file_exists(request: Request):
     check_paths = [
         "world", "mods", "plugins",
         "ops.json", "banned-players.json",
@@ -3448,29 +3448,29 @@ def api_file_exists():
     for p in check_paths:
         f = MC_DIR / p
         exists[p] = f.exists()
-    return jsonify({"exists": exists})
+    return JSONResponse({"exists": exists})
 
 
-@app.route("/api/settings", methods=["GET", "POST"])
-def api_settings():
+@app.api_route("/api/settings", methods=["GET", "POST"])
+async def api_settings(request: Request):
     if request.method == "POST":
-        body = request.get_json(force=True)
+        body = await request.json()
         save_settings(body)
         if "accent" in body:
             _env["ACCENT_COLOR"] = body["accent"]
-        return jsonify({"message": "Settings saved."})
-    return jsonify(load_settings())
+        return JSONResponse({"message": "Settings saved."})
+    return JSONResponse(load_settings())
 
 
-@app.route("/api/lang")
-def api_lang():
+@app.api_route("/api/lang")
+async def api_lang(request: Request):
     settings = load_settings()
     lang = settings.get("lang", "en")
-    return jsonify(TRANSLATIONS.get(lang, TRANSLATIONS["en"]))
+    return JSONResponse(TRANSLATIONS.get(lang, TRANSLATIONS["en"]))
 
 
-@app.route("/api/env-info")
-def api_env_info():
+@app.api_route("/api/env-info")
+async def api_env_info(request: Request):
     java_bin = find_java()
     java_ver = "?"
     try:
@@ -3481,7 +3481,7 @@ def api_env_info():
     except Exception:
         pass
     rcon = _read_rcon_config()
-    return jsonify({
+    return JSONResponse({
         "mc_dir": _env.get("MC_DIR", str(MC_DIR)),
         "port": int(_env.get("PANEL_PORT", str(PANEL_PORT))),
         "lang": _env.get("PANEL_LANG", "en"),
@@ -3496,39 +3496,39 @@ def api_env_info():
     })
 
 
-@app.route("/api/files")
-def api_files():
-    subpath = request.args.get("path", "")
+@app.api_route("/api/files")
+async def api_files(request: Request):
+    subpath = request.query_params.get("path", "")
     base = MC_DIR / subpath if subpath else MC_DIR
     if not base.exists() or not base.is_dir():
-        return jsonify({"error": "Directory not found"}), 404
-    return jsonify({"files": _dir_entries(base)})
+        return JSONResponse({"error": "Directory not found"}, status_code=404)
+    return JSONResponse({"files": _dir_entries(base)})
 
 
-@app.route("/api/file-read")
-def api_file_read():
-    name = request.args.get("name", "")
+@app.api_route("/api/file-read")
+async def api_file_read(request: Request):
+    name = request.query_params.get("name", "")
     if not name:
-        return jsonify({"error": "No name"}), 400
+        return JSONResponse({"error": "No name"}, status_code=400)
     fpath = MC_DIR / name
     if not fpath.exists() or not fpath.is_file():
-        return jsonify({"error": "Not found"}), 404
+        return JSONResponse({"error": "Not found"}, status_code=404)
     try:
         text = fpath.read_text(encoding="utf-8", errors="replace")
-        return jsonify({"name": name, "content": text})
+        return JSONResponse({"name": name, "content": text})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.route("/api/search")
-def api_search():
-    query = request.args.get("q", "").strip().lower()
-    subpath = request.args.get("path", "")
+@app.api_route("/api/search")
+async def api_search(request: Request):
+    query = request.query_params.get("q", "").strip().lower()
+    subpath = request.query_params.get("path", "")
     if not query:
-        return jsonify({"files": []})
+        return JSONResponse({"files": []})
     base = MC_DIR / subpath if subpath else MC_DIR
     if not base.exists() or not base.is_dir():
-        return jsonify({"error": "Directory not found"}), 404
+        return JSONResponse({"error": "Directory not found"}, status_code=404)
     skip_dirs = {"panel", ".git", "__pycache__"}
     results = []
     try:
@@ -3555,16 +3555,17 @@ def api_search():
             })
     except Exception:
         pass
-    return jsonify({"files": results})
+    return JSONResponse({"files": results})
 
 
-@app.route("/api/upload-core", methods=["POST"])
-def api_upload_core():
-    if "file" not in request.files:
-        return jsonify({"error": "No file"}), 400
-    file_item = request.files["file"]
+@app.api_route("/api/upload-core", methods=["POST"])
+async def api_upload_core(request: Request):
+    form = await request.form()
+    if "file" not in form:
+        return JSONResponse({"error": "No file"}, status_code=400)
+    file_item = form["file"]
     if not file_item.filename or not file_item.filename.endswith(".jar"):
-        return jsonify({"error": "File must be a .jar"}), 400
+        return JSONResponse({"error": "File must be a .jar"}, status_code=400)
     data = file_item.read()
 
     old_jar = list(MC_DIR.glob("*.jar"))
@@ -3582,7 +3583,7 @@ def api_upload_core():
         "server.properties": ["server.properties"],
     }
 
-    keep_str = request.form.get("keep_data", "{}")
+    keep_str = form.get("keep_data", "{}")
     del_paths = set()
     try:
         del_paths = set(json.loads(keep_str).keys())
@@ -3619,37 +3620,38 @@ def api_upload_core():
     msg = f"Core uploaded: {file_item.filename}. EULA accepted."
     if deleted:
         msg += f" Deleted: {', '.join(deleted)}"
-    return jsonify({"message": msg, "ok": True})
+    return JSONResponse({"message": msg, "ok": True})
 
 
-@app.route("/api/upload", methods=["POST"])
-def api_upload():
-    if "file" not in request.files:
-        return jsonify({"error": "No file"}), 400
-    file_item = request.files["file"]
-    ftype = request.form.get("type", "")
+@app.api_route("/api/upload", methods=["POST"])
+async def api_upload(request: Request):
+    form = await request.form()
+    if "file" not in form:
+        return JSONResponse({"error": "No file"}, status_code=400)
+    file_item = form["file"]
+    ftype = form.get("type", "")
     target = "mods" if ftype == "mods" else "plugins"
     if not file_item.filename:
-        return jsonify({"error": "No file"}), 400
+        return JSONResponse({"error": "No file"}, status_code=400)
     data = file_item.read()
     result = save_upload(target, file_item.filename, data)
-    return jsonify({"message": f"Uploaded {result['name']} ({result['size']} bytes)", "ok": True})
+    return JSONResponse({"message": f"Uploaded {result['name']} ({result['size']} bytes)", "ok": True})
 
 
-@app.route("/api/delete", methods=["POST"])
-def api_delete():
-    body = request.get_json(force=True)
+@app.api_route("/api/delete", methods=["POST"])
+async def api_delete(request: Request):
+    body = await request.json()
     ftype = body.get("type")
     name = body.get("name")
     target = "mods" if ftype == "mods" else "plugins"
     if delete_file(target, name):
-        return jsonify({"message": f"Deleted {name}"})
-    return jsonify({"error": "File not found"}), 404
+        return JSONResponse({"message": f"Deleted {name}"})
+    return JSONResponse({"error": "File not found"}, status_code=404)
 
 
-@app.route("/api/delete-all", methods=["POST"])
-def api_delete_all():
-    body = request.get_json(force=True)
+@app.api_route("/api/delete-all", methods=["POST"])
+async def api_delete_all(request: Request):
+    body = await request.json()
     ftype = body.get("type")
     target = "mods" if ftype == "mods" else "plugins"
     d = MC_DIR / target
@@ -3659,32 +3661,32 @@ def api_delete_all():
             if f.is_file() and f.suffix == ".jar":
                 f.unlink()
                 count += 1
-    return jsonify({"message": f"Deleted {count} files from {target}/"})
+    return JSONResponse({"message": f"Deleted {count} files from {target}/"})
 
 
-@app.route("/api/command", methods=["POST"])
-def api_command():
-    body = request.get_json(force=True)
+@app.api_route("/api/command", methods=["POST"])
+async def api_command(request: Request):
+    body = await request.json()
     cmd = body.get("cmd", "")
     if cmd:
         ok = send_command(cmd)
-        return jsonify({"ok": ok})
-    return jsonify({"ok": False})
+        return JSONResponse({"ok": ok})
+    return JSONResponse({"ok": False})
 
 
-@app.route("/api/player", methods=["POST"])
-def api_player():
-    body = request.get_json(force=True)
+@app.api_route("/api/player", methods=["POST"])
+async def api_player(request: Request):
+    body = await request.json()
     action = body.get("action")
     ptype = body.get("type")
     name = body.get("name", "").strip()
     if not name:
-        return jsonify({"error": "Name required"})
+        return JSONResponse({"error": "Name required"})
 
     files = {"ops": "ops.json", "whitelist": "whitelist.json", "ban": "banned-players.json"}
     file = files.get(ptype)
     if not file:
-        return jsonify({"error": "unknown type"})
+        return JSONResponse({"error": "unknown type"})
 
     server_up = is_server_running()
 
@@ -3695,7 +3697,7 @@ def api_player():
         if server_up:
             cmd = f"{cmd_map_add[ptype]} {name}"
             send_command(cmd)
-            return jsonify({"message": f"{name} added to {ptype} (command sent)"})
+            return JSONResponse({"message": f"{name} added to {ptype} (command sent)"})
         else:
             data = read_json_file(file)
             if not isinstance(data, list):
@@ -3705,7 +3707,7 @@ def api_player():
                 for p in data
             )
             if exists:
-                return jsonify({"message": f"{name} already in {ptype}"})
+                return JSONResponse({"message": f"{name} already in {ptype}"})
             uuid = fetch_uuid(name)
             if ptype == "ban":
                 entry = {
@@ -3720,13 +3722,13 @@ def api_player():
                 entry = {"uuid": uuid, "name": name}
             data.append(entry)
             write_json_file(file, data)
-            return jsonify({"message": f"{name} added to {ptype}"})
+            return JSONResponse({"message": f"{name} added to {ptype}"})
 
     elif action == "remove":
         if server_up:
             cmd = f"{cmd_map_remove[ptype]} {name}"
             send_command(cmd)
-            return jsonify({"message": f"{name} removed from {ptype} (command sent)"})
+            return JSONResponse({"message": f"{name} removed from {ptype} (command sent)"})
         else:
             data = read_json_file(file)
             if not isinstance(data, list):
@@ -3737,14 +3739,14 @@ def api_player():
             removed = len(data) - len(new_data)
             write_json_file(file, new_data)
             if removed > 0:
-                return jsonify({"message": f"{name} removed from {ptype}"})
-            return jsonify({"message": f"{name} not found in {ptype}"})
-    return jsonify({"error": "unknown action"})
+                return JSONResponse({"message": f"{name} removed from {ptype}"})
+            return JSONResponse({"message": f"{name} not found in {ptype}"})
+    return JSONResponse({"error": "unknown action"})
 
 
-@app.route("/api/save-env", methods=["POST"])
-def api_save_env():
-    body = request.get_json(force=True)
+@app.api_route("/api/save-env", methods=["POST"])
+async def api_save_env(request: Request):
+    body = await request.json()
     env_path = Path(__file__).parent / ".env"
     lines = []
     if env_path.exists():
@@ -3763,51 +3765,52 @@ def api_save_env():
     env_path.write_text("\n".join(lines) + "\n")
     for k, v in body.items():
         _env[k] = v
-    return jsonify({"message": "Config saved. Restart panel to apply."})
+    return JSONResponse({"message": "Config saved. Restart panel to apply."})
 
 
-@app.route("/api/file-write", methods=["POST"])
-def api_file_write():
-    body = request.get_json(force=True)
+@app.api_route("/api/file-write", methods=["POST"])
+async def api_file_write(request: Request):
+    body = await request.json()
     name = body.get("name", "")
     content = body.get("content", "")
     if not name:
-        return jsonify({"error": "No name"}), 400
+        return JSONResponse({"error": "No name"}, status_code=400)
     fpath = MC_DIR / name
     if ".." in name or name.startswith("/"):
-        return jsonify({"error": "Invalid path"}), 400
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
     try:
         fpath.parent.mkdir(parents=True, exist_ok=True)
         fpath.write_text(content, encoding="utf-8")
-        return jsonify({"message": f"Saved {name}"})
+        return JSONResponse({"message": f"Saved {name}"})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.route("/api/file-upload", methods=["POST"])
-def api_file_upload():
-    if "file" not in request.files:
-        return jsonify({"error": "No file"}), 400
-    file_item = request.files["file"]
-    target_dir = request.form.get("path", "")
+@app.api_route("/api/file-upload", methods=["POST"])
+async def api_file_upload(request: Request):
+    form = await request.form()
+    if "file" not in form:
+        return JSONResponse({"error": "No file"}, status_code=400)
+    file_item = form["file"]
+    target_dir = form.get("path", "")
     if not file_item.filename:
-        return jsonify({"error": "No filename"}), 400
+        return JSONResponse({"error": "No filename"}, status_code=400)
     if ".." in target_dir or target_dir.startswith("/"):
-        return jsonify({"error": "Invalid path"}), 400
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
     base = MC_DIR / target_dir if target_dir else MC_DIR
     base.mkdir(parents=True, exist_ok=True)
     fpath = base / file_item.filename
     fpath.write_bytes(file_item.file.read())
-    return jsonify({"message": f"Uploaded {file_item.filename}", "ok": True})
+    return JSONResponse({"message": f"Uploaded {file_item.filename}", "ok": True})
 
 
-@app.route("/api/download-core", methods=["POST"])
-def api_download_core():
-    body = request.get_json(force=True)
+@app.api_route("/api/download-core", methods=["POST"])
+async def api_download_core(request: Request):
+    body = await request.json()
     url = body.get("url", "")
     keep_str = body.get("keep_data", "{}")
     if not url:
-        return jsonify({"error": "No URL"}), 400
+        return JSONResponse({"error": "No URL"}, status_code=400)
     try:
         import urllib.request
         req = urllib.request.Request(url, headers={"User-Agent": "FizMinePanel/1.0"})
@@ -3849,10 +3852,10 @@ def api_download_core():
             log_file.unlink(missing_ok=True)
             
             if r.returncode != 0:
-                return jsonify({"error": f"Installer failed (code {r.returncode}): {stdout_text[:1000]}"}), 500
+                return JSONResponse({"error": f"Installer failed (code {r.returncode}): {stdout_text[:1000]}"}, status_code=500)
             
             if not (MC_DIR / "libraries").exists():
-                return jsonify({"error": f"No libraries. Java: {java_bin}. Output: {stdout_text[:500]}"}), 500
+                return JSONResponse({"error": f"No libraries. Java: {java_bin}. Output: {stdout_text[:500]}"}, status_code=500)
             
             eula_path = MC_DIR / "eula.txt"
             if not eula_path.exists():
@@ -3884,7 +3887,7 @@ def api_download_core():
             else:
                 all_jars = list(MC_DIR.glob("**/*.jar"))
                 jar_names = [j.name for j in all_jars[:10]]
-                return jsonify({"error": f"No server jar found. Found: {jar_names}"}), 500
+                return JSONResponse({"error": f"No server jar found. Found: {jar_names}"}, status_code=500)
         else:
             fpath = MC_DIR / "server.jar"
             fpath.write_bytes(data)
@@ -3936,40 +3939,42 @@ def api_download_core():
         msg = f"Core downloaded: {url.split('/')[-1]}. EULA accepted."
         if deleted:
             msg += f" Deleted: {', '.join(deleted)}"
-        return jsonify({"message": msg, "ok": True})
+        return JSONResponse({"message": msg, "ok": True})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-def api_file_mkdir():
-    body = request.get_json(force=True)
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.api_route("/api/file-mkdir", methods=["POST"])
+async def api_file_mkdir(request: Request):
+    body = await request.json()
     name = body.get("name", "").strip()
     subpath = body.get("path", "")
     if not name:
-        return jsonify({"error": "Folder name required"}), 400
+        return JSONResponse({"error": "Folder name required"}, status_code=400)
     if ".." in name or "/" in name or name.startswith("."):
-        return jsonify({"error": "Invalid folder name"}), 400
+        return JSONResponse({"error": "Invalid folder name"}, status_code=400)
     if ".." in subpath or subpath.startswith("/"):
-        return jsonify({"error": "Invalid path"}), 400
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
     base = MC_DIR / subpath if subpath else MC_DIR
     fpath = base / name
     if fpath.exists():
-        return jsonify({"error": "Already exists"}), 400
+        return JSONResponse({"error": "Already exists"}, status_code=400)
     try:
         fpath.mkdir(parents=True, exist_ok=True)
-        return jsonify({"message": f"Created {name}", "ok": True})
+        return JSONResponse({"message": f"Created {name}", "ok": True})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.route("/api/file-download")
-def api_file_download():
-    name = request.args.get("name", "")
+@app.api_route("/api/file-download")
+async def api_file_download(request: Request):
+    name = request.query_params.get("name", "")
     if not name:
-        return jsonify({"error": "No name"}), 400
+        return JSONResponse({"error": "No name"}, status_code=400)
     if ".." in name or name.startswith("/"):
-        return jsonify({"error": "Invalid path"}), 400
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
     fpath = MC_DIR / name
     if not fpath.exists():
-        return jsonify({"error": "Not found"}), 404
+        return JSONResponse({"error": "Not found"}, status_code=404)
     if fpath.is_dir():
         import tempfile, zipfile
         tmp = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
@@ -3981,15 +3986,15 @@ def api_file_download():
                         fp = Path(root) / file
                         arcname = str(fp.relative_to(fpath))
                         zf.write(str(fp), arcname)
-            return send_file(tmp.name, as_attachment=True, download_name=fpath.name + ".zip",
-                             mimetype="application/zip")
+            return FileResponse(tmp.name, filename=fpath.name + ".zip",
+                             media_type="application/zip")
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
-    return send_file(str(fpath), as_attachment=True, download_name=fpath.name)
+            return JSONResponse({"error": str(e)}, status_code=500)
+    return FileResponse(str(fpath), filename=fpath.name)
 
 
-@app.route("/api/backup-panel")
-def api_backup_panel():
+@app.api_route("/api/backup-panel")
+async def api_backup_panel(request: Request):
     import tempfile, zipfile
     panel_dir = Path(__file__).parent
     tmp = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
@@ -4001,14 +4006,14 @@ def api_backup_panel():
                     fp = Path(root) / file
                     arcname = str(fp.relative_to(panel_dir))
                     zf.write(str(fp), arcname)
-        return send_file(tmp.name, as_attachment=True, download_name="panel-backup.zip",
-                         mimetype="application/zip")
+        return FileResponse(tmp.name, filename="panel-backup.zip",
+                         media_type="application/zip")
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.route("/api/backup-server")
-def api_backup_server():
+@app.api_route("/api/backup-server")
+async def api_backup_server(request: Request):
     import tempfile, zipfile
     skip = {"panel", ".git", "__pycache__", "logs", "cache", "crash-reports"}
     tmp = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
@@ -4020,65 +4025,65 @@ def api_backup_server():
                     fp = Path(root) / file
                     arcname = str(fp.relative_to(MC_DIR))
                     zf.write(str(fp), arcname)
-        return send_file(tmp.name, as_attachment=True, download_name="server-backup.zip",
-                         mimetype="application/zip")
+        return FileResponse(tmp.name, filename="server-backup.zip",
+                         media_type="application/zip")
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.route("/api/set-token", methods=["POST"])
-def api_set_token():
-    body = request.get_json(force=True)
+@app.api_route("/api/set-token", methods=["POST"])
+async def api_set_token(request: Request):
+    body = await request.json()
     token = body.get("token", "").strip()
     if not token:
-        return jsonify({"error": "Password required"}), 400
+        return JSONResponse({"error": "Password required"}, status_code=400)
     if not _validate_password(token):
-        return jsonify({"error": "Password too weak (min 5 chars, no common words)"}), 400
+        return JSONResponse({"error": "Password too weak (min 5 chars, no common words)"}, status_code=400)
     _set_panel_token(token)
-    return jsonify({"message": "Password saved"})
+    return JSONResponse({"message": "Password saved"})
 
 
-@app.route("/api/remove-token", methods=["POST"])
-def api_remove_token():
+@app.api_route("/api/remove-token", methods=["POST"])
+async def api_remove_token(request: Request):
     _set_panel_token("")
-    session.pop("authenticated", None)
-    return jsonify({"message": "Token removed"})
+    request.session.pop("authenticated", None)
+    return JSONResponse({"message": "Token removed"})
 
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
+@app.api_route("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse("/login")
 
 
-@app.route("/api/file-delete", methods=["POST"])
-def api_file_delete():
-    body = request.get_json(force=True)
+@app.api_route("/api/file-delete", methods=["POST"])
+async def api_file_delete(request: Request):
+    body = await request.json()
     name = body.get("name", "")
     if not name:
-        return jsonify({"error": "No name"}), 400
+        return JSONResponse({"error": "No name"}, status_code=400)
     if ".." in name or name.startswith("/"):
-        return jsonify({"error": "Invalid path"}), 400
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
     fpath = MC_DIR / name
     if not fpath.exists():
-        return jsonify({"error": "Not found"}), 404
+        return JSONResponse({"error": "Not found"}, status_code=404)
     protected = {"panel", ".git", "__pycache__", "server.jar", "eula.txt", "panel.tar"}
     rel = str(fpath.relative_to(MC_DIR))
     top = rel.split("/")[0] if "/" in rel else rel
     if top in protected:
-        return jsonify({"error": "Protected file"}), 403
+        return JSONResponse({"error": "Protected file"}, status_code=403)
     try:
         if fpath.is_dir():
             shutil.rmtree(fpath)
         else:
             fpath.unlink()
-        return jsonify({"message": f"Deleted {name}", "ok": True})
+        return JSONResponse({"message": f"Deleted {name}", "ok": True})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
-@app.route("/api/check-update")
-def api_check_update():
+@app.api_route("/api/check-update")
+async def api_check_update(request: Request):
     import urllib.request
     try:
         local_ver = PANEL_VERSION
@@ -4092,13 +4097,13 @@ def api_check_update():
         remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
-        return jsonify({"update": remote_ver != local_ver, "local": local_ver, "remote": remote_ver})
+        return JSONResponse({"update": remote_ver != local_ver, "local": local_ver, "remote": remote_ver})
     except Exception as e:
-        return jsonify({"update": False, "error": str(e)})
+        return JSONResponse({"update": False, "error": str(e)})
 
 
-@app.route("/api/do-update", methods=["POST"])
-def api_do_update():
+@app.api_route("/api/do-update", methods=["POST"])
+async def api_do_update(request: Request):
     import urllib.request
     try:
         local_ver = PANEL_VERSION
@@ -4114,7 +4119,7 @@ def api_do_update():
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
         if remote_ver == local_ver:
-            return jsonify({"ok": True, "message": "Already up to date"})
+            return JSONResponse({"ok": True, "message": "Already up to date"})
         
         panel_path = Path(__file__).resolve()
         shutil.copy2(str(panel_path), str(panel_path) + ".bak")
@@ -4129,25 +4134,10 @@ def api_do_update():
                 os._exit(0)
         threading.Thread(target=restart, daemon=True).start()
         
-        return jsonify({"ok": True, "message": "Updated! Restarting..."})
+        return JSONResponse({"ok": True, "message": "Updated! Restarting..."})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
 
-
-class _WerkzeugFilter:
-    def __init__(self, orig):
-        self.orig = orig
-        self._skip = False
-    def write(self, s):
-        if "WARNING" in s and "development server" in s:
-            self._skip = True
-            return
-        if self._skip:
-            self._skip = False
-            return
-        self.orig.write(s)
-    def flush(self):
-        self.orig.flush()
 
 def main():
     MC_DIR.mkdir(parents=True, exist_ok=True)
@@ -4171,10 +4161,8 @@ def main():
     
     print(f"FizMine Panel starting on http://0.0.0.0:{PANEL_PORT}")
     print(f"Minecraft directory: {MC_DIR}")
-    import logging
-    logging.getLogger("werkzeug").setLevel(logging.ERROR)
-    sys.stderr = _WerkzeugFilter(sys.stderr)
-    app.run(host="0.0.0.0", port=PANEL_PORT, debug=False)
+    
+    uvicorn.run(app, host="0.0.0.0", port=PANEL_PORT)
 
 
 if __name__ == "__main__":
