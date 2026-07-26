@@ -1711,11 +1711,18 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .sidebar{position:fixed;z-index:10}
 
 @media(max-width:768px){
-.sidebar{width:64px}.sidebar .logo h1,.sidebar .logo span,.sidebar nav a span{display:none}
-.sidebar nav a{justify-content:center;padding:12px}
-.main{margin-left:64px;padding:16px}
-.grid-2,.grid-3{grid-template-columns:1fr}
-.status-bar{flex-direction:column}
+.sidebar{width:58px}.sidebar .logo{padding:12px 8px}.sidebar .logo-icon{width:40px;height:40px;margin-bottom:0}.sidebar .logo-icon svg{width:28px;height:28px}.sidebar .logo h1,.sidebar .logo span,.sidebar nav a span{display:none}
+.sidebar nav{padding:10px 7px;overflow-y:auto}.sidebar nav a{justify-content:center;padding:11px 8px;margin-bottom:4px}.sidebar nav a .icon{width:22px}.sidebar #account-badge{display:none}
+.main{margin-left:58px;padding:16px 12px;min-width:0}.header{gap:10px;margin-bottom:18px;align-items:flex-start}.header h2{font-size:19px;line-height:1.3}.header #header-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}
+.grid-2,.grid-3{grid-template-columns:1fr}.status-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px}.status-card{min-width:0;padding:13px 12px;border-radius:11px}.status-card .value{font-size:19px}
+.panel{padding:15px;margin-bottom:14px;border-radius:12px}.panel h3{font-size:14px}.console-box{height:300px;padding:10px;font-size:11px}.cmd-input{gap:6px}.cmd-input input{min-width:0;padding:10px}.cmd-input .btn{padding:9px 12px}
+.btn{min-height:40px;padding:9px 13px}.btn-sm{min-height:36px;padding:7px 10px}
+table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}th,td{padding:9px 10px}
+.drop-zone{padding:24px 12px}.modal{width:calc(100vw - 28px)!important;max-width:420px;margin:14px}.modal-overlay{padding:14px}
+.form-group input,.form-group select,.form-group textarea{font-size:16px}.custom-select-selected{min-height:42px;box-sizing:border-box}
+}
+@media(max-width:420px){
+ .main{padding:12px 8px}.status-bar{grid-template-columns:1fr}.header{flex-direction:column}.header #header-actions{width:100%;justify-content:flex-start}.header #header-actions .btn{flex:1;justify-content:center}.panel{padding:12px}.cmd-input .btn span{display:none}.cmd-input .btn{padding:10px 12px}.modal{padding:16px!important}
 }
 @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 .spin{animation:spin 1s linear infinite}
