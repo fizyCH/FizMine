@@ -2371,7 +2371,7 @@ async function executeAction(action,type,name){
   }else if(action==='deleteFileItemConfirm'){
    deleteFileItemConfirm(type);
   }else if(action==='deleteUserConfirm'){
-   deleteUserConfirm(name);
+   deleteUserConfirm(type);
   }
 }
 function lineClass(l){
