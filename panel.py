@@ -3368,6 +3368,9 @@ async function saveAuthState(enabled){
    T=await (await fetch('/api/lang',{credentials:'same-origin'})).json();
   applyTranslations();
   showTab(currentTab);
+  // Account name and other async UI fragments need an explicit refresh too;
+  // they are not covered by the static data-i18n pass.
+  loadCurrentAccount();
   toast(t('saved'));
  }
 
