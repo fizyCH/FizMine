@@ -279,14 +279,8 @@ if(params.get('locked')){
 
 @app.middleware("http")
 async def check_auth(request: Request, call_next):
-    settings = load_settings()
-    # Once accounts exist the panel is always protected, even if the legacy
-    # single-password switch was previously disabled.
-    if not settings.get("auth_enabled") and not load_users():
-        return await call_next(request)
-    token = _get_panel_token()
-    if not token:
-        return await call_next(request)
+    # Accounts are mandatory. The old optional auth toggle and legacy token
+    # must never provide an unauthenticated way into the panel.
     path = request.url.path
     if path in ("/login", "/logout"):
         return await call_next(request)
@@ -345,8 +339,6 @@ def _validate_password(pw):
 async def login(request: Request):
     token = _get_panel_token()
     users = load_users()
-    if not token and not users:
-        return RedirectResponse("/")
     ip = request.client.host
     if request.method == "GET":
         if request.session.get("authenticated"):
