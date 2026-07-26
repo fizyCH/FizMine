@@ -2092,7 +2092,7 @@ function applyAccess(){
  if(!IS_ADMIN){const nav=document.getElementById('nav-settings'),panel=document.getElementById('tab-settings'),users=document.getElementById('tab-users');if(nav)nav.style.display='none';if(panel)panel.remove();if(users)users.remove();return;}
  const settingsNav=document.getElementById('nav-settings');
  if(settingsNav&&!document.getElementById('nav-users')){
-  const nav=document.createElement('a');nav.id='nav-users';nav.href='#';nav.onclick=()=>showTab('users');nav.innerHTML='<span class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg></span><span>Пользователи</span>';settingsNav.parentNode.insertBefore(nav,settingsNav);
+  const nav=document.createElement('a');nav.id='nav-users';nav.href='#';nav.onclick=()=>showTab('users');nav.innerHTML='<span class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg></span><span data-i18n="users">Пользователи</span>';settingsNav.parentNode.insertBefore(nav,settingsNav);
  }
 }
 async function loadCurrentAccount(){
@@ -2140,6 +2140,7 @@ async function loadLang(){
    if(sd.fireflies&&!firefliesOn){firefliesOn=true;setTimeout(()=>{initFireflies();document.getElementById('fireflies-canvas').classList.add('active');animateFireflies();},500);}
  }catch(e){}
  applyTranslations();
+ loadCurrentAccount();
 }
 
 function applyTranslations(){
