@@ -3182,22 +3182,15 @@ async function deleteItem(type,name){
 const ACCENT_PRESETS=['#6c5ce7','#a855f7','#3b82f6','#06b6d4','#22c55e','#eab308','#f97316','#ef4444','#ec4899','#8b5cf6'];
 
 let currentLang='en';
-let languagePreview=false;
 function toggleCustomSelect(el){
  el.classList.toggle('open');
  document.querySelectorAll('.custom-select').forEach(s=>{if(s!==el)s.classList.remove('open');});
 }
-async function selectLang(code,label){
+function selectLang(code,label){
  currentLang=code;
- languagePreview=true;
  document.getElementById('lang-selected').textContent=label;
  document.getElementById('lang-options').querySelectorAll('.custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===code));
  document.querySelectorAll('.custom-select').forEach(s=>s.classList.remove('open'));
- try{
-  T=await (await fetch('/api/lang?lang='+encodeURIComponent(code),{credentials:'same-origin'})).json();
-  if(!T.password_hint)T.password_hint=(EXTRA_TRANSLATIONS[code]||EXTRA_TRANSLATIONS.en).password_hint;
-  applyTranslations();
- }catch(e){toast('Language loading error');}
 }
 document.addEventListener('click',e=>{
  if(!e.target.closest('.custom-select'))document.querySelectorAll('.custom-select').forEach(s=>s.classList.remove('open'));
@@ -3219,8 +3212,8 @@ async function loadEnvInfo(){
 
 async function loadSettingsPage(){
  const data=await api('settings');
- if(data.lang&&!languagePreview){
-  if(!languagePreview)currentLang=data.lang;
+ if(data.lang){
+  currentLang=data.lang;
   const langMap={en:'English',ru:'Русский',de:'Deutsch',fr:'Français',zh:'中文'};
   document.getElementById('lang-selected').textContent=langMap[data.lang]||'English';
   document.getElementById('lang-options').querySelectorAll('.custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===data.lang));
@@ -3358,15 +3351,14 @@ async function saveAuthState(enabled){
 }
 
  async function saveSettings(){
- const lang=currentLang;
+  const lang=currentLang;
   const mcdir=document.getElementById('set-mcdir').value.trim();
   const port=document.getElementById('set-port').value.trim();
   const javaargs=document.getElementById('set-javaargs').value.trim();
   const encoding=document.getElementById('set-encoding').value.trim();
   const accent=document.getElementById('color-picker').value;
   const ff=document.getElementById('fireflies-toggle').checked;
-  await api('settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang,accent,fireflies:ff,panel_opacity:panelOpacity})});
-  languagePreview=false;
+   await api('settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang,accent,fireflies:ff,panel_opacity:panelOpacity})});
   const envData={MC_DIR:mcdir||'/minecraft',PANEL_PORT:port||'8080',JAVA_ARGS:javaargs,JAVA_ENCODING:encoding};
   await api('save-env',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(envData)});
    savedAccent=accent;
@@ -3652,7 +3644,7 @@ async def api_settings(request: Request):
 @app.api_route("/api/lang")
 async def api_lang(request: Request):
     settings = load_settings()
-    lang = request.query_params.get("lang") or settings.get("lang", "en")
+    lang = settings.get("lang", "en")
     return JSONResponse(TRANSLATIONS.get(lang, TRANSLATIONS["en"]))
 
 
