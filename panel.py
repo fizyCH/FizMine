@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import io
+import hashlib
+import hmac
 import json
+import getpass
 import os
 import platform
 import re
@@ -95,6 +98,86 @@ def _set_panel_token(token):
         del os.environ["PANEL_TOKEN"]
 
 
+# Accounts are deliberately kept separate from settings: this makes it harder to
+# accidentally expose credentials through the settings API or a panel backup.
+USERS_FILE = Path(__file__).parent / "users.json"
+# Permissions are intentionally granular so an operator can receive only the
+# parts of the panel they need.
+PERMISSIONS = ("console", "mods", "properties", "files", "server_control", "players")
+
+
+def _password_hash(password, salt=None):
+    salt = salt or os.urandom(16)
+    digest = hashlib.scrypt(password.encode("utf-8"), salt=salt, n=2**14, r=8, p=1)
+    return salt.hex() + "$" + digest.hex()
+
+
+def _password_matches(password, stored):
+    try:
+        salt_hex, digest_hex = stored.split("$", 1)
+        check = _password_hash(password, bytes.fromhex(salt_hex)).split("$", 1)[1]
+        return hmac.compare_digest(check, digest_hex)
+    except (ValueError, AttributeError):
+        return False
+
+
+def load_users():
+    if not USERS_FILE.exists():
+        return {}
+    try:
+        data = json.loads(USERS_FILE.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def save_users(users):
+    USERS_FILE.write_text(json.dumps(users, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def user_permissions(user):
+    if user and user.get("role") == "admin":
+        return list(PERMISSIONS)
+    return [p for p in (user or {}).get("permissions", []) if p in PERMISSIONS]
+
+
+def can(request, permission):
+    username = request.session.get("username")
+    user = load_users().get(username, {})
+    return user.get("role") == "admin" or permission in user_permissions(user)
+
+
+def forbidden():
+    return JSONResponse({"error": "Permission denied"}, status_code=403)
+
+
+def require(request, permission):
+    return None if can(request, permission) else forbidden()
+
+
+def api_permission(path):
+    if path in {"/api/server"}:
+        return "server_control"
+    if path in {"/api/console", "/api/command"}:
+        return "console"
+    if path in {"/api/player", "/api/online", "/api/json"}:
+        return "players"
+    if path in {"/api/settings", "/api/env-info", "/api/save-env", "/api/set-token",
+                "/api/remove-token", "/api/backup-panel", "/api/backup-server",
+                "/api/check-update", "/api/do-update", "/api/upload-core", "/api/download-core",
+                "/api/users"}:
+        return "admin"
+    if path in {"/api/properties"}:
+        return "properties"
+    if path in {"/api/plugins", "/api/mods", "/api/upload", "/api/delete", "/api/delete-all"}:
+        return "mods"
+    if path in {"/api/file-exists", "/api/files", "/api/file-read", "/api/search",
+                "/api/file-write", "/api/file-upload", "/api/file-delete",
+                "/api/file-mkdir", "/api/file-download"}:
+        return "files"
+    return None
+
+
 LOGIN_HTML = r"""<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -128,7 +211,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#050505;color:#e0e0e
 <p style="font-family:'Press Start 2P',monospace;font-size:0.85rem;margin-top:1.2rem;letter-spacing:3px;color:%TEXT%">Minecraft Panel</p></div>
 <div class="error" id="errorBox"></div>
 <form method="POST" action="/login">
-<input type="password" name="token" class="form-input" placeholder="%LOGIN_PH%" required autofocus id="token-input">
+<input type="text" name="username" class="form-input" placeholder="Логин" required autofocus autocomplete="username">
+<input type="password" name="token" class="form-input" placeholder="%LOGIN_PH%" required autocomplete="current-password" id="token-input">
 <button type="submit" class="btn" id="login-btn">%LOGIN_BTN%</button>
 </form>
 </div>
@@ -196,7 +280,9 @@ if(params.get('locked')){
 @app.middleware("http")
 async def check_auth(request: Request, call_next):
     settings = load_settings()
-    if not settings.get("auth_enabled"):
+    # Once accounts exist the panel is always protected, even if the legacy
+    # single-password switch was previously disabled.
+    if not settings.get("auth_enabled") and not load_users():
         return await call_next(request)
     token = _get_panel_token()
     if not token:
@@ -206,7 +292,10 @@ async def check_auth(request: Request, call_next):
         return await call_next(request)
     if path.startswith("/static/"):
         return await call_next(request)
-    if request.request.session.get("authenticated"):
+    if request.session.get("authenticated") and request.session.get("username"):
+        permission = api_permission(path) if path.startswith("/api/") else None
+        if permission and not can(request, permission):
+            return forbidden()
         return await call_next(request)
     if path.startswith("/api/"):
         return JSONResponse({"error": "Unauthorized"}, status_code=401)
@@ -255,7 +344,8 @@ def _validate_password(pw):
 @app.api_route("/login", methods=["GET", "POST"])
 async def login(request: Request):
     token = _get_panel_token()
-    if not token:
+    users = load_users()
+    if not token and not users:
         return RedirectResponse("/")
     ip = request.client.host
     if request.method == "GET":
@@ -283,11 +373,23 @@ async def login(request: Request):
         return RedirectResponse("/login?locked=1")
     form_data = await request.form()
     entered = form_data.get("token", "")
-    if entered == token:
+    username = form_data.get("username", "").strip().lower()
+    user = users.get(username)
+    valid = bool(user and _password_matches(entered, user.get("password_hash", "")))
+    # Existing panels can use their former password once to become the admin.
+    if not users and token and username == "admin" and hmac.compare_digest(entered, token):
+        users = {"admin": {"role": "admin", "password_hash": _password_hash(entered)}}
+        save_users(users)
+        user = users["admin"]
+        valid = True
+    if valid:
         request.session["authenticated"] = True
+        request.session["username"] = username
         _login_attempts.pop(ip, None)
         _lockout_until.pop(ip, None)
-        return RedirectResponse("/")
+        # A 303 converts the login POST into a normal GET for the dashboard.
+        # The default 307 repeats POST / on the target and causes a 405.
+        return RedirectResponse("/", status_code=303)
     _record_failed(ip)
     return RedirectResponse("/login?error=1")
 
@@ -1127,6 +1229,8 @@ TRANSLATIONS = {
         "upload_file": "Upload", "create_folder": "New Folder",
         "download_core": "Download a ready server core:",
         "logout": "Logout",
+        "users": "Users", "add_user": "Add user", "user_list": "Users", "username": "Username", "password": "Password", "user_role": "Role", "user": "User", "administrator": "Administrator", "create_user": "Create user", "save_permissions": "Save permissions", "delete_user": "Delete user", "account": "Account",
+        "perm_console": "Console and commands", "perm_mods": "Add/remove mods and plugins", "perm_properties": "Edit server properties", "perm_files": "Server file browser", "perm_server_control": "Start, stop and restart server", "perm_players": "OP, ban and whitelist",
         "install_core": "Install",
     },
     "ru": {
@@ -1185,6 +1289,8 @@ TRANSLATIONS = {
         "upload_file": "Загрузить", "create_folder": "Новая папка",
         "download_core": "Скачать готовое ядро сервера:",
         "logout": "Выйти",
+        "users": "Пользователи", "add_user": "Добавить пользователя", "user_list": "Пользователи", "username": "Логин", "password": "Пароль", "user_role": "Роль", "user": "Пользователь", "administrator": "Администратор", "create_user": "Создать пользователя", "save_permissions": "Сохранить права", "delete_user": "Удалить пользователя", "account": "Аккаунт",
+        "perm_console": "Просмотр консоли и команды", "perm_mods": "Добавление и удаление модов/плагинов", "perm_properties": "Редактирование свойств сервера", "perm_files": "Файловый браузер сервера", "perm_server_control": "Запуск, остановка и перезапуск сервера", "perm_players": "OP, бан и вайтлист",
         "install_core": "Установить",
     },
     "de": {
@@ -1242,6 +1348,8 @@ TRANSLATIONS = {
         "upload_file": "Hochladen", "create_folder": "Neuer Ordner",
         "download_core": "Fertigen Server-Kern herunterladen:",
         "logout": "Abmelden",
+        "users": "Benutzer", "add_user": "Benutzer hinzufügen", "user_list": "Benutzer", "username": "Benutzername", "password": "Passwort", "user_role": "Rolle", "user": "Benutzer", "administrator": "Administrator", "create_user": "Benutzer erstellen", "save_permissions": "Berechtigungen speichern", "delete_user": "Benutzer löschen", "account": "Konto",
+        "perm_console": "Konsole und Befehle anzeigen", "perm_mods": "Mods und Plugins hinzufügen/löschen", "perm_properties": "Servereigenschaften bearbeiten", "perm_files": "Server-Dateibrowser", "perm_server_control": "Server starten, stoppen und neu starten", "perm_players": "OP, Bann und Whitelist",
         "install_core": "Installieren",
     },
     "fr": {
@@ -1300,6 +1408,8 @@ TRANSLATIONS = {
         "upload_file": "Téléverser", "create_folder": "Nouveau dossier",
         "download_core": "Télécharger un noyau de serveur prêt :",
         "logout": "Déconnexion",
+        "users": "Utilisateurs", "add_user": "Ajouter un utilisateur", "user_list": "Utilisateurs", "username": "Nom d'utilisateur", "password": "Mot de passe", "user_role": "Rôle", "user": "Utilisateur", "administrator": "Administrateur", "create_user": "Créer l'utilisateur", "save_permissions": "Enregistrer les droits", "delete_user": "Supprimer l'utilisateur", "account": "Compte",
+        "perm_console": "Voir la console et les commandes", "perm_mods": "Ajouter/supprimer mods et plugins", "perm_properties": "Modifier les propriétés du serveur", "perm_files": "Explorateur de fichiers serveur", "perm_server_control": "Démarrer, arrêter et redémarrer le serveur", "perm_players": "OP, bannissement et whitelist",
         "install_core": "Installer",
     },
     "zh": {
@@ -1358,6 +1468,8 @@ TRANSLATIONS = {
         "upload_file": "上传", "create_folder": "新建文件夹",
         "download_core": "下载现成的服务器核心：",
         "logout": "退出登录",
+        "users": "用户", "add_user": "添加用户", "user_list": "用户", "username": "用户名", "password": "密码", "user_role": "角色", "user": "用户", "administrator": "管理员", "create_user": "创建用户", "save_permissions": "保存权限", "delete_user": "删除用户", "account": "账户",
+        "perm_console": "查看控制台和命令", "perm_mods": "添加/删除模组和插件", "perm_properties": "编辑服务器属性", "perm_files": "服务器文件浏览器", "perm_server_control": "启动、停止和重启服务器", "perm_players": "OP、封禁和白名单",
         "install_core": "安装",
     }
 }
@@ -1660,7 +1772,8 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
    <a href="#" onclick="showTab('filebrowser')" id="nav-filebrowser"><span class="icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span><span data-i18n="files">Files</span></a>
    <a href="#" onclick="showTab('plugins')" id="nav-plugins"><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></span><span data-i18n="plugins">Plugins & Mods</span></a>
     <a href="#" onclick="showTab('settings')" id="nav-settings"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span data-i18n="settings">Settings</span></a>
-    <a href="/logout" style="margin-top:auto;display:flex;align-items:center;gap:12px;padding:11px 16px;color:var(--red);border-radius:10px;font-size:13.5px;font-weight:500;transition:all .25s;text-decoration:none" onmouseover="this.style.background='rgba(239,68,68,.1)'" onmouseout="this.style.background='transparent'"><span class="icon"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span data-i18n="logout">Logout</span></a>
+    <div id="account-badge" style="margin-top:auto;padding:12px 16px 4px;color:var(--text2);font-size:12px"></div>
+    <a href="/logout" style="display:flex;align-items:center;gap:12px;padding:11px 16px;color:var(--red);border-radius:10px;font-size:13.5px;font-weight:500;transition:all .25s;text-decoration:none" onmouseover="this.style.background='rgba(239,68,68,.1)'" onmouseout="this.style.background='transparent'"><span class="icon"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 12"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span data-i18n="logout">Logout</span></a>
    </nav>
 </div>
 
@@ -1829,6 +1942,27 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
   </div>
  </div>
 
+ <div id="tab-users" style="display:none">
+  <div class="grid-2">
+   <div class="panel">
+    <h3 data-i18n="add_user">Добавить пользователя</h3>
+    <div class="form-group"><label data-i18n="username">Логин</label><input id="new-user-name" maxlength="32" placeholder="moderator"></div>
+    <div class="form-group"><label data-i18n="password">Пароль</label><input id="new-user-password" type="password" placeholder="Минимум 5 символов"></div>
+    <div class="form-group"><label data-i18n="user_role">Роль</label><select id="new-user-role"><option value="user" data-i18n="user">Пользователь</option><option value="admin" data-i18n="administrator">Администратор</option></select></div>
+    <div id="new-user-perms" style="display:grid;gap:10px;margin:14px 0;color:var(--text2);font-size:13px">
+     <label><input type="checkbox" value="console"><span data-i18n="perm_console">Просмотр консоли и команды</span></label>
+     <label><input type="checkbox" value="mods"><span data-i18n="perm_mods">Добавление и удаление модов/плагинов</span></label>
+     <label><input type="checkbox" value="properties"><span data-i18n="perm_properties">Редактирование свойств сервера</span></label>
+     <label><input type="checkbox" value="files"><span data-i18n="perm_files">Файловый браузер и редактирование файлов</span></label>
+     <label><input type="checkbox" value="server_control"><span data-i18n="perm_server_control">Запуск, остановка и перезапуск сервера</span></label>
+     <label><input type="checkbox" value="players"><span data-i18n="perm_players">OP, бан и вайтлист игроков</span></label>
+    </div>
+    <button class="btn btn-accent" onclick="createUser()" data-i18n="create_user">Создать пользователя</button>
+   </div>
+   <div class="panel"><h3 data-i18n="user_list">Пользователи</h3><div id="users-list"></div></div>
+  </div>
+ </div>
+
  <div id="tab-settings" style="display:none">
   <div class="grid-2">
    <div class="panel">
@@ -1905,7 +2039,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
      <a href="/api/backup-panel" class="btn btn-accent btn-sm" download><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg> <span data-i18n="download_backup">backup</span></a>
      <a href="/api/backup-server" class="btn btn-green btn-sm" download><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span data-i18n="backup_server">server backup</span></a>
     </div>
-    <div class="panel" id="auth-panel">
+    <div class="panel" id="auth-panel" style="display:none">
      <div style="display:flex;align-items:center;justify-content:space-between">
       <h3 style="margin:0"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> <span data-i18n="auth_settings">Authorization</span></h3>
       <label class="toggle"><input type="checkbox" id="auth-toggle" onchange="toggleAuth(this.checked)"><span class="slider"></span></label>
@@ -1943,6 +2077,27 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 </div>
 
 <script>
+const CAN=%PERMISSIONS%;
+const IS_ADMIN=%IS_ADMIN%;
+const PERMISSION_LABELS={console:'perm_console',mods:'perm_mods',properties:'perm_properties',files:'perm_files',server_control:'perm_server_control',players:'perm_players'};
+function applyAccess(){
+ const tabs={setup:'server_control',console:'console',players:'players',files:'properties',filebrowser:'files',plugins:'mods'};
+ Object.entries(tabs).forEach(([tab,permission])=>{
+  if(CAN.includes(permission))return;
+  const nav=document.getElementById('nav-'+tab),panel=document.getElementById('tab-'+tab);
+ if(nav)nav.style.display='none'; if(panel)panel.remove();
+ });
+ if(!CAN.includes('server_control')){const controls=document.getElementById('control-btns');if(controls&&controls.closest('.panel'))controls.closest('.panel').style.display='none';}
+ if(!CAN.includes('console')){const dash=document.getElementById('dash-console');if(dash&&dash.closest('.panel'))dash.closest('.panel').style.display='none';}
+ if(!IS_ADMIN){const nav=document.getElementById('nav-settings'),panel=document.getElementById('tab-settings'),users=document.getElementById('tab-users');if(nav)nav.style.display='none';if(panel)panel.remove();if(users)users.remove();return;}
+ const settingsNav=document.getElementById('nav-settings');
+ if(settingsNav&&!document.getElementById('nav-users')){
+  const nav=document.createElement('a');nav.id='nav-users';nav.href='#';nav.onclick=()=>showTab('users');nav.innerHTML='<span class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg></span><span>Пользователи</span>';settingsNav.parentNode.insertBefore(nav,settingsNav);
+ }
+}
+async function loadCurrentAccount(){
+ try{const me=await api('me');const el=document.getElementById('account-badge');if(el&&me.username)el.textContent=t('account')+': '+me.username+(me.role==='admin'?' · '+t('administrator'):'');}catch(e){}
+}
 let currentTab='dashboard';
 let currentList='ops';
 let consoleLines=[];
@@ -1972,6 +2127,8 @@ let T={};
 function t(key){return T[key]||key;}
 
 async function loadLang(){
+ applyAccess();
+ loadCurrentAccount();
  try{
   const r=await fetch('/api/lang',{credentials:'same-origin'});
   T=await r.json();
@@ -2005,6 +2162,7 @@ function applyTranslations(){
  else if(currentTab==='plugins')loadPlugins();
  else if(currentTab==='setup')loadSetup();
  else if(currentTab==='settings')loadSettingsPage();
+ else if(currentTab==='users')loadUsers();
 }
 
 let lastUpdateResult=null;
@@ -2039,7 +2197,24 @@ function showTab(tab){
   if(tab==='filebrowser')loadFiles();
   if(tab==='plugins')loadPlugins();
   if(tab==='settings')loadSettingsPage();
+  if(tab==='users')loadUsers();
 }
+
+function selectedPermissions(){return [...document.querySelectorAll('#new-user-perms input:checked')].map(el=>el.value);}
+async function createUser(){
+ const username=document.getElementById('new-user-name').value.trim();
+ const password=document.getElementById('new-user-password').value;
+ const role=document.getElementById('new-user-role').value;
+ const r=await api('users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,role,permissions:selectedPermissions()})});
+ if(r.error){toast(r.error);return;} document.getElementById('new-user-name').value='';document.getElementById('new-user-password').value='';toast(r.message);loadUsers();
+}
+async function loadUsers(){
+ const data=await api('users'); const out=document.getElementById('users-list');if(!out)return;
+ if(data.error){out.innerHTML='<div class="empty">'+esc(data.error)+'</div>';return;}
+ out.innerHTML=data.users.map(u=>{const perms=Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+' '+(u.role==='admin'?'disabled':'')+'> '+t(labelKey)+'</label>').join('');return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b>'+esc(u.username)+'</b><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+esc(u.username)+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+esc(u.username)+'\')">'+t('save_permissions')+'</button>'+(u.username==='admin'?'':'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+esc(u.username)+'\')">'+t('delete_user')+'</button>')+'</div></div>';}).join('')||'<div class="empty">'+t('user_list')+'</div>';
+}
+async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});toast(r.error||r.message);loadUsers();}
+async function deleteUser(username){if(!confirm('Удалить пользователя '+username+'?'))return;const r=await api('users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});toast(r.error||r.message);loadUsers();}
 
 function toast(msg){
  let el=document.createElement('div');
@@ -2182,6 +2357,7 @@ function lineClass(l){
  document.getElementById('status-dot').style.background=info.running?'var(--green)':'var(--red)';
 
  let btns='';
+ if(!CAN.includes('server_control')){document.getElementById('control-btns').innerHTML='';return;}
  if(info.running){
    btns+=`<button class="btn btn-red" onclick="serverAction('stop')"><svg class="ico ico-sm" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="5" y="5" width="14" height="14" rx="2"/></svg> ${t('stop')}</button>`;
   btns+=`<button class="btn btn-yellow" onclick="serverAction('restart')">&#8635; ${t('restart')}</button>`;
@@ -3055,9 +3231,8 @@ async function loadSettingsPage(){
     if(fireflyAnim){cancelAnimationFrame(fireflyAnim);fireflyAnim=null;}
    }
  await loadEnvInfo();
- document.getElementById('token-status').textContent=envData.token_set?t('auth_status_set'):t('auth_status_unset');
- const authEnabled=data.auth_enabled||false;
- document.getElementById('auth-toggle').checked=authEnabled;
+ // Authorization is account-based and is configured during installation;
+ // the old enable/disable switch is intentionally no longer exposed.
   if(authEnabled){const b=document.getElementById('auth-body');b.style.maxHeight=b.scrollHeight+'px';b.style.opacity='1';}
    if(data.panel_opacity!==undefined){
     panelOpacity=data.panel_opacity;
@@ -3362,7 +3537,15 @@ async def index(request: Request):
     accent = settings.get("accent", "#6c5ce7")
     fireflies = "true" if settings.get("fireflies") else "false"
     opacity = str(settings.get("panel_opacity", 100))
+    username = request.session.get("username")
+    user = load_users().get(username, {})
+    # First-run panels retain full local access so the owner can create the
+    # initial `admin` account from the new Users page.
+    first_run = not load_users()
+    permissions = json.dumps(list(PERMISSIONS) if first_run else user_permissions(user))
+    is_admin = "true" if first_run or user.get("role") == "admin" else "false"
     page = HTML_TEMPLATE.replace("%ACCENT%", accent).replace("%FIREFLIES%", fireflies).replace("%OPACITY%", opacity)
+    page = page.replace("%PERMISSIONS%", permissions).replace("%IS_ADMIN%", is_admin)
     return HTMLResponse(page)
 
 
@@ -3461,6 +3644,71 @@ async def api_lang(request: Request):
     return JSONResponse(TRANSLATIONS.get(lang, TRANSLATIONS["en"]))
 
 
+@app.api_route("/api/me")
+async def api_me(request: Request):
+    username = request.session.get("username")
+    user = load_users().get(username, {})
+    return JSONResponse({"username": username, "role": user.get("role", "user"),
+                         "permissions": user_permissions(user)})
+
+
+@app.api_route("/api/users", methods=["GET", "POST", "PUT", "DELETE"])
+async def api_users(request: Request):
+    users = load_users()
+    if request.method == "GET":
+        return JSONResponse({"users": [
+            {"username": name, "role": data.get("role", "user"),
+             "permissions": user_permissions(data)}
+            for name, data in sorted(users.items())
+        ]})
+
+    body = await request.json()
+    username = str(body.get("username", "")).strip().lower()
+    if not re.fullmatch(r"[a-z0-9_.-]{3,32}", username):
+        return JSONResponse({"error": "Username: 3–32 Latin letters, digits, ., _ or -"}, status_code=400)
+
+    if not users and request.method == "POST" and username != "admin":
+        return JSONResponse({"error": "Create the initial account with username admin"}, status_code=400)
+
+    if request.method == "POST":
+        password = str(body.get("password", ""))
+        if username in users:
+            return JSONResponse({"error": "User already exists"}, status_code=409)
+        if not _validate_password(password):
+            return JSONResponse({"error": "Password too weak (min 5 chars, no common words)"}, status_code=400)
+        # The first account is always the administrator, otherwise a panel
+        # could be permanently locked with no-one able to manage accounts.
+        role = "admin" if not users or body.get("role") == "admin" else "user"
+        requested = body.get("permissions", [])
+        permissions = [p for p in requested if p in PERMISSIONS] if isinstance(requested, list) else []
+        users[username] = {"role": role, "password_hash": _password_hash(password), "permissions": permissions}
+        save_users(users)
+        return JSONResponse({"message": "User created"})
+
+    if username not in users:
+        return JSONResponse({"error": "User not found"}, status_code=404)
+    if request.method == "PUT":
+        if "role" in body:
+            users[username]["role"] = "admin" if body["role"] == "admin" else "user"
+        if "permissions" in body and isinstance(body["permissions"], list):
+            users[username]["permissions"] = [p for p in body["permissions"] if p in PERMISSIONS]
+        password = str(body.get("password", ""))
+        if password:
+            if not _validate_password(password):
+                return JSONResponse({"error": "Password too weak (min 5 chars, no common words)"}, status_code=400)
+            users[username]["password_hash"] = _password_hash(password)
+        save_users(users)
+        return JSONResponse({"message": "User updated"})
+
+    if username == request.session.get("username"):
+        return JSONResponse({"error": "You cannot delete your own account"}, status_code=400)
+    if users[username].get("role") == "admin" and sum(u.get("role") == "admin" for u in users.values()) <= 1:
+        return JSONResponse({"error": "At least one administrator is required"}, status_code=400)
+    del users[username]
+    save_users(users)
+    return JSONResponse({"message": "User deleted"})
+
+
 @app.api_route("/api/env-info")
 async def api_env_info(request: Request):
     java_bin = find_java()
@@ -3552,17 +3800,45 @@ async def api_search(request: Request):
 
 @app.api_route("/api/upload-core", methods=["POST"])
 async def api_upload_core(request: Request):
-    form = await request.form()
+    try:
+        form = await request.form()
+    except Exception as exc:
+        return JSONResponse({"error": f"Unable to read upload: {exc}"}, status_code=400)
     if "file" not in form:
         return JSONResponse({"error": "No file"}, status_code=400)
     file_item = form["file"]
-    if not file_item.filename or not file_item.filename.endswith(".jar"):
+    filename = getattr(file_item, "filename", "")
+    if not filename or not filename.lower().endswith(".jar"):
         return JSONResponse({"error": "File must be a .jar"}, status_code=400)
-    data = await file_item.read()
+    try:
+        data = await file_item.read()
+    except Exception as exc:
+        return JSONResponse({"error": f"Unable to read uploaded file: {exc}"}, status_code=400)
+    if not data:
+        return JSONResponse({"error": "Uploaded file is empty"}, status_code=400)
 
-    old_jar = list(MC_DIR.glob("*.jar"))
-    for j in old_jar:
-        j.unlink()
+    # Write the new core first.  Replacing the file is atomic on the same
+    # filesystem, so a failed upload never removes a working server.jar.
+    temp_core = MC_DIR / ".server.jar.uploading"
+    try:
+        MC_DIR.mkdir(parents=True, exist_ok=True)
+        temp_core.write_bytes(data)
+        temp_core.replace(MC_DIR / "server.jar")
+    except OSError as exc:
+        try:
+            temp_core.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return JSONResponse({"error": f"Could not save server core: {exc}"}, status_code=500)
+
+    # Remove any remaining old core jars only after server.jar is safely saved.
+    for old_jar in MC_DIR.glob("*.jar"):
+        if old_jar.name == "server.jar":
+            continue
+        try:
+            old_jar.unlink()
+        except OSError:
+            pass
 
     keep_map = {
         "world": ["world", "world_nether", "world_the_end"],
@@ -3604,12 +3880,12 @@ async def api_upload_core(request: Request):
     except Exception:
         pass
 
-    fpath = MC_DIR / "server.jar"
-    fpath.write_bytes(data)
+    try:
+        setup_server()
+    except OSError as exc:
+        return JSONResponse({"error": f"Core saved, but server setup failed: {exc}"}, status_code=500)
 
-    setup_server()
-
-    msg = f"Core uploaded: {file_item.filename}. EULA accepted."
+    msg = f"Core uploaded: {filename}. EULA accepted."
     if deleted:
         msg += f" Deleted: {', '.join(deleted)}"
     return JSONResponse({"message": msg, "ok": True})
@@ -4131,6 +4407,29 @@ async def api_do_update(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
+def setup_initial_account():
+    """Interactive first-run account creation used by the installer script."""
+    users = load_users()
+    if users:
+        return 0
+    print("\nFizMine: создание администратора панели")
+    username = input("Логин: ").strip().lower()
+    if not re.fullmatch(r"[a-z0-9_.-]{3,32}", username):
+        print("Ошибка: логин должен содержать 3–32 символа (a-z, 0-9, ., _, -)")
+        return 1
+    password = getpass.getpass("Пароль: ")
+    if not _validate_password(password):
+        print("Ошибка: пароль минимум 5 символов и не должен быть распространённым")
+        return 1
+    confirmation = getpass.getpass("Повторите пароль: ")
+    if password != confirmation:
+        print("Ошибка: пароли не совпадают")
+        return 1
+    save_users({username: {"role": "admin", "password_hash": _password_hash(password), "permissions": list(PERMISSIONS)}})
+    print(f"Администратор {username} создан.")
+    return 0
+
+
 def main():
     MC_DIR.mkdir(parents=True, exist_ok=True)
     
@@ -4158,4 +4457,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if "--setup-account" in sys.argv:
+        raise SystemExit(setup_initial_account())
     main()

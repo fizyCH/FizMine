@@ -12,6 +12,14 @@ if (Test-Path $EnvFile) {
 $McDir = if ($env:MC_DIR) { $env:MC_DIR } else { $ScriptDir }
 $PanelPort = if ($env:PANEL_PORT) { $env:PANEL_PORT } else { "8080" }
 
+function Ensure-Account {
+    $usersFile = Join-Path $ScriptDir "users.json"
+    if (-not (Test-Path $usersFile)) {
+        python (Join-Path $ScriptDir "panel.py") --setup-account
+        if ($LASTEXITCODE -ne 0) { throw "Account setup failed" }
+    }
+}
+
 function Show-Menu {
     Clear-Host
     Write-Host ""
@@ -38,6 +46,7 @@ function Show-Menu {
 }
 
 function Start-Panel {
+    Ensure-Account
     $proc = Get-Process -Name python* -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*panel.py*" }
     if ($proc) {
         Write-Host "  Panel is already running"

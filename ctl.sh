@@ -11,6 +11,12 @@ fi
 MC_DIR="${MC_DIR:-$SCRIPT_DIR}"
 PANEL_PORT="${PANEL_PORT:-8080}"
 
+ensure_account() {
+  if [ ! -s "$SCRIPT_DIR/users.json" ]; then
+    python3 "$SCRIPT_DIR/panel.py" --setup-account || return 1
+  fi
+}
+
 show_menu() {
   clear
   echo ""
@@ -84,14 +90,15 @@ check_java() {
 }
 
 start_panel() {
-  if pgrep -f "panel.py" > /dev/null; then
+  ensure_account || return 1
+  if pgrep -f "[p]ython3 panel.py" > /dev/null; then
     echo "  Panel is already running"
     return
   fi
   cd "$SCRIPT_DIR"
   nohup python3 panel.py > /tmp/mcpanel.log 2>&1 &
   sleep 1
-  if pgrep -f "panel.py" > /dev/null; then
+  if pgrep -f "[p]ython3 panel.py" > /dev/null; then
     echo "  Panel started -> http://$(hostname -I | awk '{print $1}'):$PANEL_PORT"
   else
     echo "  Failed to start"
@@ -99,8 +106,8 @@ start_panel() {
 }
 
 stop_panel() {
-  if pgrep -f "panel.py" > /dev/null; then
-    pkill -f "panel.py"
+  if pgrep -f "[p]ython3 panel.py" > /dev/null; then
+    pkill -f "[p]ython3 panel.py"
     echo "  Panel stopped"
   else
     echo "  Panel is not running"
@@ -114,8 +121,8 @@ restart_panel() {
 }
 
 status_panel() {
-  if pgrep -f "panel.py" > /dev/null; then
-    echo "  Running (PID: $(pgrep -f panel.py))"
+  if pgrep -f "[p]ython3 panel.py" > /dev/null; then
+    echo "  Running (PID: $(pgrep -f '[p]ython3 panel.py'))"
   else
     echo "  Stopped"
   fi

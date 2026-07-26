@@ -37,15 +37,11 @@ INSTALL_DIR="${INSTALL_DIR:-$HOME/minecraft}"
 # Expand ~ to home directory
 INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
 
-read -rp "Enable authentication? (y/n) [n]: " AUTH_CHOICE
-AUTH_CHOICE="${AUTH_CHOICE:-n}"
-
 read -rp "Panel port [8080]: " PANEL_PORT
 PANEL_PORT="${PANEL_PORT:-8080}"
 
 echo ""
 echo "Installing to: $INSTALL_DIR"
-echo "Auth: $AUTH_CHOICE"
 echo "Port: $PANEL_PORT"
 echo ""
 
@@ -142,15 +138,9 @@ rm -f fizmine-panel.tar
 chmod +x "$INSTALL_DIR/ctl.sh" 2>/dev/null || true
 chmod +x "$INSTALL_DIR/panel.py" 2>/dev/null || true
 
-AUTH_TOKEN=""
-if [ "$AUTH_CHOICE" = "y" ] || [ "$AUTH_CHOICE" = "Y" ]; then
-  read -rp "Set authentication password: " AUTH_TOKEN
-fi
-
 cat > "$INSTALL_DIR/.env" << ENVEOF
 PANEL_PORT=$PANEL_PORT
 MC_DIR=$INSTALL_DIR
-PANEL_TOKEN=$AUTH_TOKEN
 ENVEOF
 
 echo ""
@@ -160,3 +150,6 @@ echo "cd $INSTALL_DIR"
 echo "./ctl.sh start"
 echo "Panel: http://localhost:$PANEL_PORT"
 echo ""
+
+cd "$INSTALL_DIR"
+./ctl.sh start

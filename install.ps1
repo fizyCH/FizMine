@@ -14,17 +14,12 @@ $defaultPath = "C:\minecraft"
 $installDir = Read-Host "Install path [$defaultPath]"
 if (-not $installDir) { $installDir = $defaultPath }
 
-# Auth
-$authChoice = Read-Host "Enable authentication? (y/n) [n]"
-if (-not $authChoice) { $authChoice = "n" }
-
 # Port
 $panelPort = Read-Host "Panel port [8080]"
 if (-not $panelPort) { $panelPort = "8080" }
 
 Write-Host ""
 Write-Host "Installing to: $installDir"
-Write-Host "Auth: $authChoice"
 Write-Host "Port: $panelPort"
 Write-Host ""
 
@@ -109,19 +104,12 @@ Write-Host "Extracting to $installDir..."
 Expand-Archive -Path $tempFile -DestinationPath $installDir -Force
 Remove-Item $tempFile
 
-# Write .env
-$authToken = ""
-if ($authChoice -eq "y" -or $authChoice -eq "Y") {
-    $authToken = Read-Host "Set authentication password"
-}
-
 # Remove trailing backslash
 $installDir = $installDir.TrimEnd('\')
 
 $envContent = @"
 PANEL_PORT=$panelPort
 MC_DIR=$installDir
-PANEL_TOKEN=$authToken
 "@
 Set-Content -Path "$installDir\.env" -Value $envContent -Encoding UTF8
 
@@ -132,3 +120,5 @@ Write-Host "  cd $installDir"
 Write-Host "  python panel.py"
 Write-Host "  Panel: http://localhost:$panelPort"
 Write-Host ""
+
+& (Join-Path $installDir "ctl.ps1") start
