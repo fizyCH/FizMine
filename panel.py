@@ -2313,79 +2313,120 @@ async function loadSetup(){
    </div>`;
  });
 
-  if(info.has_jar){
-   el.innerHTML=`
-   <div class="grid-2">
-    <div class="panel">
-      <h3>Server Core</h3>
-      <p>Current: <strong>${esc(jarName)}</strong></p>
+   if(info.has_jar){
+    el.innerHTML=`
+    <div class="grid-2">
+     <div class="panel">
+       <h3>Server Core</h3>
+       <p>Current: <strong>${esc(jarName)}</strong></p>
+       <div class="drop-zone" id="drop-core" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDropCore(event,this)" onclick="this.querySelector('input').click()">
+        <input type="file" accept=".jar" onchange="uploadCore(this.files[0]);this.value=''">
+        <div class="drop-text">Drop .jar here</div>
+       </div>
+       <div id="core-replace-opts" style="display:none">
+        ${togglesHtml}
+        <button class="btn btn-accent" onclick="installCore()" style="margin-top:14px">${t('install_core')}</button>
+       </div>
+       <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
+        <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
+         <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
+         <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
+         <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
+         <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
+         <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
+          <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
+         </div>
+        </div>
+       </div>
+      </div>
+     <div class="panel">
+       <h3>Server Files</h3>
+       <div id="setup-files"></div>
+     </div>
+    </div>`;
+    loadSetupFiles();
+   }else{
+    el.innerHTML=`
+    <div class="setup-card">
+      <h3>Setup Minecraft Server</h3>
+      <p>Upload a server .jar file to get started.</p>
       <div class="drop-zone" id="drop-core" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDropCore(event,this)" onclick="this.querySelector('input').click()">
        <input type="file" accept=".jar" onchange="uploadCore(this.files[0]);this.value=''">
-       <div class="drop-text">Drop .jar here</div>
+       <div class="drop-text">Drop server.jar here</div>
       </div>
       <div id="core-replace-opts" style="display:none">
        ${togglesHtml}
-       <button class="btn btn-accent" onclick="doDownloadCore()" style="margin-top:14px">${t('install_core')}</button>
+       <button class="btn btn-accent" onclick="installCore()" style="margin-top:14px">${t('install_core')}</button>
       </div>
-      <button class="btn btn-accent" onclick="uploadCoreConfirm()" id="btn-core-upload" style="display:none;margin-top:14px">${t('upload_replace')}</button>
-      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px">
        <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
        <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
         <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
         <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
         <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
-       <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
-        <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
-        <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
+        <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
+        <div id="core-versions-panel" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);z-index:10;margin-top:8px;overflow:hidden">
+         <div style="padding:12px 16px;border-bottom:1px solid var(--border)"><h4 id="core-versions-title" style="margin:0;font-size:14px"></h4><p id="core-versions-java" style="color:var(--text2);font-size:11px;margin:4px 0 0"></p></div>
+         <div id="core-versions-list" style="max-height:300px;overflow-y:auto"></div>
+        </div>
        </div>
       </div>
-     </div>
-    </div>
-    <div class="panel">
-      <h3>Server Files</h3>
-      <div id="setup-files"></div>
-    </div>
-   </div>`;
-   loadSetupFiles();
-  }else{
-   el.innerHTML=`
-   <div class="setup-card">
-     <h3>Setup Minecraft Server</h3>
-     <p>Upload a server .jar file to get started.</p>
-     <div class="drop-zone" id="drop-core" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handleDropCore(event,this)" onclick="this.querySelector('input').click()">
-      <input type="file" accept=".jar" onchange="uploadCore(this.files[0]);this.value=''">
-      <div class="drop-text">Drop server.jar here</div>
-     </div>
-     <button class="btn btn-accent" onclick="uploadCoreConfirm()" id="btn-core-upload" style="display:none;margin-top:12px">${t('upload_create')}</button>
-     <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:14px">
-      <p style="color:var(--text2);font-size:12px;margin-bottom:8px">${t('download_core')}</p>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;position:relative">
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('vanilla',this)">Vanilla</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('purpur',this)">Purpur</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('fabric',this)">Fabric</button>
-       <button class="btn btn-accent btn-sm" onclick="showCoreVersions('mohist',this)">Mohist</button>
-      </div>
-     </div>
-     </div>`;
+      </div>`;
    }
 }
 
 let pendingCoreFile=null;
+let pendingCoreUrl=null;
+let pendingCoreName='';
 async function uploadCore(file){
  if(!file||!file.name.endsWith('.jar')){toast('Only .jar files');return;}
  pendingCoreFile=file;
- document.getElementById('btn-core-upload').style.display='inline-flex';
+ pendingCoreUrl=null;
+ pendingCoreName=file.name;
  const info=await api('status');
- if(info.has_jar){
-  document.getElementById('core-replace-opts').style.display='block';
+ if(info.has_jar||true){
+  const panel=document.getElementById('core-replace-opts');
+  if(panel)panel.style.display='block';
  }
  toast('File selected: '+file.name);
 }
 
-async function uploadCoreConfirm(){
- if(!pendingCoreFile){toast('Select a file first');return;}
-  confirmAction(t('confirm_replace_core')+': '+pendingCoreFile.name+'?','doUploadCore','','','true');
+async function installCore(){
+ const opts=document.getElementById('core-replace-opts');
+ if(opts)opts.style.display='none';
+ const keepMap={'keep-world':['world','world_nether','world_the_end'],'keep-mods':['mods'],'keep-plugins':['plugins'],'keep-ops':['ops.json'],'keep-bans':['banned-players.json'],'keep-bansip':['banned-ips.json'],'keep-wl':['whitelist.json'],'keep-props':['server.properties']};
+ const dels={};
+ for(const[key,paths]of Object.entries(keepMap)){
+  const el=document.getElementById(key);
+  if(el&&!el.disabled&&!el.checked){paths.forEach(p=>{dels[p]=true;});}
+ }
+ if(pendingCoreFile){
+  if(!confirm(t('install_core')+': '+pendingCoreFile.name+'?'))return;
+  toast(t('uploading')+' '+pendingCoreFile.name+'...');
+  try{
+   const fd=new FormData();
+   fd.append('file',pendingCoreFile);
+   fd.append('type','core');
+   fd.append('keep_data',JSON.stringify(dels));
+   const r=await fetch('/api/upload-core',{method:'POST',body:fd,credentials:'same-origin'});
+   const j=await r.json();
+   if(j.error){toast(j.error);return;}
+   toast(j.message||t('uploaded'));
+   pendingCoreFile=null;
+   loadSetup();
+  }catch(e){toast('Error: '+e.message);}
+ }else if(pendingCoreUrl){
+  if(!confirm(t('install_core')+': '+pendingCoreName+'?'))return;
+  toast(t('uploading')+' '+pendingCoreName+'...');
+  try{
+   const r=await api('download-core',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:pendingCoreUrl,keep_data:dels})});
+   if(r.error){toast(r.error);return;}
+   toast(r.message||t('uploaded'));
+   loadSetup();
+  }catch(e){toast('Error: '+e.message);}
+ }
 }
 
 const CORE_VERSIONS={
@@ -2482,77 +2523,27 @@ document.addEventListener('click',function(e){
  if(panel&&panel.style.display==='block'&&!e.target.closest('#core-versions-panel')&&!e.target.closest('[onclick*="showCoreVersions"]')){
   panel.style.display='none';
  }
-});
-
-let pendingCoreUrl='';
-let pendingCoreName='';
+ });
 
 function showKeepToggles(callback){
- const panel=document.getElementById('core-replace-opts');
- panel.style.display='block';
- panel.dataset.callback=callback;
-}
+  /* unused - toggles now shown directly in loadSetup */
+ }
 
 async function downloadCore(url,name){
  pendingCoreUrl=url;
  pendingCoreName=name;
+ pendingCoreFile=null;
  const info=await api('status');
- if(info.has_jar){
-  showKeepToggles('doDownloadCore');
- }else{
-  doDownloadCore();
- }
+ const panel=document.getElementById('core-replace-opts');
+ if(panel)panel.style.display='block';
 }
 
 async function doDownloadCore(){
- const opts=document.getElementById('core-replace-opts');
- if(opts)opts.style.display='none';
- if(!confirm(t('download_core')+': '+pendingCoreName+'?'))return;
- toast(t('uploading')+' '+pendingCoreName+'...');
- try{
-  const keepMap={'keep-world':['world','world_nether','world_the_end'],'keep-mods':['mods'],'keep-plugins':['plugins'],'keep-ops':['ops.json'],'keep-bans':['banned-players.json'],'keep-bansip':['banned-ips.json'],'keep-wl':['whitelist.json'],'keep-props':['server.properties']};
-  const dels={};
-  for(const[key,paths]of Object.entries(keepMap)){
-   const el=document.getElementById(key);
-   if(el&&!el.disabled&&!el.checked){paths.forEach(p=>{dels[p]=true;});}
-  }
-  const r=await api('download-core',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:pendingCoreUrl,keep_data:dels})});
-  if(r.error){toast(r.error);return;}
-  toast(r.message||t('uploaded'));
-  loadSetup();
- }catch(e){toast('Error: '+e.message);}
+ installCore();
 }
 
 async function doUploadCore(){
- if(!pendingCoreFile)return;
- const fd=new FormData();
- fd.append('file',pendingCoreFile);
- fd.append('type','core');
- const keepMap={
-  'keep-world':['world','world_nether','world_the_end'],
-  'keep-mods':['mods'],
-  'keep-plugins':['plugins'],
-  'keep-ops':['ops.json'],
-  'keep-bans':['banned-players.json'],
-  'keep-bansip':['banned-ips.json'],
-  'keep-wl':['whitelist.json'],
-  'keep-props':['server.properties'],
- };
- const dels={};
- for(const[key,paths]of Object.entries(keepMap)){
-  const el=document.getElementById(key);
-  if(el&&!el.disabled&&!el.checked){
-   paths.forEach(p=>{dels[p]=true;});
-  }
- }
- fd.append('keep_data',JSON.stringify(dels));
- toast('Uploading '+pendingCoreFile.name+'...');
-  const r=await fetch('/api/upload-core',{method:'POST',body:fd,credentials:'same-origin'});
- const d=await r.json();
- toast(d.message||'Uploaded');
- pendingCoreFile=null;
- document.getElementById('btn-core-upload').style.display='none';
- loadSetup();
+ installCore();
 }
 
 async function handleDropCore(e,el){
