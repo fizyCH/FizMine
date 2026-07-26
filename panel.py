@@ -370,7 +370,7 @@ async def login(request: Request):
         page = page.replace("%LOGIN_LOCK%", tr.get("login_locked", "Too many attempts. Try again later."))
         return HTMLResponse(page)
     if _check_lockout(ip) > 0:
-        return RedirectResponse("/login?locked=1")
+        return RedirectResponse("/login?locked=1", status_code=303)
     form_data = await request.form()
     entered = form_data.get("token", "")
     username = form_data.get("username", "").strip().lower()
@@ -391,7 +391,7 @@ async def login(request: Request):
         # The default 307 repeats POST / on the target and causes a 405.
         return RedirectResponse("/", status_code=303)
     _record_failed(ip)
-    return RedirectResponse("/login?error=1")
+    return RedirectResponse("/login?error=1", status_code=303)
 
 _default_mcdir = "C:\\minecraft" if IS_WINDOWS else "/minecraft"
 
