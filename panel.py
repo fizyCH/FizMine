@@ -211,7 +211,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#050505;color:#e0e0e
 <p style="font-family:'Press Start 2P',monospace;font-size:0.85rem;margin-top:1.2rem;letter-spacing:3px;color:%TEXT%">Minecraft Panel</p></div>
 <div class="error" id="errorBox"></div>
 <form method="POST" action="/login">
-<input type="text" name="username" class="form-input" placeholder="Логин" required autofocus autocomplete="username">
+<input type="text" name="username" class="form-input" placeholder="%LOGIN_USER%" required autofocus autocomplete="username">
 <input type="password" name="token" class="form-input" placeholder="%LOGIN_PH%" required autocomplete="current-password" id="token-input">
 <button type="submit" class="btn" id="login-btn">%LOGIN_BTN%</button>
 </form>
@@ -362,6 +362,8 @@ async def login(request: Request):
         page = page.replace("%TEXT%", text_color).replace("%LOGOCOLOR%", logo_color)
         lang = settings.get("lang", "en")
         tr = TRANSLATIONS.get(lang, TRANSLATIONS["en"])
+        login_user = {"en": "Username", "ru": "Логин", "de": "Benutzername", "fr": "Nom d'utilisateur", "zh": "用户名"}.get(lang, "Username")
+        page = page.replace("%LOGIN_USER%", login_user)
         page = page.replace("%LOGIN_PH%", tr.get("login_password", "Password"))
         page = page.replace("%LOGIN_BTN%", tr.get("login_btn", "Login"))
         page = page.replace("%LOGIN_ERR%", tr.get("login_error", "Invalid password"))
