@@ -2262,7 +2262,8 @@ async function loadUsers(){
  out.innerHTML=data.users.map(u=>{const perms=Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+' '+(u.role==='admin'?'disabled':'')+'> '+t(labelKey)+'</label>').join('');return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b>'+esc(u.username)+'</b><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+esc(u.username)+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+esc(u.username)+'\')">'+t('save_permissions')+'</button>'+(u.username==='admin'?'':'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+esc(u.username)+'\')">'+t('delete_user')+'</button>')+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
 }
 async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();}
-async function deleteUser(username){if(!confirm(t('confirm_delete_user')+' '+username+'?'))return;const r=await api('users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});if(r.error){toast(r.error);return;}toast(t('user_deleted'));loadUsers();}
+function deleteUser(username){confirmAction(t('confirm_delete_user')+': '+username+'?','deleteUserConfirm',username,'','true');}
+async function deleteUserConfirm(username){const r=await api('users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});if(r.error){toast(r.error);return;}toast(t('user_deleted'));loadUsers();}
 
 function toast(msg){
  let el=document.createElement('div');
@@ -2354,6 +2355,8 @@ async function executeAction(action,type,name){
    doUploadCore();
   }else if(action==='deleteFileItemConfirm'){
    deleteFileItemConfirm(type);
+  }else if(action==='deleteUserConfirm'){
+   deleteUserConfirm(name);
   }
 }
 function lineClass(l){
