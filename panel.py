@@ -296,6 +296,12 @@ async def check_auth(request: Request, call_next):
     return RedirectResponse("/login")
 
 
+# The auth middleware needs the session populated first. FastAPI stores
+# decorator middleware ahead of middleware added with add_middleware(), so
+# reverse the registration order once to keep SessionMiddleware outermost.
+app.user_middleware.reverse()
+
+
 _login_attempts = {}
 _lockout_until = {}
 
