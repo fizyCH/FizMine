@@ -1222,7 +1222,7 @@ TRANSLATIONS = {
         "download_core": "Download a ready server core:",
         "logout": "Logout",
         "users": "Users", "add_user": "Add user", "user_list": "Users", "username": "Username", "password": "Password", "user_role": "Role", "user": "User", "administrator": "Administrator", "create_user": "Create user", "save_permissions": "Save permissions", "delete_user": "Delete user", "account": "Account",
-        "perm_console": "Console and commands", "perm_mods": "Add/remove mods and plugins", "perm_properties": "Edit server properties", "perm_files": "Server file browser", "perm_server_control": "Start, stop and restart server", "perm_players": "OP, ban and whitelist",
+        "perm_console": "Console and commands", "perm_mods": "Add/remove mods and plugins", "perm_properties": "Edit server properties", "perm_files": "Server file browser", "perm_server_control": "Start, stop and restart server", "perm_players": "OP, ban and whitelist", "no_users": "No users yet", "confirm_delete_user": "Delete user", "user_created": "User created", "user_updated": "Permissions saved", "user_deleted": "User deleted",
         "install_core": "Install",
     },
     "ru": {
@@ -1282,7 +1282,7 @@ TRANSLATIONS = {
         "download_core": "Скачать готовое ядро сервера:",
         "logout": "Выйти",
         "users": "Пользователи", "add_user": "Добавить пользователя", "user_list": "Пользователи", "username": "Логин", "password": "Пароль", "user_role": "Роль", "user": "Пользователь", "administrator": "Администратор", "create_user": "Создать пользователя", "save_permissions": "Сохранить права", "delete_user": "Удалить пользователя", "account": "Аккаунт",
-        "perm_console": "Просмотр консоли и команды", "perm_mods": "Добавление и удаление модов/плагинов", "perm_properties": "Редактирование свойств сервера", "perm_files": "Файловый браузер сервера", "perm_server_control": "Запуск, остановка и перезапуск сервера", "perm_players": "OP, бан и вайтлист",
+        "perm_console": "Просмотр консоли и команды", "perm_mods": "Добавление и удаление модов/плагинов", "perm_properties": "Редактирование свойств сервера", "perm_files": "Файловый браузер сервера", "perm_server_control": "Запуск, остановка и перезапуск сервера", "perm_players": "OP, бан и вайтлист", "no_users": "Пользователей пока нет", "confirm_delete_user": "Удалить пользователя", "user_created": "Пользователь создан", "user_updated": "Права сохранены", "user_deleted": "Пользователь удалён",
         "install_core": "Установить",
     },
     "de": {
@@ -1341,7 +1341,7 @@ TRANSLATIONS = {
         "download_core": "Fertigen Server-Kern herunterladen:",
         "logout": "Abmelden",
         "users": "Benutzer", "add_user": "Benutzer hinzufügen", "user_list": "Benutzer", "username": "Benutzername", "password": "Passwort", "user_role": "Rolle", "user": "Benutzer", "administrator": "Administrator", "create_user": "Benutzer erstellen", "save_permissions": "Berechtigungen speichern", "delete_user": "Benutzer löschen", "account": "Konto",
-        "perm_console": "Konsole und Befehle anzeigen", "perm_mods": "Mods und Plugins hinzufügen/löschen", "perm_properties": "Servereigenschaften bearbeiten", "perm_files": "Server-Dateibrowser", "perm_server_control": "Server starten, stoppen und neu starten", "perm_players": "OP, Bann und Whitelist",
+        "perm_console": "Konsole und Befehle anzeigen", "perm_mods": "Mods und Plugins hinzufügen/löschen", "perm_properties": "Servereigenschaften bearbeiten", "perm_files": "Server-Dateibrowser", "perm_server_control": "Server starten, stoppen und neu starten", "perm_players": "OP, Bann und Whitelist", "no_users": "Noch keine Benutzer", "confirm_delete_user": "Benutzer löschen", "user_created": "Benutzer erstellt", "user_updated": "Berechtigungen gespeichert", "user_deleted": "Benutzer gelöscht",
         "install_core": "Installieren",
     },
     "fr": {
@@ -1401,7 +1401,7 @@ TRANSLATIONS = {
         "download_core": "Télécharger un noyau de serveur prêt :",
         "logout": "Déconnexion",
         "users": "Utilisateurs", "add_user": "Ajouter un utilisateur", "user_list": "Utilisateurs", "username": "Nom d'utilisateur", "password": "Mot de passe", "user_role": "Rôle", "user": "Utilisateur", "administrator": "Administrateur", "create_user": "Créer l'utilisateur", "save_permissions": "Enregistrer les droits", "delete_user": "Supprimer l'utilisateur", "account": "Compte",
-        "perm_console": "Voir la console et les commandes", "perm_mods": "Ajouter/supprimer mods et plugins", "perm_properties": "Modifier les propriétés du serveur", "perm_files": "Explorateur de fichiers serveur", "perm_server_control": "Démarrer, arrêter et redémarrer le serveur", "perm_players": "OP, bannissement et whitelist",
+        "perm_console": "Voir la console et les commandes", "perm_mods": "Ajouter/supprimer mods et plugins", "perm_properties": "Modifier les propriétés du serveur", "perm_files": "Explorateur de fichiers serveur", "perm_server_control": "Démarrer, arrêter et redémarrer le serveur", "perm_players": "OP, bannissement et whitelist", "no_users": "Aucun utilisateur", "confirm_delete_user": "Supprimer l'utilisateur", "user_created": "Utilisateur créé", "user_updated": "Droits enregistrés", "user_deleted": "Utilisateur supprimé",
         "install_core": "Installer",
     },
     "zh": {
@@ -1461,7 +1461,7 @@ TRANSLATIONS = {
         "download_core": "下载现成的服务器核心：",
         "logout": "退出登录",
         "users": "用户", "add_user": "添加用户", "user_list": "用户", "username": "用户名", "password": "密码", "user_role": "角色", "user": "用户", "administrator": "管理员", "create_user": "创建用户", "save_permissions": "保存权限", "delete_user": "删除用户", "account": "账户",
-        "perm_console": "查看控制台和命令", "perm_mods": "添加/删除模组和插件", "perm_properties": "编辑服务器属性", "perm_files": "服务器文件浏览器", "perm_server_control": "启动、停止和重启服务器", "perm_players": "OP、封禁和白名单",
+        "perm_console": "查看控制台和命令", "perm_mods": "添加/删除模组和插件", "perm_properties": "编辑服务器属性", "perm_files": "服务器文件浏览器", "perm_server_control": "启动、停止和重启服务器", "perm_players": "OP、封禁和白名单", "no_users": "暂无用户", "confirm_delete_user": "删除用户", "user_created": "用户已创建", "user_updated": "权限已保存", "user_deleted": "用户已删除",
         "install_core": "安装",
     }
 }
@@ -1938,8 +1938,8 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
   <div class="grid-2">
    <div class="panel">
     <h3 data-i18n="add_user">Добавить пользователя</h3>
-    <div class="form-group"><label data-i18n="username">Логин</label><input id="new-user-name" maxlength="32" placeholder="moderator"></div>
-    <div class="form-group"><label data-i18n="password">Пароль</label><input id="new-user-password" type="password" placeholder="Минимум 5 символов"></div>
+    <div class="form-group"><label data-i18n="username">Логин</label><input id="new-user-name" maxlength="32" placeholder="nickname"></div>
+    <div class="form-group"><label data-i18n="password">Пароль</label><input id="new-user-password" type="password" data-i18n-ph="login_password" placeholder="Пароль"><small data-i18n="password_hint" style="display:block;color:var(--text2);font-size:11px;margin-top:5px">Минимум 5 символов</small></div>
     <div class="form-group"><label data-i18n="user_role">Роль</label><select id="new-user-role"><option value="user" data-i18n="user">Пользователь</option><option value="admin" data-i18n="administrator">Администратор</option></select></div>
     <div id="new-user-perms" style="display:grid;gap:10px;margin:14px 0;color:var(--text2);font-size:13px">
      <label><input type="checkbox" value="console"><span data-i18n="perm_console">Просмотр консоли и команды</span></label>
@@ -2072,6 +2072,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 const CAN=%PERMISSIONS%;
 const IS_ADMIN=%IS_ADMIN%;
 const PERMISSION_LABELS={console:'perm_console',mods:'perm_mods',properties:'perm_properties',files:'perm_files',server_control:'perm_server_control',players:'perm_players'};
+const EXTRA_TRANSLATIONS={en:{password_hint:'Minimum 5 characters'},ru:{password_hint:'Минимум 5 символов'},de:{password_hint:'Mindestens 5 Zeichen'},fr:{password_hint:'5 caractères minimum'},zh:{password_hint:'至少5个字符'}};
 function applyAccess(){
  const tabs={setup:'server_control',console:'console',players:'players',files:'properties',filebrowser:'files',plugins:'mods'};
  Object.entries(tabs).forEach(([tab,permission])=>{
@@ -2124,6 +2125,8 @@ async function loadLang(){
  try{
   const r=await fetch('/api/lang',{credentials:'same-origin'});
   T=await r.json();
+  const lang=(await fetch('/api/settings',{credentials:'same-origin'}).then(x=>x.json()).catch(()=>({lang:'en'}))).lang||'en';
+  if(!T.password_hint)T.password_hint=(EXTRA_TRANSLATIONS[lang]||EXTRA_TRANSLATIONS.en).password_hint;
  }catch(e){T={};}
  try{
   const sr=await fetch('/api/settings',{credentials:'same-origin'});
@@ -2199,15 +2202,15 @@ async function createUser(){
  const password=document.getElementById('new-user-password').value;
  const role=document.getElementById('new-user-role').value;
  const r=await api('users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,role,permissions:selectedPermissions()})});
- if(r.error){toast(r.error);return;} document.getElementById('new-user-name').value='';document.getElementById('new-user-password').value='';toast(r.message);loadUsers();
+ if(r.error){toast(r.error);return;} document.getElementById('new-user-name').value='';document.getElementById('new-user-password').value='';toast(t('user_created'));loadUsers();
 }
 async function loadUsers(){
  const data=await api('users'); const out=document.getElementById('users-list');if(!out)return;
  if(data.error){out.innerHTML='<div class="empty">'+esc(data.error)+'</div>';return;}
- out.innerHTML=data.users.map(u=>{const perms=Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+' '+(u.role==='admin'?'disabled':'')+'> '+t(labelKey)+'</label>').join('');return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b>'+esc(u.username)+'</b><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+esc(u.username)+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+esc(u.username)+'\')">'+t('save_permissions')+'</button>'+(u.username==='admin'?'':'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+esc(u.username)+'\')">'+t('delete_user')+'</button>')+'</div></div>';}).join('')||'<div class="empty">'+t('user_list')+'</div>';
+ out.innerHTML=data.users.map(u=>{const perms=Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+' '+(u.role==='admin'?'disabled':'')+'> '+t(labelKey)+'</label>').join('');return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b>'+esc(u.username)+'</b><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+esc(u.username)+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+esc(u.username)+'\')">'+t('save_permissions')+'</button>'+(u.username==='admin'?'':'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+esc(u.username)+'\')">'+t('delete_user')+'</button>')+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
 }
-async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});toast(r.error||r.message);loadUsers();}
-async function deleteUser(username){if(!confirm('Удалить пользователя '+username+'?'))return;const r=await api('users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});toast(r.error||r.message);loadUsers();}
+async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();}
+async function deleteUser(username){if(!confirm(t('confirm_delete_user')+' '+username+'?'))return;const r=await api('users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});if(r.error){toast(r.error);return;}toast(t('user_deleted'));loadUsers();}
 
 function toast(msg){
  let el=document.createElement('div');
