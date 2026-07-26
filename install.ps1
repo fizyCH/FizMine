@@ -18,6 +18,13 @@ if (-not $installDir) { $installDir = $defaultPath }
 $panelPort = Read-Host "Panel port [8080]"
 if (-not $panelPort) { $panelPort = "8080" }
 
+$adminUsername = Read-Host "Admin login [admin]"
+if (-not $adminUsername) { $adminUsername = "admin" }
+$adminPassword = Read-Host "Admin password" -AsSecureString
+$adminPasswordConfirm = Read-Host "Repeat admin password" -AsSecureString
+$adminPasswordPlain = [System.Net.NetworkCredential]::new('', $adminPassword).Password
+$adminPasswordConfirmPlain = [System.Net.NetworkCredential]::new('', $adminPasswordConfirm).Password
+
 Write-Host ""
 Write-Host "Installing to: $installDir"
 Write-Host "Port: $panelPort"
@@ -104,6 +111,13 @@ Write-Host "Extracting to $installDir..."
 Expand-Archive -Path $tempFile -DestinationPath $installDir -Force
 Remove-Item $tempFile
 
+# Releases may contain a top-level directory. Resolve the directory containing
+# ctl.ps1 so starting the panel works with either archive layout.
+if (-not (Test-Path (Join-Path $installDir "ctl.ps1"))) {
+    $foundCtl = Get-ChildItem -Path $installDir -Filter "ctl.ps1" -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($foundCtl) { $installDir = $foundCtl.DirectoryName }
+}
+
 # Remove trailing backslash
 $installDir = $installDir.TrimEnd('\')
 
@@ -121,4 +135,7 @@ Write-Host "  python panel.py"
 Write-Host "  Panel: http://localhost:$panelPort"
 Write-Host ""
 
+$env:FIZMINE_ADMIN_USERNAME = $adminUsername
+$env:FIZMINE_ADMIN_PASSWORD = $adminPasswordPlain
+$env:FIZMINE_ADMIN_PASSWORD_CONFIRM = $adminPasswordConfirmPlain
 & (Join-Path $installDir "ctl.ps1") start

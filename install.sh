@@ -40,6 +40,13 @@ INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
 read -rp "Panel port [8080]: " PANEL_PORT
 PANEL_PORT="${PANEL_PORT:-8080}"
 
+read -rp "Admin login [admin]: " FIZMINE_ADMIN_USERNAME
+FIZMINE_ADMIN_USERNAME="${FIZMINE_ADMIN_USERNAME:-admin}"
+read -rsp "Admin password: " FIZMINE_ADMIN_PASSWORD
+echo
+read -rsp "Repeat admin password: " FIZMINE_ADMIN_PASSWORD_CONFIRM
+echo
+
 echo ""
 echo "Installing to: $INSTALL_DIR"
 echo "Port: $PANEL_PORT"
@@ -135,6 +142,13 @@ echo "Extracting to $INSTALL_DIR..."
 sudo tar xf fizmine-panel.tar -C "$INSTALL_DIR" --strip-components=0
 rm -f fizmine-panel.tar
 
+# Releases may contain a top-level directory. Use the directory that actually
+# contains the control script so ./ctl.sh works after either archive layout.
+if [ ! -f "$INSTALL_DIR/ctl.sh" ]; then
+  FOUND_CTL=$(find "$INSTALL_DIR" -maxdepth 3 -type f -name ctl.sh -print -quit 2>/dev/null || true)
+  if [ -n "$FOUND_CTL" ]; then INSTALL_DIR=$(dirname "$FOUND_CTL"); fi
+fi
+
 chmod +x "$INSTALL_DIR/ctl.sh" 2>/dev/null || true
 chmod +x "$INSTALL_DIR/panel.py" 2>/dev/null || true
 
@@ -152,4 +166,5 @@ echo "Panel: http://localhost:$PANEL_PORT"
 echo ""
 
 cd "$INSTALL_DIR"
+export FIZMINE_ADMIN_USERNAME FIZMINE_ADMIN_PASSWORD FIZMINE_ADMIN_PASSWORD_CONFIRM
 ./ctl.sh start

@@ -2077,6 +2077,17 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
  </div>
 </div>
 
+<div class="modal-overlay" id="input-modal-overlay" onclick="if(event.target===this)closeInputModal()">
+ <div class="modal" style="width:420px">
+  <h3 id="input-modal-title"></h3>
+  <div class="form-group"><label id="input-modal-label"></label><input type="text" id="input-modal-value" autocomplete="off" onkeydown="if(event.key==='Enter')inputModalConfirm()"></div>
+  <div style="display:flex;gap:10px;justify-content:flex-end">
+   <button class="btn btn-outline" onclick="closeInputModal()"><span data-i18n="cancel">Cancel</span></button>
+   <button class="btn btn-accent" onclick="inputModalConfirm()"><span data-i18n="confirm">Confirm</span></button>
+  </div>
+ </div>
+</div>
+
 <script>
 const CAN=%PERMISSIONS%;
 const IS_ADMIN=%IS_ADMIN%;
@@ -2107,6 +2118,29 @@ let modalAction='';
 let serverReady=false;
 let lastWasRunning=null;
 let lastDashInfo=null;
+let inputModalCallback=null;
+
+function showInputModal(title,label,callback){
+ document.getElementById('input-modal-title').textContent=title;
+ document.getElementById('input-modal-label').textContent=label;
+ const input=document.getElementById('input-modal-value');
+ input.value='';
+ inputModalCallback=callback;
+ document.getElementById('input-modal-overlay').classList.add('active');
+ setTimeout(()=>input.focus(),50);
+}
+function closeInputModal(){
+ document.getElementById('input-modal-overlay').classList.remove('active');
+ inputModalCallback=null;
+}
+async function inputModalConfirm(){
+ const input=document.getElementById('input-modal-value');
+ const value=input.value.trim();
+ if(!value||!inputModalCallback)return;
+ const callback=inputModalCallback;
+ closeInputModal();
+ await callback(value);
+}
 
 function playCrashSound(){
  try{
@@ -3081,12 +3115,12 @@ function closeFileEditor(){
 }
 
 async function createFolder(){
- const name=prompt(t('enter_name'));
- if(!name)return;
- const r=await api('file-mkdir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,path:currentDir||''})});
- if(r.error){toast(r.error);return;}
- toast(r.message||t('saved'));
- loadFiles(currentDir);
+ showInputModal(t('create_folder'),t('enter_name'),async name=>{
+  const r=await api('file-mkdir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,path:currentDir||''})});
+  if(r.error){toast(r.error);return;}
+  toast(r.message||t('saved'));
+  loadFiles(currentDir);
+ });
 }
 
 function updateCreateFileLabel(){
@@ -3097,15 +3131,14 @@ function updateCreateFileLabel(){
 
 async function createFile(){
  const labels={en:'File name',ru:'Имя файла',de:'Dateiname',fr:'Nom du fichier',zh:'文件名'};
- const name=prompt(labels[currentLang]||labels.en);
- if(!name)return;
- const clean=name.trim();
- if(!clean)return;
- const fileName=currentDir?currentDir+'/'+clean:clean;
- const r=await api('file-write',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:fileName,content:''})});
- if(r.error){toast(r.error);return;}
- toast(r.message||t('saved'));
- loadFiles(currentDir);
+ const titles={en:'Create File',ru:'Создать файл',de:'Datei erstellen',fr:'Créer un fichier',zh:'创建文件'};
+ showInputModal(titles[currentLang]||titles.en,labels[currentLang]||labels.en,async name=>{
+  const fileName=currentDir?currentDir+'/'+name:name;
+  const r=await api('file-write',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:fileName,content:''})});
+  if(r.error){toast(r.error);return;}
+  toast(r.message||t('saved'));
+  loadFiles(currentDir);
+ });
 }
 
 async function uploadFileToDir(file){
@@ -4441,15 +4474,15 @@ def setup_initial_account():
     if users:
         return 0
     print("\nFizMine: создание администратора панели")
-    username = input("Логин: ").strip().lower()
+    username = os.environ.get("FIZMINE_ADMIN_USERNAME", "").strip().lower() or input("Логин: ").strip().lower()
     if not re.fullmatch(r"[a-z0-9_.-]{3,32}", username):
         print("Ошибка: логин должен содержать 3–32 символа (a-z, 0-9, ., _, -)")
         return 1
-    password = getpass.getpass("Пароль: ")
+    password = os.environ.get("FIZMINE_ADMIN_PASSWORD") or getpass.getpass("Пароль: ")
     if not _validate_password(password):
         print("Ошибка: пароль минимум 5 символов и не должен быть распространённым")
         return 1
-    confirmation = getpass.getpass("Повторите пароль: ")
+    confirmation = os.environ.get("FIZMINE_ADMIN_PASSWORD_CONFIRM") or getpass.getpass("Повторите пароль: ")
     if password != confirmation:
         print("Ошибка: пароли не совпадают")
         return 1
