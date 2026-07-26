@@ -3558,7 +3558,7 @@ async def api_upload_core(request: Request):
     file_item = form["file"]
     if not file_item.filename or not file_item.filename.endswith(".jar"):
         return JSONResponse({"error": "File must be a .jar"}, status_code=400)
-    data = file_item.read()
+    data = await file_item.read()
 
     old_jar = list(MC_DIR.glob("*.jar"))
     for j in old_jar:
@@ -3625,7 +3625,7 @@ async def api_upload(request: Request):
     target = "mods" if ftype == "mods" else "plugins"
     if not file_item.filename:
         return JSONResponse({"error": "No file"}, status_code=400)
-    data = file_item.read()
+    data = await file_item.read()
     result = save_upload(target, file_item.filename, data)
     return JSONResponse({"message": f"Uploaded {result['name']} ({result['size']} bytes)", "ok": True})
 
@@ -3792,7 +3792,7 @@ async def api_file_upload(request: Request):
     base = MC_DIR / target_dir if target_dir else MC_DIR
     base.mkdir(parents=True, exist_ok=True)
     fpath = base / file_item.filename
-    fpath.write_bytes(file_item.file.read())
+    fpath.write_bytes(await file_item.file.read())
     return JSONResponse({"message": f"Uploaded {file_item.filename}", "ok": True})
 
 
