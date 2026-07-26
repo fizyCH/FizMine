@@ -1949,7 +1949,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
     <h3 data-i18n="add_user">Добавить пользователя</h3>
     <div class="form-group"><label data-i18n="username">Логин</label><input id="new-user-name" maxlength="32" placeholder="nickname"></div>
     <div class="form-group"><label data-i18n="password">Пароль</label><input id="new-user-password" type="password" data-i18n-ph="login_password" placeholder="Пароль"><small data-i18n="password_hint" style="display:block;color:var(--text2);font-size:11px;margin-top:5px">Минимум 5 символов</small></div>
-    <div class="form-group"><label data-i18n="user_role">Роль</label><select id="new-user-role"><option value="user" data-i18n="user">Пользователь</option><option value="admin" data-i18n="administrator">Администратор</option></select></div>
+    <div class="form-group"><label data-i18n="user_role">Роль</label><div class="custom-select" id="role-select" onclick="toggleCustomSelect(this)"><div class="custom-select-selected" id="role-selected" data-value="user">Пользователь</div><div class="custom-select-options"><div class="custom-select-option selected" data-value="user" onclick="event.stopPropagation();selectUserRole('user')" data-i18n="user">Пользователь</div><div class="custom-select-option" data-value="admin" onclick="event.stopPropagation();selectUserRole('admin')" data-i18n="administrator">Администратор</div></div></div><select id="new-user-role" aria-hidden="true" tabindex="-1" style="display:none"><option value="user">Пользователь</option><option value="admin">Администратор</option></select></div>
     <div id="new-user-perms" style="display:grid;gap:10px;margin:14px 0;color:var(--text2);font-size:13px">
      <label><input type="checkbox" value="console"><span data-i18n="perm_console">Просмотр консоли и команды</span></label>
      <label><input type="checkbox" value="mods"><span data-i18n="perm_mods">Добавление и удаление модов/плагинов</span></label>
@@ -2190,6 +2190,8 @@ function applyTranslations(){
   const key=el.getAttribute('data-i18n-ph');
   if(T[key])el.placeholder=T[key];
  });
+ const roleSelect=document.getElementById('new-user-role');
+ if(roleSelect)selectUserRole(roleSelect.value||'user');
  document.getElementById('page-title').textContent=t(currentTab);
  const ml=document.getElementById('chart-mem-label');if(ml)ml.textContent=t('memory_used');
  const dl=document.getElementById('chart-disk-label');if(dl)dl.textContent=t('disk_usage');
@@ -3245,6 +3247,14 @@ function selectLang(code,label){
  document.getElementById('lang-selected').textContent=label;
  document.getElementById('lang-options').querySelectorAll('.custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===code));
  document.querySelectorAll('.custom-select').forEach(s=>s.classList.remove('open'));
+}
+function selectUserRole(role){
+ const select=document.getElementById('new-user-role');
+ const selected=document.getElementById('role-selected');
+ if(select)select.value=role;
+ if(selected){selected.dataset.value=role;selected.textContent=role==='admin'?t('administrator'):t('user');}
+ document.querySelectorAll('#role-select .custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===role));
+ document.getElementById('role-select')?.classList.remove('open');
 }
 document.addEventListener('click',e=>{
  if(!e.target.closest('.custom-select'))document.querySelectorAll('.custom-select').forEach(s=>s.classList.remove('open'));
