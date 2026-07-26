@@ -1601,6 +1601,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:all .25s}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
 .form-group textarea{min-height:60px;resize:vertical;font-family:monospace}
+#new-user-perms input[type=checkbox],.user-perms input[type=checkbox]{accent-color:var(--accent)}
 
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
