@@ -2455,6 +2455,7 @@ let javaVersion=0;
 
 function showCoreVersions(core,btn){
  const panel=document.getElementById('core-versions-panel');
+ if(!panel)return;
  if(panel.style.display==='block'){panel.style.display='none';return;}
  const data=CORE_VERSIONS[core];
  if(!data)return;
