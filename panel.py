@@ -3237,7 +3237,6 @@ async function loadSettingsPage(){
  await loadEnvInfo();
  // Authorization is account-based and is configured during installation;
  // the old enable/disable switch is intentionally no longer exposed.
-  if(authEnabled){const b=document.getElementById('auth-body');b.style.maxHeight=b.scrollHeight+'px';b.style.opacity='1';}
    if(data.panel_opacity!==undefined){
     panelOpacity=data.panel_opacity;
     document.getElementById('opacity-slider').value=panelOpacity;
