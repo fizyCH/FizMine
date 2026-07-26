@@ -2110,13 +2110,23 @@ async function executeAction(action,type,name){
   const r=await api('server?action=stop');toast(r.message||'Stopped');setTimeout(refreshDashboard,2000);
  }else if(action==='start'){
   const r=await api('server?action=start');toast(r.message||'Started');setTimeout(refreshDashboard,2000);
-   }else if(action==='restart'){
-    await api('server?action=stop');
-    setTimeout(async()=>{
-     await api('server?action=start');
+    }else if(action==='restart'){
+     await api('server?action=stop');
      toast(t('server_restarting'));
-     setTimeout(refreshDashboard,5000);
-    },3000);
+     let waited=0;
+     const poll=async()=>{
+      try{
+       const s=await api('status');
+       if(!s.running||waited>=30000){
+        await api('server?action=start');
+        setTimeout(refreshDashboard,5000);
+        return;
+       }
+      }catch(e){}
+      waited+=1000;
+      setTimeout(poll,1000);
+     };
+     setTimeout(poll,1000);
   }else if(action==='doUploadCore'){
    doUploadCore();
   }else if(action==='deleteFileItemConfirm'){
@@ -3881,7 +3891,11 @@ def api_download_core():
 
         del_paths = set()
         try:
-            del_paths = set(json.loads(keep_str).keys())
+            kd = body.get("keep_data", "{}")
+            if isinstance(kd, dict):
+                del_paths = set(kd.keys())
+            else:
+                del_paths = set(json.loads(kd).keys())
         except Exception:
             pass
 
@@ -4068,27 +4082,17 @@ def api_check_update():
     import urllib.request
     try:
         local_ver = PANEL_VERSION
-        try:
-            with open(Path(__file__), "r", errors="replace") as f:
-                content = f.read(50000)
-            m = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', content)
-            if m:
-                local_ver = m.group(1)
-        except:
-            pass
         
         req = urllib.request.Request(
             "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py?t=" + str(int(time.time())),
-            headers={"User-Agent": "FizMine-Panel"}
+            headers={"User-Agent": "FizMinePanel/2.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
             remote = resp.read(200000).decode("utf-8", errors="replace")
         remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
         
-        if remote_ver != local_ver:
-            return jsonify({"update": True, "local": local_ver, "remote": remote_ver})
-        return jsonify({"update": False, "local": local_ver, "remote": remote_ver})
+        return jsonify({"update": remote_ver != local_ver, "local": local_ver, "remote": remote_ver})
     except Exception as e:
         return jsonify({"update": False, "error": str(e)})
 
