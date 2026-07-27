@@ -1993,12 +1993,12 @@ async def api_do_update(request: Request):
     try:
         local_ver = PANEL_VERSION
         
-        req = urllib.request.Request(
-            "https://raw.githubusercontent.com/fizyCH/FizMine/main/app.py?t=" + str(int(time.time())),
-            headers={"User-Agent": "FizMine-Panel"}
-        )
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            remote = resp.read().decode("utf-8", errors="replace")
+        base_url = "https://raw.githubusercontent.com/fizyCH/FizMine/main/"
+        def fetch_file(relative):
+            req = urllib.request.Request(base_url + relative + "?t=" + str(int(time.time())), headers={"User-Agent": "FizMine-Panel"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return resp.read().decode("utf-8", errors="replace")
+        remote = fetch_file("app.py")
         
         remote_ver = re.search(r'PANEL_VERSION\s*=\s*"([^"]+)"', remote)
         remote_ver = remote_ver.group(1) if remote_ver else "0"
@@ -2006,9 +2006,15 @@ async def api_do_update(request: Request):
         if remote_ver == local_ver:
             return JSONResponse({"ok": True, "message": "Already up to date"})
         
-        panel_path = Path(__file__).resolve()
-        shutil.copy2(str(panel_path), str(panel_path) + ".bak")
-        panel_path.write_text(remote, encoding="utf-8")
+        root = Path(__file__).resolve().parent
+        updates = {"app.py": remote, "panel.py": fetch_file("panel.py")}
+        for module in ("__init__.py", "auth.py", "users.py", "server.py", "files.py", "settings.py", "rcon.py", "backup.py", "templates.py"):
+            updates[f"panel_modules/{module}"] = fetch_file(f"panel_modules/{module}")
+        for relative, content in updates.items():
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists(): shutil.copy2(str(target), str(target) + ".bak")
+            target.write_text(content, encoding="utf-8")
         
         def restart():
             time.sleep(2)
