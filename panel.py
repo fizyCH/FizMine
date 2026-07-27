@@ -1682,7 +1682,6 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .color-swatch:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .color-swatch.active{border-color:var(--text);box-shadow:0 0 12px rgba(255,255,255,.2)}
 .color-input{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
-.color-custom-preview{width:24px;height:24px;border-radius:7px;border:2px solid var(--text);box-shadow:0 0 12px rgba(var(--accent-rgb),.35);transition:background .2s}
 .color-input input[type=color]{width:40px;height:34px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0}
 .color-input input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
 .color-input input[type=color]::-webkit-color-swatch{border-radius:6px;border:none}
@@ -2027,7 +2026,6 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
      <div class="color-input">
       <input type="color" id="color-picker" value="#6c5ce7" aria-label="Accent color" oninput="setAccent(this.value)" onchange="setAccent(this.value)">
       <span style="color:var(--text2);font-size:12px" id="color-hex">#6c5ce7</span>
-      <span class="color-custom-preview" id="custom-color-preview" title="Preview"></span>
      </div>
       <div class="toggle-row" style="margin-top:14px;border:none;padding:0">
        <div class="toggle-label"><span data-i18n="fireflies">Fireflies</span><span style="color:var(--text2);font-size:10px">ambient particles</span></div>
@@ -3349,7 +3347,6 @@ function initColorPresets(){
 function setAccent(hex){
  document.getElementById('color-picker').value=hex;
  document.getElementById('color-hex').textContent=hex;
- const customPreview=document.getElementById('custom-color-preview');if(customPreview)customPreview.style.background=hex;
  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.toggle('active',s.style.background===hex||rgbToHex(s.style.background)===hex));
  applyAccent(hex);
 }
@@ -3398,7 +3395,6 @@ function restoreAccent(){
  document.documentElement.style.setProperty('--text2',lum<.35?'#b0b8c8':'#8892a4');
  document.getElementById('color-picker').value=hex;
  document.getElementById('color-hex').textContent=hex;
- const customPreview=document.getElementById('custom-color-preview');if(customPreview)customPreview.style.background=hex;
  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.toggle('active',rgbToHex(s.style.background)===hex));
  const a=(panelOpacity/100).toFixed(2);
  document.documentElement.style.setProperty('--panel-bg',`rgba(21,25,34,${a})`);
