@@ -2179,6 +2179,8 @@ function selectUserRole(role){
  const selected=document.getElementById('role-selected');
  if(select)select.value=role;
  if(selected){selected.dataset.value=role;selected.textContent=role==='admin'?t('administrator'):t('user');}
+ const permissions=document.getElementById('new-user-perms');
+ if(permissions)permissions.style.display=role==='admin'?'none':'grid';
  document.querySelectorAll('#role-select .custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===role));
  document.getElementById('role-select')?.classList.remove('open');
 }
@@ -2508,4 +2510,3 @@ setInterval(()=>{if(currentTab==='players')loadOnlinePlayers();},3000);
 </script>
 </body>
 </html>"""
-
