@@ -7,6 +7,7 @@ import getpass
 import os
 import platform
 import re
+import secrets
 import shutil
 import signal
 import subprocess
@@ -142,13 +143,13 @@ def ensure_default_admin():
     users = load_users()
     if users:
         return False
-    password = "qwerty123"
+    password = secrets.token_urlsafe(12)
     save_users({"admin": {
         "role": "admin",
         "password_hash": _password_hash(password),
         "permissions": list(PERMISSIONS),
     }})
-    print("FizMine: пользователей нет — создан admin с паролем qwerty123")
+    print(f"FizMine: пользователей нет — создан admin с паролем {password}")
     return True
 
 
