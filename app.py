@@ -149,7 +149,12 @@ def ensure_default_admin():
         "password_hash": _password_hash(password),
         "permissions": list(PERMISSIONS),
     }})
-    print(f"FizMine: пользователей нет — создан admin с паролем {password}")
+    print("\n+------------------------------------------+")
+    print("| FizMine initial administrator           |")
+    print("+------------------------------------------+")
+    print("| Username: admin                         |")
+    print(f"| Password: {password:<32}|")
+    print("+------------------------------------------+\n")
     return True
 
 
