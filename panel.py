@@ -1682,6 +1682,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .color-swatch:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .color-swatch.active{border-color:var(--text);box-shadow:0 0 12px rgba(255,255,255,.2)}
 .color-input{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.color-custom-preview{width:24px;height:24px;border-radius:7px;border:2px solid var(--text);box-shadow:0 0 12px rgba(var(--accent-rgb),.35);transition:background .2s}
 .color-input input[type=color]{width:40px;height:34px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0}
 .color-input input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
 .color-input input[type=color]::-webkit-color-swatch{border-radius:6px;border:none}
@@ -1921,6 +1922,7 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
   <div class="modal" style="width:420px">
    <h3 data-i18n="account">Edit profile</h3>
    <div class="form-group"><label data-i18n="username">Username</label><input id="profile-username" maxlength="32"></div>
+   <div class="form-group"><label data-i18n="user_role">Role</label><select id="profile-role"><option value="user" data-i18n="user">User</option><option value="admin" data-i18n="administrator">Administrator</option></select></div>
    <div class="form-group"><label data-i18n="password">Password</label><div style="display:flex;gap:8px"><input id="profile-password" type="password" placeholder="Leave blank to keep current" style="flex:1"><button class="icon-btn" type="button" onclick="toggleProfilePassword(this)"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div></div>
    <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn btn-outline" onclick="closeProfileModal()"><span data-i18n="cancel">Cancel</span></button><button class="btn btn-accent" onclick="saveProfile()"><span data-i18n="save_properties">Save</span></button></div>
   </div>
@@ -2023,8 +2025,9 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
      <h3><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16c3.3 0 6-2.7 6-6 0-5.5-4.5-9.8-10-9.8z"/></svg> <span data-i18n="accent_color">Accent Color</span></h3>
      <div class="color-grid" id="color-presets"></div>
      <div class="color-input">
-      <input type="color" id="color-picker" value="#6c5ce7" aria-label="Accent color" oninput="setAccent(this.value)">
+      <input type="color" id="color-picker" value="#6c5ce7" aria-label="Accent color" oninput="setAccent(this.value)" onchange="setAccent(this.value)">
       <span style="color:var(--text2);font-size:12px" id="color-hex">#6c5ce7</span>
+      <span class="color-custom-preview" id="custom-color-preview" title="Preview"></span>
      </div>
       <div class="toggle-row" style="margin-top:14px;border:none;padding:0">
        <div class="toggle-label"><span data-i18n="fireflies">Fireflies</span><span style="color:var(--text2);font-size:10px">ambient particles</span></div>
@@ -2268,14 +2271,14 @@ async function createUser(){
  if(r.error){toast(r.error);return;} document.getElementById('new-user-name').value='';document.getElementById('new-user-password').value='';toast(t('user_created'));loadUsers();
 }
 async function loadUsers(){
- const data=await api('users'); const out=document.getElementById('users-list');if(!out)return;
+ const data=await api('users'); window.userRoleMap=Object.fromEntries((data.users||[]).map(u=>[u.username,u.role])); const out=document.getElementById('users-list');if(!out)return;
  if(data.error){out.innerHTML='<div class="empty">'+esc(data.error)+'</div>';return;}
- out.innerHTML=data.users.map(u=>{const perms=Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+' '+(u.role==='admin'?'disabled':'')+'> '+t(labelKey)+'</label>').join('');const name=esc(u.username);return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px;min-width:0"><b class="user-name" data-user="'+name+'">'+name+'</b><button class="icon-btn" title="Edit profile" onclick="editProfile(\''+name+'\')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L8 18l-4 1 1-4Z"/></svg></button></div><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+name+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+name+'\')">'+t('save_permissions')+'</button>'+'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+name+'\')">'+t('delete_user')+'</button>'+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
+ out.innerHTML=data.users.map(u=>{const perms=u.role==='admin'?'':Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+'> '+t(labelKey)+'</label>').join('');const name=esc(u.username);return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px;min-width:0"><b class="user-name" data-user="'+name+'">'+name+'</b><button class="icon-btn" title="Edit profile" onclick="editProfile(\''+name+'\')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L8 18l-4 1 1-4Z"/></svg></button></div><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+name+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+name+'\')">'+t('save_permissions')+'</button>'+'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+name+'\')">'+t('delete_user')+'</button>'+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
 }
 function closeProfileModal(){document.getElementById('profile-overlay').classList.remove('active');}
 function toggleProfilePassword(button){const input=document.getElementById('profile-password');input.type=input.type==='password'?'text':'password';button.classList.toggle('active',input.type==='text');}
-function editProfile(username){document.getElementById('profile-username').value=username;document.getElementById('profile-username').dataset.original=username;document.getElementById('profile-password').value='';document.getElementById('profile-password').type='password';document.getElementById('profile-overlay').classList.add('active');setTimeout(()=>document.getElementById('profile-username').focus(),50);}
-async function saveProfile(){const original=document.getElementById('profile-username').dataset.original;const newUsername=document.getElementById('profile-username').value.trim();const password=document.getElementById('profile-password').value;const body={username:original,new_username:newUsername};if(password)body.password=password;const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(r.error){toast(r.error);return;}closeProfileModal();toast(t('user_updated'));loadUsers();}
+function editProfile(username){document.getElementById('profile-username').value=username;document.getElementById('profile-username').dataset.original=username;document.getElementById('profile-role').value=(window.userRoleMap&&window.userRoleMap[username])||'user';document.getElementById('profile-password').value='';document.getElementById('profile-password').type='password';document.getElementById('profile-overlay').classList.add('active');setTimeout(()=>document.getElementById('profile-username').focus(),50);}
+async function saveProfile(){const original=document.getElementById('profile-username').dataset.original;const newUsername=document.getElementById('profile-username').value.trim();const password=document.getElementById('profile-password').value;const body={username:original,new_username:newUsername,role:document.getElementById('profile-role').value};if(password)body.password=password;const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(r.error){toast(r.error);return;}closeProfileModal();toast(t('user_updated'));loadUsers();}
 async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();}
 function deleteUser(username){confirmAction(t('confirm_delete_user')+': '+username+'?','deleteUserConfirm',username,'','true');}
 async function deleteUserConfirm(username){const r=await api('users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});if(r.error){toast(r.error);return;}toast(t('user_deleted'));loadUsers();}
@@ -3346,6 +3349,7 @@ function initColorPresets(){
 function setAccent(hex){
  document.getElementById('color-picker').value=hex;
  document.getElementById('color-hex').textContent=hex;
+ const customPreview=document.getElementById('custom-color-preview');if(customPreview)customPreview.style.background=hex;
  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.toggle('active',s.style.background===hex||rgbToHex(s.style.background)===hex));
  applyAccent(hex);
 }
@@ -3394,6 +3398,7 @@ function restoreAccent(){
  document.documentElement.style.setProperty('--text2',lum<.35?'#b0b8c8':'#8892a4');
  document.getElementById('color-picker').value=hex;
  document.getElementById('color-hex').textContent=hex;
+ const customPreview=document.getElementById('custom-color-preview');if(customPreview)customPreview.style.background=hex;
  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.toggle('active',rgbToHex(s.style.background)===hex));
  const a=(panelOpacity/100).toFixed(2);
  document.documentElement.style.setProperty('--panel-bg',`rgba(21,25,34,${a})`);
