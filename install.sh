@@ -11,9 +11,11 @@ echo "          Panel Installer"
 echo ""
 
 # Check for updates
-if [ -f "$HOME/minecraft/panel.py" ]; then
-  LOCAL_VER=$(grep -o "FizMine Panel v[0-9.]*" "$HOME/minecraft/panel.py" 2>/dev/null | head -1 | grep -o "[0-9.]*" || echo "0")
-  REMOTE_VER=$(curl -sL "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py" 2>/dev/null | grep -o "FizMine Panel v[0-9.]*" | head -1 | grep -o "[0-9.]*" || echo "0")
+if [ -f "$HOME/minecraft/app.py" ] || [ -f "$HOME/minecraft/panel.py" ]; then
+  VERSION_FILE="$HOME/minecraft/app.py"
+  [ -f "$VERSION_FILE" ] || VERSION_FILE="$HOME/minecraft/panel.py"
+  LOCAL_VER=$(grep -o 'PANEL_VERSION[[:space:]]*=[[:space:]]*"[^"]*"' "$VERSION_FILE" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)"/\1/' || echo "0")
+  REMOTE_VER=$(curl -sL "https://raw.githubusercontent.com/fizyCH/FizMine/main/app.py" 2>/dev/null | grep -o 'PANEL_VERSION[[:space:]]*=[[:space:]]*"[^"]*"' | head -1 | sed -E 's/.*"([^"]+)"/\1/' || echo "0")
   if [ -n "$LOCAL_VER" ] && [ -n "$REMOTE_VER" ] && [ "$LOCAL_VER" != "$REMOTE_VER" ]; then
     echo "Update available: $LOCAL_VER -> $REMOTE_VER"
     read -rp "Update now? (y/n) [y]: " UPDATE_CHOICE

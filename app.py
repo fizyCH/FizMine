@@ -1974,7 +1974,7 @@ async def api_check_update(request: Request):
         local_ver = PANEL_VERSION
         
         req = urllib.request.Request(
-            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py?t=" + str(int(time.time())),
+            "https://raw.githubusercontent.com/fizyCH/FizMine/main/app.py?t=" + str(int(time.time())),
             headers={"User-Agent": "FizMinePanel/2.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
@@ -1994,7 +1994,7 @@ async def api_do_update(request: Request):
         local_ver = PANEL_VERSION
         
         req = urllib.request.Request(
-            "https://raw.githubusercontent.com/fizyCH/FizMine/main/panel.py?t=" + str(int(time.time())),
+            "https://raw.githubusercontent.com/fizyCH/FizMine/main/app.py?t=" + str(int(time.time())),
             headers={"User-Agent": "FizMine-Panel"}
         )
         with urllib.request.urlopen(req, timeout=30) as resp:
