@@ -137,6 +137,21 @@ def save_users(users):
     USERS_FILE.write_text(json.dumps(users, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def ensure_default_admin():
+    """Create the documented emergency admin when no accounts exist."""
+    users = load_users()
+    if users:
+        return False
+    password = "qwerty123"
+    save_users({"admin": {
+        "role": "admin",
+        "password_hash": _password_hash(password),
+        "permissions": list(PERMISSIONS),
+    }})
+    print("FizMine: пользователей нет — создан admin с паролем qwerty123")
+    return True
+
+
 def user_permissions(user):
     if user and user.get("role") == "admin":
         return list(PERMISSIONS)
@@ -2055,6 +2070,7 @@ def setup_initial_account():
 
 def main():
     MC_DIR.mkdir(parents=True, exist_ok=True)
+    ensure_default_admin()
     
     java_bin = find_java()
     java_ver = 0
