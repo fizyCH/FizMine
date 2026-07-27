@@ -1677,11 +1677,11 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .setup-card h3{font-size:18px;margin-bottom:10px}
 .setup-card p{color:var(--text2);font-size:13px;margin-bottom:20px}
 
-.color-grid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.color-grid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:12px}
 .color-swatch{width:36px;height:36px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:all .25s cubic-bezier(.16,1,.3,1)}
 .color-swatch:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .color-swatch.active{border-color:var(--text);box-shadow:0 0 12px rgba(255,255,255,.2)}
-.color-input{display:flex;align-items:center;gap:8px}
+.color-input{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
 .color-input input[type=color]{width:40px;height:34px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0}
 .color-input input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
 .color-input input[type=color]::-webkit-color-swatch{border-radius:6px;border:none}
@@ -2023,7 +2023,7 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
      <h3><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16c3.3 0 6-2.7 6-6 0-5.5-4.5-9.8-10-9.8z"/></svg> <span data-i18n="accent_color">Accent Color</span></h3>
      <div class="color-grid" id="color-presets"></div>
      <div class="color-input">
-      <input type="color" id="color-picker" value="#6c5ce7">
+      <input type="color" id="color-picker" value="#6c5ce7" aria-label="Accent color" oninput="setAccent(this.value)">
       <span style="color:var(--text2);font-size:12px" id="color-hex">#6c5ce7</span>
      </div>
       <div class="toggle-row" style="margin-top:14px;border:none;padding:0">
@@ -3308,9 +3308,10 @@ async function loadSettingsPage(){
   document.getElementById('lang-options').querySelectorAll('.custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===data.lang));
  }
  if(data.accent){
-  savedAccent=data.accent;
+ savedAccent=data.accent;
   document.getElementById('color-picker').value=data.accent;
   document.getElementById('color-hex').textContent=data.accent;
+  applyAccent(data.accent);
  }
    document.getElementById('fireflies-toggle').checked=!!data.fireflies;
    if(data.fireflies&&!firefliesOn){
