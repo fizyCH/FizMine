@@ -1921,7 +1921,7 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
   <div class="modal" style="width:420px">
    <h3 data-i18n="account">Edit profile</h3>
    <div class="form-group"><label data-i18n="username">Username</label><input id="profile-username" maxlength="32"></div>
-   <div class="form-group"><label data-i18n="user_role">Role</label><select id="profile-role"><option value="user" data-i18n="user">User</option><option value="admin" data-i18n="administrator">Administrator</option></select></div>
+   <div class="form-group"><label data-i18n="user_role">Role</label><div class="custom-select" id="profile-role-select" onclick="toggleCustomSelect(this)"><div class="custom-select-selected" id="profile-role-selected" data-value="user">User</div><div class="custom-select-options"><div class="custom-select-option selected" data-value="user" onclick="event.stopPropagation();selectProfileRole('user')" data-i18n="user">User</div><div class="custom-select-option" data-value="admin" onclick="event.stopPropagation();selectProfileRole('admin')" data-i18n="administrator">Administrator</div></div></div><select id="profile-role" aria-hidden="true" tabindex="-1" style="display:none"><option value="user">User</option><option value="admin">Administrator</option></select></div>
    <div class="form-group"><label data-i18n="password">Password</label><div style="display:flex;gap:8px"><input id="profile-password" type="password" placeholder="Leave blank to keep current" style="flex:1"><button class="icon-btn" type="button" onclick="toggleProfilePassword(this)"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div></div>
    <div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn btn-outline" onclick="closeProfileModal()"><span data-i18n="cancel">Cancel</span></button><button class="btn btn-accent" onclick="saveProfile()"><span data-i18n="save_properties">Save</span></button></div>
   </div>
@@ -2211,6 +2211,8 @@ function applyTranslations(){
  });
  const roleSelect=document.getElementById('new-user-role');
  if(roleSelect)selectUserRole(roleSelect.value||'user');
+ const profileRole=document.getElementById('profile-role');
+ if(profileRole)selectProfileRole(profileRole.value||'user');
  document.getElementById('page-title').textContent=t(currentTab);
  const ml=document.getElementById('chart-mem-label');if(ml)ml.textContent=t('memory_used');
  const dl=document.getElementById('chart-disk-label');if(dl)dl.textContent=t('disk_usage');
@@ -2275,7 +2277,7 @@ async function loadUsers(){
 }
 function closeProfileModal(){document.getElementById('profile-overlay').classList.remove('active');}
 function toggleProfilePassword(button){const input=document.getElementById('profile-password');input.type=input.type==='password'?'text':'password';button.classList.toggle('active',input.type==='text');}
-function editProfile(username){document.getElementById('profile-username').value=username;document.getElementById('profile-username').dataset.original=username;document.getElementById('profile-role').value=(window.userRoleMap&&window.userRoleMap[username])||'user';document.getElementById('profile-password').value='';document.getElementById('profile-password').type='password';document.getElementById('profile-overlay').classList.add('active');setTimeout(()=>document.getElementById('profile-username').focus(),50);}
+function editProfile(username){document.getElementById('profile-username').value=username;document.getElementById('profile-username').dataset.original=username;selectProfileRole((window.userRoleMap&&window.userRoleMap[username])||'user');document.getElementById('profile-password').value='';document.getElementById('profile-password').type='password';document.getElementById('profile-overlay').classList.add('active');setTimeout(()=>document.getElementById('profile-username').focus(),50);}
 async function saveProfile(){const original=document.getElementById('profile-username').dataset.original;const newUsername=document.getElementById('profile-username').value.trim();const password=document.getElementById('profile-password').value;const body={username:original,new_username:newUsername,role:document.getElementById('profile-role').value};if(password)body.password=password;const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(r.error){toast(r.error);return;}closeProfileModal();toast(t('user_updated'));loadUsers();}
 async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();}
 function deleteUser(username){confirmAction(t('confirm_delete_user')+': '+username+'?','deleteUserConfirm',username,'','true');}
@@ -3281,6 +3283,14 @@ function selectUserRole(role){
  if(selected){selected.dataset.value=role;selected.textContent=role==='admin'?t('administrator'):t('user');}
  document.querySelectorAll('#role-select .custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===role));
  document.getElementById('role-select')?.classList.remove('open');
+}
+function selectProfileRole(role){
+ const select=document.getElementById('profile-role');
+ const selected=document.getElementById('profile-role-selected');
+ if(select)select.value=role;
+ if(selected){selected.dataset.value=role;selected.textContent=role==='admin'?t('administrator'):t('user');}
+ document.querySelectorAll('#profile-role-select .custom-select-option').forEach(o=>o.classList.toggle('selected',o.dataset.value===role));
+ document.getElementById('profile-role-select')?.classList.remove('open');
 }
 document.addEventListener('click',e=>{
  if(!e.target.closest('.custom-select'))document.querySelectorAll('.custom-select').forEach(s=>s.classList.remove('open'));
