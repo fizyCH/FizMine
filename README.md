@@ -45,32 +45,18 @@ irm https://raw.githubusercontent.com/fizyCH/FizMine/main/install.ps1 | iex
 ./ctl.sh log        # View logs
 ```
 
+# Version 3.0
+
 ## What's New
 
-| Status | Change | Description |
-|--------|--------|-------------|
-| FIXED | Java check on startup | Displays the Java version in the terminal when the panel starts |
-| NEW | Check for updates | Button in Settings → System for checking for updates from GitHub |
-| NEW | Purpur core | Added Purpur (Bukkit/Spigot hybrid) for download |
-| NEW | Arclight core | Added Arclight (Forge+Bukkit hybrid) for download |
-| FIXED | Automatic Flask installation | Added sudo pip fallback, improved error messages |
-| BETA | Update checker | Check for updates button in Settings with auto-install |
-| FIXED | NeoForge installer | Fixed --installServer flag, increased timeout to 600s |
-| NEW | Fabric loader updated | Updated to loader 0.19.3 for all versions |
-| NEW | Search in plugins/mods | Quick search filter for installed plugins and mods |
-| NEW | Interactive menu | ctl.sh/ctl.ps1 with Start, Stop, Restart, Status, Port, Java, Delete |
-| FIXED | .env path handling | Fixed tilde expansion and absolute path resolution |
-| NEW | Install script prompts | Interactive setup: install path, auth, port |
-| NEW | Multi-distro support | apt, dnf, yum, pacman, apk for Linux |
-| NEW | Auto Java install | Install script auto-installs Java 17 if missing |
-| NEW | 5 languages | English, Russian, German, French, Chinese |
-| NEW | Fireflies animation | Ambient particles with accent color |
-| NEW | Accent color picker | Customizable panel theme colors |
-| NEW | Panel opacity | 0-100% transparency slider |
-| NEW | Authentication | Login with anti-brute-force (5 attempts = 5 min lockout) |
-| NEW | File manager | Upload, download, edit, delete files |
-| NEW | Search in files | Recursive search across subdirectories |
-| NEW | Server core download | Vanilla, Purpur, Fabric, Arclight |
-| NEW | Backup | Panel + server backup download |
-| NEW | Crash detection | Sound notification when server crashes |
-| NEW | Cross-platform | Linux + Windows support |
+| Category | Changes |
+|----------|----------|
+| Account System | Added a full account system with **Administrator** and **User** roles. |
+| User Management | - Create, edit, and delete users.<br>- Change nickname and password.<br>- Change user roles.<br>- Demote administrators to regular users. |
+| Permissions | Added flexible permission management for:<br>- Console<br>- Server management<br>- Files<br>- Properties<br>- Plugins and Mods<br>- Player management<br><br>Administrators have unrestricted access. |
+| File Browser | Added a built-in server file browser with support for creating files. |
+| Mobile Interface | Added an adaptive interface for mobile devices (**BETA**). |
+| Modular Architecture | The application has been split into modules:<br>- `app.py`<br>- `auth.py`<br>- `users.py`<br>- `server.py`<br>- `files.py`<br>- `settings.py`<br>- `rcon.py`<br>- `backup.py`<br>- `panel.py` (compatible launcher) |
+| Panel Updater | Added an automatic updater that:<br>- Checks the latest version via `app.py`.<br>- Downloads `app.py`, `panel.py`, and all modules.<br>- Creates `.bak` backups before updating.<br>- Restarts the panel automatically. |
+| First Administrator | On the first launch, the panel automatically creates an administrator account:<br>- Login: `admin`<br>- Random secure password<br>- Credentials are displayed in a formatted table. |
+| Automatic Account Generation | Accounts are automatically initialized when the panel is launched using `ctl.sh` or `ctl.ps1`. |
