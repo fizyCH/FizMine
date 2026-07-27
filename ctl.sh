@@ -13,7 +13,7 @@ PANEL_PORT="${PANEL_PORT:-8080}"
 
 ensure_account() {
   if [ ! -s "$SCRIPT_DIR/users.json" ]; then
-    python3 "$SCRIPT_DIR/panel.py" --setup-account || return 1
+    python3 "$SCRIPT_DIR/panel.py" --ensure-account || return 1
   fi
 }
 

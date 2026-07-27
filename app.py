@@ -2104,4 +2104,7 @@ def main():
 if __name__ == "__main__":
     if "--setup-account" in sys.argv:
         raise SystemExit(setup_initial_account())
+    if "--ensure-account" in sys.argv:
+        ensure_default_admin()
+        raise SystemExit(0)
     main()

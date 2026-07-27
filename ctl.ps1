@@ -14,8 +14,8 @@ $PanelPort = if ($env:PANEL_PORT) { $env:PANEL_PORT } else { "8080" }
 
 function Ensure-Account {
     $usersFile = Join-Path $ScriptDir "users.json"
-    if (-not (Test-Path $usersFile)) {
-        python (Join-Path $ScriptDir "panel.py") --setup-account
+    if (-not (Test-Path $usersFile) -or ((Get-Item $usersFile).Length -eq 0)) {
+        python (Join-Path $ScriptDir "panel.py") --ensure-account
         if ($LASTEXITCODE -ne 0) { throw "Account setup failed" }
     }
 }
