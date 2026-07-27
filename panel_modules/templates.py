@@ -580,6 +580,8 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .color-swatch:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .color-swatch.active{border-color:var(--text);box-shadow:0 0 12px rgba(255,255,255,.2)}
 .color-input{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.color-picker-trigger{display:flex;align-items:center;gap:9px;background:transparent;border:0;color:var(--text);cursor:pointer;font:inherit;padding:0}.color-picker-dot{width:28px;height:28px;border-radius:8px;border:2px solid var(--border);box-shadow:0 0 12px rgba(var(--accent-rgb),.3)}
+.custom-color-popover{display:none;position:absolute;z-index:80;width:270px;margin-top:8px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.45)}.custom-color-popover.open{display:block}.color-sv{height:150px;border-radius:8px;cursor:crosshair;background:linear-gradient(to bottom,#0000,#000),linear-gradient(to right,#fff,var(--picker-hue,#eab308));position:relative}.color-sv::after{content:'';position:absolute;width:12px;height:12px;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px #111;left:var(--sv-x,80%);top:var(--sv-y,20%);transform:translate(-50%,-50%)}.color-hue{height:14px;margin:10px 0;border-radius:8px;cursor:pointer;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);position:relative}.color-hue::after{content:'';position:absolute;width:12px;height:20px;top:-3px;left:var(--hue-x,50%);border:2px solid #fff;border-radius:6px;box-shadow:0 0 0 1px #111;transform:translateX(-50%)}.color-rgb{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.color-rgb label{font-size:10px;color:var(--text2);text-transform:uppercase}.color-rgb input{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:7px;font-size:12px}
 .color-input input[type=color]{width:40px;height:34px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0}
 .color-input input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
 .color-input input[type=color]::-webkit-color-swatch{border-radius:6px;border:none}
@@ -921,9 +923,10 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
     <div class="panel">
      <h3><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16c3.3 0 6-2.7 6-6 0-5.5-4.5-9.8-10-9.8z"/></svg> <span data-i18n="accent_color">Accent Color</span></h3>
      <div class="color-grid" id="color-presets"></div>
-     <div class="color-input">
-      <input type="color" id="color-picker" value="#6c5ce7" aria-label="Accent color" oninput="setAccent(this.value)" onchange="setAccent(this.value)">
-      <span style="color:var(--text2);font-size:12px" id="color-hex">#6c5ce7</span>
+     <div class="color-input" style="position:relative">
+      <input type="hidden" id="color-picker" value="#6c5ce7">
+      <button class="color-picker-trigger" type="button" onclick="toggleColorPicker(event)"><span class="color-picker-dot" id="color-picker-dot"></span><span style="color:var(--text2);font-size:12px" id="color-hex">#6c5ce7</span></button>
+      <div class="custom-color-popover" id="custom-color-popover" onclick="event.stopPropagation()"><div class="color-sv" id="color-sv" onclick="pickSV(event)"></div><div class="color-hue" id="color-hue" onclick="pickHue(event)"></div><div class="color-rgb"><label>R<input id="color-r" type="number" min="0" max="255" oninput="pickRgb()"></label><label>G<input id="color-g" type="number" min="0" max="255" oninput="pickRgb()"></label><label>B<input id="color-b" type="number" min="0" max="255" oninput="pickRgb()"></label></div></div>
      </div>
       <div class="toggle-row" style="margin-top:14px;border:none;padding:0">
        <div class="toggle-label"><span data-i18n="fireflies">Fireflies</span><span style="color:var(--text2);font-size:10px">ambient particles</span></div>
@@ -2194,6 +2197,7 @@ function selectProfileRole(role){
 }
 document.addEventListener('click',e=>{
  if(!e.target.closest('.custom-select'))document.querySelectorAll('.custom-select').forEach(s=>s.classList.remove('open'));
+ if(!e.target.closest('.color-input'))document.getElementById('custom-color-popover')?.classList.remove('open');
 });
 
 let envData={};
@@ -2259,7 +2263,18 @@ function setAccent(hex){
  document.getElementById('color-hex').textContent=hex;
  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.toggle('active',s.style.background===hex||rgbToHex(s.style.background)===hex));
  applyAccent(hex);
+ updateCustomColorPicker(hex);
 }
+
+let customHue=0,customSat=0,customVal=1;
+function hexToRgb(hex){return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];}
+function rgbToHsv(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h=0;if(d){if(max===r)h=((g-b)/d)%6;else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;if(h<0)h+=360;}return [h,max?d/max:0,max];}
+function hsvToHex(h,s,v){const c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c;let r=0,g=0,b=0;if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];return '#'+[r,g,b].map(n=>Math.round((n+m)*255).toString(16).padStart(2,'0')).join('');}
+function updateCustomColorPicker(hex){const [r,g,b]=hexToRgb(hex);[customHue,customSat,customVal]=rgbToHsv(r,g,b);const sv=document.getElementById('color-sv'),hue=document.getElementById('color-hue'),dot=document.getElementById('color-picker-dot');if(sv){sv.style.setProperty('--picker-hue',hsvToHex(customHue,1,1));sv.style.setProperty('--sv-x',(customSat*100)+'%');sv.style.setProperty('--sv-y',((1-customVal)*100)+'%');}if(hue)hue.style.setProperty('--hue-x',(customHue/360*100)+'%');if(dot)dot.style.background=hex;['r','g','b'].forEach((k,i)=>{const el=document.getElementById('color-'+k);if(el)el.value=[r,g,b][i];});}
+function toggleColorPicker(e){e.stopPropagation();document.getElementById('custom-color-popover').classList.toggle('open');updateCustomColorPicker(document.getElementById('color-picker').value);}
+function pickSV(e){const r=e.currentTarget.getBoundingClientRect();customSat=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));customVal=1-Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));setAccent(hsvToHex(customHue,customSat,customVal));}
+function pickHue(e){const r=e.currentTarget.getBoundingClientRect();customHue=Math.max(0,Math.min(360,((e.clientX-r.left)/r.width)*360));setAccent(hsvToHex(customHue,customSat,customVal));}
+function pickRgb(){const vals=['r','g','b'].map(k=>Math.max(0,Math.min(255,Number(document.getElementById('color-'+k).value)||0)));setAccent('#'+vals.map(n=>n.toString(16).padStart(2,'0')).join(''));}
 
 function rgbToHex(rgb){
  if(rgb.startsWith('#'))return rgb;
