@@ -57,8 +57,6 @@ irm https://raw.githubusercontent.com/fizyCH/FizMine/main/install.ps1 | iex
 | File Browser | Added a built-in server file browser with support for creating files. |
 | Mobile Interface | Added an adaptive interface for mobile devices (**BETA**). |
 | Modular Architecture | The application has been split into modules:<br>- `app.py`<br>- `auth.py`<br>- `users.py`<br>- `server.py`<br>- `files.py`<br>- `settings.py`<br>- `rcon.py`<br>- `backup.py`<br>- `panel.py` (compatible launcher) |
-
-.
 | Panel Updater | Added an automatic updater that:<br>- Checks the latest version via `app.py`.<br>- Downloads `app.py`, `panel.py`, and all modules.<br>- Creates `.bak` backups before updating.<br>- Restarts the panel automatically. |
 | First Administrator | On the first launch, the panel automatically creates an administrator account:<br>- Login: `admin`<br>- Random secure password<br>- Credentials are displayed in a formatted table. |
 | Automatic Account Generation | Accounts are automatically initialized when the panel is launched using `ctl.sh` or `ctl.ps1`. |
