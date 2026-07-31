@@ -122,6 +122,7 @@ TRANSLATIONS = {
         "drop_jar_here": "Drop server.jar here", "supported": "Spigot, Paper, Purpur, Purpur, etc.",
         "quick_actions": "Quick Actions", "start": "Start", "restart": "Restart", "stop": "Stop",
         "server_properties": "server.properties", "save_properties": "Save Properties",
+        "props_server": "Server", "props_world": "World", "props_players": "Players", "props_misc": "Miscellaneous",
         "server_files": "Server Files", "plugins_tab": "Plugins", "mods_tab": "Mods",
         "drop_jar_files": "Drop .jar files here", "or_browse": "or click to browse",
         "no_plugins": "No plugins installed", "no_mods": "No mods installed",
@@ -181,6 +182,7 @@ TRANSLATIONS = {
         "drop_jar_here": "Перетащите server.jar сюда", "supported": "Spigot, Paper, Purpur, Purpur и др.",
         "quick_actions": "Быстрые действия", "start": "Старт", "restart": "Перезапуск", "stop": "Стоп",
         "server_properties": "server.properties", "save_properties": "Сохранить",
+        "props_server": "Сервер", "props_world": "Мир", "props_players": "Игроки", "props_misc": "Разное",
         "server_files": "Файлы сервера", "plugins_tab": "Плагины", "mods_tab": "Моды",
         "drop_jar_files": "Перетащите .jar файлы", "or_browse": "или нажмите для выбора",
         "no_plugins": "Плагинов нет", "no_mods": "Модов нет",
@@ -241,6 +243,7 @@ TRANSLATIONS = {
         "drop_jar_here": "server.jar hier ablegen", "supported": "Spigot, Paper, Purpur, Purpur usw.",
         "quick_actions": "Schnellaktionen", "start": "Start", "restart": "Neustart", "stop": "Stopp",
         "server_properties": "server.properties", "save_properties": "Speichern",
+        "props_server": "Server", "props_world": "Welt", "props_players": "Spieler", "props_misc": "Sonstiges",
         "server_files": "Serverdateien", "plugins_tab": "Plugins", "mods_tab": "Mods",
         "drop_jar_files": "Jar-Dateien hier ablegen", "or_browse": "oder klicken zum Auswählen",
         "no_plugins": "Keine Plugins installiert", "no_mods": "Keine Mods installiert",
@@ -300,6 +303,7 @@ TRANSLATIONS = {
         "drop_jar_here": "Déposez server.jar ici", "supported": "Spigot, Paper, Purpur, Purpur, etc.",
         "quick_actions": "Actions rapides", "start": "Démarrer", "restart": "Redémarrer", "stop": "Arrêter",
         "server_properties": "server.properties", "save_properties": "Enregistrer",
+        "props_server": "Serveur", "props_world": "Monde", "props_players": "Joueurs", "props_misc": "Divers",
         "server_files": "Fichiers serveur", "plugins_tab": "Plugins", "mods_tab": "Mods",
         "drop_jar_files": "Déposez des fichiers .jar ici", "or_browse": "ou cliquez pour parcourir",
         "no_plugins": "Aucun plugin installé", "no_mods": "Aucun mod installé",
@@ -360,6 +364,7 @@ TRANSLATIONS = {
         "drop_jar_here": "拖放server.jar到此处", "supported": "Spigot, Paper, Purpur, Purpur等",
         "quick_actions": "快捷操作", "start": "启动", "restart": "重启", "stop": "停止",
         "server_properties": "server.properties", "save_properties": "保存",
+        "props_server": "服务器", "props_world": "世界", "props_players": "玩家", "props_misc": "其他",
         "server_files": "服务器文件", "plugins_tab": "插件", "mods_tab": "Mod",
         "drop_jar_files": "拖放.jar文件到此处", "or_browse": "或点击浏览",
         "no_plugins": "没有安装插件", "no_mods": "没有安装Mod",
@@ -504,6 +509,17 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
+.props-panel{background:var(--bg);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;transition:border-color .3s}
+.props-panel:hover{border-color:rgba(var(--accent-rgb),.15)}
+.props-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;cursor:pointer;user-select:none;font-size:13px;font-weight:600;color:var(--text);transition:background .2s}
+.props-panel-head:hover{background:rgba(var(--accent-rgb),.04)}
+.props-panel-title{display:flex;align-items:center;gap:9px;min-width:0}
+.props-panel-title svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.props-panel-head>svg{width:16px;height:16px;stroke:var(--text2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:transform .35s}
+.props-panel.collapsed .props-panel-head>svg{transform:rotate(-90deg)}
+.props-panel-body{overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.props-panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));column-gap:14px;padding:16px}
+
 .drop-zone{border:2px dashed var(--border);border-radius:14px;padding:36px;text-align:center;cursor:pointer;transition:all .35s cubic-bezier(.16,1,.3,1);margin-bottom:16px;position:relative;overflow:hidden}
 .drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:rgba(var(--accent-rgb),.05);box-shadow:0 0 30px rgba(var(--accent-rgb),.1)}
 .drop-zone.dragover{border-style:solid;transform:scale(1.02)}
@@ -609,7 +625,7 @@ tr:hover{background:rgba(var(--accent-rgb),.04)}
 #core-versions-panel .cv-item.disabled{opacity:.4;cursor:default}
 #core-versions-panel .cv-item.disabled:hover{background:none}
 @keyframes rotateBg{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.main{position:relative;z-index:1}
+.main{position:relative}
 .sidebar{position:fixed;z-index:10}
 
 @media(max-width:768px){
@@ -625,6 +641,22 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
 }
 @media(max-width:420px){
  .main{padding:12px 8px}.status-bar{grid-template-columns:1fr}.header{flex-direction:column}.header #header-actions{width:100%;justify-content:flex-start}.header #header-actions .btn{flex:1;justify-content:center}.panel{padding:12px}.cmd-input .btn span{display:none}.cmd-input .btn{padding:10px 12px}.modal{padding:16px!important}
+}
+@media(max-width:768px){
+ #tab-users .grid-2>.panel:first-child{order:2}
+ #tab-users .grid-2>.panel:last-child{order:1}
+ #tab-users .panel:first-child .btn-accent{width:100%;justify-content:center}
+ #new-user-perms label{display:flex;align-items:center;gap:8px;min-height:24px}
+ .user-card .user-head{gap:8px}
+ .user-card .user-perms label{display:flex;align-items:center;gap:6px;min-height:22px}
+ .user-card .user-actions .btn{flex:1;justify-content:center;white-space:nowrap}
+ .chart-modal-grid{grid-template-columns:1fr;gap:22px}
+ #chart-overlay .modal{max-height:92vh;overflow-y:auto}
+ .props-panel-grid{grid-template-columns:1fr}
+}
+@media(max-width:420px){
+ .user-card .user-actions{flex-direction:column}
+ .user-card .user-actions .btn{width:100%}
 }
 @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 .spin{animation:spin 1s linear infinite}
@@ -1174,10 +1206,23 @@ async function createUser(){
 async function loadUsers(){
  const data=await api('users'); window.userRoleMap=Object.fromEntries((data.users||[]).map(u=>[u.username,u.role])); const out=document.getElementById('users-list');if(!out)return;
  if(data.error){out.innerHTML='<div class="empty">'+esc(data.error)+'</div>';return;}
- out.innerHTML=data.users.map(u=>{const perms=u.role==='admin'?'':Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+'> '+t(labelKey)+'</label>').join('');const name=esc(u.username);return '<div class="panel" style="padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px;min-width:0"><b class="user-name" data-user="'+name+'">'+name+'</b><button class="icon-btn" title="Edit profile" onclick="editProfile(\''+name+'\')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L8 18l-4 1 1-4Z"/></svg></button></div><span style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+name+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+name+'\')">'+t('save_permissions')+'</button>'+'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+name+'\')">'+t('delete_user')+'</button>'+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
+  out.innerHTML=data.users.map(u=>{const perms=u.role==='admin'?'':Object.entries(PERMISSION_LABELS).map(([key,labelKey])=>'<label style="display:block;margin:6px 0"><input type="checkbox" data-perm="'+key+'" '+(u.permissions.includes(key)?'checked':'')+'> '+t(labelKey)+'</label>').join('');const name=esc(u.username);const dotColor=u.online?'var(--green)':'var(--red)';return '<div class="panel user-card" style="padding:14px;margin-bottom:10px"><div class="user-head" style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span class="user-dot" data-user="'+name+'" style="width:10px;height:10px;border-radius:50%;background:'+dotColor+';flex-shrink:0;box-shadow:0 0 6px '+dotColor+'"></span><b class="user-name" data-user="'+name+'">'+name+'</b><button class="icon-btn" title="Edit profile" onclick="editProfile(\''+name+'\')"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L8 18l-4 1 1-4Z"/></svg></button></div><span class="user-role" style="color:var(--text2);font-size:12px">'+(u.role==='admin'?t('administrator'):t('user'))+'</span></div><div class="user-perms" data-user="'+name+'" style="margin:10px 0;font-size:12px;color:var(--text2)">'+perms+'</div><div class="user-actions" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-accent btn-sm" onclick="saveUser(\''+name+'\')">'+t('save_permissions')+'</button>'+'<button class="btn btn-red btn-sm" onclick="deleteUser(\''+name+'\')">'+t('delete_user')+'</button>'+'</div></div>';}).join('')||'<div class="empty">'+t('no_users')+'</div>';
 }
 function closeProfileModal(){document.getElementById('profile-overlay').classList.remove('active');}
 function toggleProfilePassword(button){const input=document.getElementById('profile-password');input.type=input.type==='password'?'text':'password';button.classList.toggle('active',input.type==='text');}
+async function updateUserStatus(){
+ const out=document.getElementById('users-list');
+ if(!out)return;
+ const data=await api('users');
+ if(!data||!data.users)return;
+ const online=Object.fromEntries(data.users.map(u=>[u.username,!!u.online]));
+ out.querySelectorAll('.user-dot').forEach(dot=>{
+  const on=online[dot.dataset.user];
+  if(on===undefined)return;
+  dot.style.background=on?'var(--green)':'var(--red)';
+  dot.style.boxShadow=on?'0 0 6px var(--green)':'none';
+ });
+}
 function editProfile(username){document.getElementById('profile-username').value=username;document.getElementById('profile-username').dataset.original=username;selectProfileRole((window.userRoleMap&&window.userRoleMap[username])||'user');document.getElementById('profile-password').value='';document.getElementById('profile-password').type='password';document.getElementById('profile-overlay').classList.add('active');setTimeout(()=>document.getElementById('profile-username').focus(),50);}
 async function saveProfile(){const original=document.getElementById('profile-username').dataset.original;const newUsername=document.getElementById('profile-username').value.trim();const password=document.getElementById('profile-password').value;const body={username:original,new_username:newUsername,role:document.getElementById('profile-role').value};if(password)body.password=password;const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(r.error){toast(r.error);return;}closeProfileModal();toast(t('user_updated'));loadUsers();}
 async function saveUser(username){const row=document.querySelector('.user-perms[data-user="'+CSS.escape(username)+'"]');const permissions=[...row.querySelectorAll('input:checked')].map(x=>x.dataset.perm);const r=await api('users',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,permissions})});if(r.error){toast(r.error);return;}toast(t('user_updated'));loadUsers();}
@@ -1822,47 +1867,62 @@ async function removePlayerConfirm(type,name){
  toast(r.message||t('removed'));loadPlayers();
 }
 
+const PROP_GROUPS=[
+ {id:'server',key:'props_server',icon:'<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',match:['server-','online-mode','motd','enforce-secure-profile','prevent-proxy-connections','enable-status','enable-query','query.port','enable-rcon','rcon.','broadcast-console-to-ops','broadcast-rcon-to-ops','network-compression','rate-limit','max-tick-time','debug','log-ips','use-native-transport','region-file-compression','max-chained-neighbor-updates','chat-spam-threshold','command-spam-threshold','text-filtering','bug-report-link','enable-code-of-conduct','enable-jmx-monitoring','enable-command-block','accepts-transfers','management-server','pause-when-empty','status-heartbeat']},
+ {id:'world',key:'props_world',icon:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>',match:['level-name','level-seed','level-type','generator-settings','generate-structures','allow-nether','packs','view-distance','simulation-distance','spawn-protection','max-world-size','sync-chunk-writes','entity-broadcast-range','hardcore']},
+ {id:'players',key:'props_players',icon:'<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',match:['max-players','gamemode','difficulty','pvp','white-list','enforce-whitelist','allow-flight','spawn-animals','spawn-monsters','spawn-npcs','hide-online-players','op-permission-level','function-permission-level','player-idle-timeout']},
+ {id:'misc',key:'props_misc',icon:'<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',match:[]}
+];
+const PROP_DROPDOWNS={
+ 'gamemode':['survival','creative','adventure','spectator'],
+ 'difficulty':['peaceful','easy','normal','hard'],
+ 'level-type':['minecraft\\:normal','minecraft\\:flat','minecraft\\:largebiomes','minecraft\\:amplified','minecraft\\:single_biome_surface'],
+ 'region-file-compression':['deflate','none']
+};
+function propField(k,v){
+ const opts=PROP_DROPDOWNS[k]||((v==='true'||v==='false')?['true','false']:null);
+ if(opts){
+  let h=`<div class="form-group"><label>${k}</label><div class="custom-select" onclick="toggleCustomSelect(this)"><div class="custom-select-selected" data-key="${k}" data-value="${esc(v)}">${esc(v)}</div><div class="custom-select-options">`;
+  opts.forEach(o=>{h+=`<div class="custom-select-option${o===v?' selected':''}" data-value="${esc(o)}" onclick="selectProp(this)">${esc(o)}</div>`;});
+  return h+`</div></div></div>`;
+ }
+ return `<div class="form-group"><label>${k}</label><input type="text" data-key="${k}" value="${esc(v)}"${k==='level-name'?' data-orig="'+esc(v)+'"':''}></div>`;
+}
 async function loadProperties(){
  const data=await api('properties');
  if(!data||data.error)return;
- const important=['server-port','server-ip','max-players','motd','gamemode','difficulty','pvp','white-list','online-mode','level-name','view-distance','simulation-distance','spawn-protection','max-world-size','level-seed','allow-flight','hardcore','enable-command-block'];
- const dropdowns={
-  'gamemode':['survival','creative','adventure','spectator'],
-  'difficulty':['peaceful','easy','normal','hard'],
-  'level-type':['minecraft\\:normal','minecraft\\:flat','minecraft\\:largebiomes','minecraft\\:amplified','minecraft\\:single_biome_surface'],
-  'pvp':['true','false'],
-  'white-list':['true','false'],
-  'online-mode':['true','false'],
-  'hardcore':['true','false'],
-  'enable-command-block':['true','false'],
-  'allow-flight':['true','false'],
-  'force-gamemode':['true','false'],
-  'spawn-animals':['true','false'],
-  'spawn-monsters':['true','false'],
-  'spawn-npcs':['true','false'],
-  'generate-structures':['true','false'],
-  'enable-rcon':['true','false'],
-  'sync-chunk-writes':['true','false'],
-  'use-native-transport':['true','false'],
-  'prevent-proxy-connections':['true','false'],
- };
+ const groups=PROP_GROUPS.map(g=>({id:g.id,key:g.key,icon:g.icon,props:[]}));
+ Object.keys(data).forEach(k=>{
+  const g=PROP_GROUPS.find(g=>g.match.some(p=>k.includes(p)))||PROP_GROUPS[PROP_GROUPS.length-1];
+  groups.find(x=>x.id===g.id).props.push(k);
+ });
  let html='';
- important.forEach(k=>{
-  if(!(k in data))return;
-  const v=data[k];
-  if(k in dropdowns){
-   const opts=dropdowns[k];
-   const selId='prop-'+k.replace(/[^a-z0-9]/g,'-');
-   html+=`<div class="form-group"><label>${k}</label><div class="custom-select" onclick="toggleCustomSelect(this)"><div class="custom-select-selected" data-key="${k}" data-value="${esc(v)}">${esc(v)}</div><div class="custom-select-options">`;
-   opts.forEach(o=>{
-    html+=`<div class="custom-select-option${o===v?' selected':''}" data-value="${esc(o)}" onclick="selectProp(this)">${esc(o)}</div>`;
-   });
-   html+=`</div></div></div>`;
-  }else{
-   html+=`<div class="form-group"><label>${k}</label><input type="text" data-key="${k}" value="${esc(v)}"${k==='level-name'?' data-orig="'+esc(v)+'"':''}></div>`;
-  }
+ groups.forEach(g=>{
+  if(!g.props.length)return;
+  const items=g.props.map(k=>propField(k,data[k])).join('');
+  html+=`<div class="props-panel" id="props-${g.id}"><div class="props-panel-head" onclick="togglePropsPanel('props-${g.id}')"><span class="props-panel-title">${g.icon}<span>${t(g.key)}</span></span><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div><div class="props-panel-body"><div class="props-panel-grid">${items}</div></div></div>`;
  });
  document.getElementById('props-form').innerHTML=html;
+}
+function togglePropsPanel(id){
+ const panel=document.getElementById(id);
+ const body=panel.querySelector('.props-panel-body');
+ if(panel.classList.contains('collapsed')){
+  panel.classList.remove('collapsed');
+  body.style.maxHeight=body.scrollHeight+'px';
+  const done=()=>{
+   if(!panel.classList.contains('collapsed'))body.style.maxHeight='none';
+   body.removeEventListener('transitionend',done);
+  };
+  body.addEventListener('transitionend',done);
+ }else{
+  body.style.transition='none';
+  body.style.maxHeight=body.scrollHeight+'px';
+  body.offsetHeight;
+  body.style.transition='';
+  panel.classList.add('collapsed');
+  body.style.maxHeight='0px';
+ }
 }
 
 function selectProp(el){
@@ -2522,6 +2582,8 @@ loadLang();
 loadEnvInfo();
 setInterval(()=>{if(currentTab==='dashboard')refreshDashboard();},2000);
 setInterval(()=>{if(currentTab==='players')loadOnlinePlayers();},3000);
+setInterval(updateUserStatus,10000);
+setInterval(()=>{api('ping');},45000);
 </script>
 </body>
 </html>"""

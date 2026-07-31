@@ -60,6 +60,9 @@ app.add_middleware(SessionMiddleware, secret_key=os.urandom(32).hex())
 
 IS_WINDOWS = platform.system() == "Windows"
 
+_active_sessions = {}
+_ACTIVE_TIMEOUT = 90
+
 
 def load_env():
     env_path = Path(__file__).parent / ".env"
@@ -213,6 +216,8 @@ async def check_auth(request: Request, call_next):
     if path.startswith("/static/"):
         return await call_next(request)
     if request.session.get("authenticated") and request.session.get("username"):
+        username = request.session["username"]
+        _active_sessions[username] = time.time()
         permission = api_permission(path) if path.startswith("/api/") else None
         if permission and not can(request, permission):
             return forbidden()
@@ -1205,7 +1210,7 @@ async def api_server(request: Request):
 @app.api_route("/api/json")
 async def api_json(request: Request):
     file = request.query_params.get("file", "")
-    if file:
+    if file in {"ops.json", "whitelist.json", "banned-players.json", "banned-ips.json"}:
         return JSONResponse(read_json_file(file))
     return JSONResponse([])
 
@@ -1277,13 +1282,22 @@ async def api_me(request: Request):
                          "permissions": user_permissions(user)})
 
 
+@app.api_route("/api/ping")
+async def api_ping(request: Request):
+    # Lightweight heartbeat: keeps the current session marked as active so
+    # other users see an accurate online/offline status. No disk access.
+    return JSONResponse({"ok": True})
+
+
 @app.api_route("/api/users", methods=["GET", "POST", "PUT", "DELETE"])
 async def api_users(request: Request):
     users = load_users()
     if request.method == "GET":
+        now = time.time()
         return JSONResponse({"users": [
             {"username": name, "role": data.get("role", "user"),
-             "permissions": user_permissions(data)}
+             "permissions": user_permissions(data),
+             "online": name in _active_sessions and (now - _active_sessions[name]) < _ACTIVE_TIMEOUT}
             for name, data in sorted(users.items())
         ]})
 
@@ -1388,9 +1402,14 @@ async def api_file_read(request: Request):
     name = request.query_params.get("name", "")
     if not name:
         return JSONResponse({"error": "No name"}, status_code=400)
+    if ".." in name or name.startswith("/"):
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
     fpath = MC_DIR / name
     if not fpath.exists() or not fpath.is_file():
         return JSONResponse({"error": "Not found"}, status_code=404)
+    rel = str(fpath.relative_to(MC_DIR))
+    if rel.split("/", 1)[0] in {"panel", ".git", "__pycache__"}:
+        return JSONResponse({"error": "Protected file"}, status_code=403)
     try:
         text = fpath.read_text(encoding="utf-8", errors="replace")
         return JSONResponse({"name": name, "content": text})
