@@ -54,7 +54,7 @@ import uvicorn
 
 from panel_modules.templates import LOGIN_HTML, HTML_TEMPLATE, TRANSLATIONS
 
-PANEL_VERSION = "3.5 pre-release"
+PANEL_VERSION = "3.7 latest pre-release"
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(32).hex())
 
@@ -191,7 +191,9 @@ def api_permission(path):
     if path in {"/api/settings", "/api/env-info", "/api/save-env", "/api/set-token",
                 "/api/remove-token", "/api/backup-panel", "/api/backup-server",
                 "/api/check-update", "/api/do-update", "/api/upload-core", "/api/download-core",
-                "/api/users"}:
+                "/api/users", "/api/panel-plugins/toggle", "/api/panel-plugins/install",
+                "/api/panel-plugins/delete", "/api/panel-plugins/check", "/api/panel-plugins/rpc",
+                "/api/panel-plugins/download"}:
         return "admin"
     if path in {"/api/properties"}:
         return "properties"
@@ -971,6 +973,96 @@ def list_mods():
     return [f.name for f in d.iterdir() if f.suffix == ".jar" and f.is_file()]
 
 
+# --- Panel plugin system ---------------------------------------------------
+# Plugins live in the `plugin/` folder next to the panel. A plugin is a
+# directory with a manifest.json (id, name, tabs...) plus plugin.css,
+# plugin.html and plugin.js modules. The updater never touches this folder.
+PLUGIN_DIR = Path(__file__).parent / "plugin"
+PLUGIN_STATE_FILE = PLUGIN_DIR / "plugins.json"
+NODE_BIN = shutil.which("node") or "node"
+
+
+def _load_plugin_state():
+    if PLUGIN_STATE_FILE.exists():
+        try:
+            data = json.loads(PLUGIN_STATE_FILE.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_plugin_state(state):
+    PLUGIN_DIR.mkdir(parents=True, exist_ok=True)
+    PLUGIN_STATE_FILE.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _safe_plugin_name(name):
+    return re.sub(r"[^A-Za-z0-9_.-]", "", name or "")
+
+
+def _plugin_manifest(plugin_id):
+    mf = PLUGIN_DIR / plugin_id / "manifest.json"
+    if not mf.exists():
+        return None
+    try:
+        data = json.loads(mf.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
+
+def _list_panel_plugins():
+    state = _load_plugin_state()
+    plugins = []
+    if not PLUGIN_DIR.exists():
+        return plugins
+    for folder in sorted(PLUGIN_DIR.iterdir()):
+        if not folder.is_dir() or folder.name.startswith("."):
+            continue
+        manifest = _plugin_manifest(folder.name)
+        if not manifest:
+            continue
+        files = [f.name for f in sorted(folder.iterdir()) if f.is_file()]
+        plugins.append({
+            "id": folder.name,
+            "name": manifest.get("name", folder.name),
+            "version": manifest.get("version", "0.0.0"),
+            "author": manifest.get("author", ""),
+            "description": manifest.get("description", ""),
+            "tabs": manifest.get("tabs", []),
+            "enabled": bool(state.get(folder.name, {}).get("enabled", False)),
+            "files": files,
+        })
+    return plugins
+
+
+def _check_plugin_js(plugin_id):
+    folder = PLUGIN_DIR / plugin_id
+    if not folder.is_dir():
+        return {"ok": False, "errors": ["Plugin not found"]}
+    errors = []
+    js_files = sorted(folder.glob("*.js"))
+    for f in js_files:
+        if shutil.which("node") is None:
+            return {"ok": False, "errors": ["node is not available for JS syntax check"]}
+        try:
+            r = subprocess.run([NODE_BIN, "--check", str(f)], capture_output=True, text=True, timeout=20)
+        except Exception as e:
+            return {"ok": False, "errors": [f"{f.name}: {e}"]}
+        if r.returncode != 0:
+            errors.append(f"{f.name}: {r.stderr.strip()[:400]}")
+    backend = folder / "backend.py"
+    if backend.exists():
+        try:
+            r = subprocess.run([sys.executable, "-m", "py_compile", str(backend)], capture_output=True, text=True, timeout=20)
+        except Exception as e:
+            return {"ok": False, "errors": [f"backend.py: {e}"]}
+        if r.returncode != 0:
+            errors.append(f"backend.py: {r.stderr.strip()[:400]}")
+    return {"ok": not errors, "errors": errors}
+
+
 def fetch_uuid(username):
     import urllib.request
     try:
@@ -1229,6 +1321,204 @@ async def api_properties(request: Request):
 @app.api_route("/api/plugins")
 async def api_plugins(request: Request):
     return JSONResponse(list_plugins())
+
+
+@app.api_route("/api/panel-plugins")
+async def api_panel_plugins(request: Request):
+    return JSONResponse({"plugins": _list_panel_plugins()})
+
+
+@app.api_route("/api/panel-plugins/toggle", methods=["POST"])
+async def api_panel_plugin_toggle(request: Request):
+    body = await request.json()
+    plugin_id = _safe_plugin_name(body.get("id", ""))
+    enabled = bool(body.get("enabled"))
+    if not plugin_id or not _plugin_manifest(plugin_id):
+        return JSONResponse({"error": "Plugin not found"}, status_code=404)
+    state = _load_plugin_state()
+    state.setdefault(plugin_id, {})["enabled"] = enabled
+    _save_plugin_state(state)
+    return JSONResponse({"ok": True, "plugins": _list_panel_plugins()})
+
+
+@app.api_route("/api/panel-plugins/check", methods=["POST"])
+async def api_panel_plugin_check(request: Request):
+    body = await request.json()
+    plugin_id = _safe_plugin_name(body.get("id", ""))
+    if not plugin_id or not _plugin_manifest(plugin_id):
+        return JSONResponse({"error": "Plugin not found"}, status_code=404)
+    return JSONResponse(_check_plugin_js(plugin_id))
+
+
+@app.api_route("/api/panel-plugins/install", methods=["POST"])
+async def api_panel_plugin_install(request: Request):
+    form = await request.form()
+    if "file" not in form:
+        return JSONResponse({"error": "No file"}, status_code=400)
+    file_item = form["file"]
+    if not file_item.filename:
+        return JSONResponse({"error": "No filename"}, status_code=400)
+    if not file_item.filename.lower().endswith(".zip"):
+        return JSONResponse({"error": "Only .zip archives are supported"}, status_code=400)
+    data = await file_item.read()
+    if len(data) > 5 * 1024 * 1024:
+        return JSONResponse({"error": "Plugin archive too large (max 5 MB)"}, status_code=400)
+    import zipfile, io
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(data))
+    except zipfile.BadZipFile:
+        return JSONResponse({"error": "Invalid zip archive"}, status_code=400)
+    names = [n for n in zf.namelist()]
+    manifest_name = None
+    for n in names:
+        if n.split("/")[-1] == "manifest.json":
+            manifest_name = n
+            break
+    if manifest_name is None:
+        return JSONResponse({"error": "manifest.json not found in archive"}, status_code=400)
+    root = os.path.dirname(manifest_name)
+    plugin_id = _safe_plugin_name(os.path.basename(root) or root)
+    if not plugin_id:
+        return JSONResponse({"error": "Could not determine plugin id"}, status_code=400)
+    allowed_ext = {".json", ".js", ".html", ".css", ".svg", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".md", ".py"}
+    tmp_target = PLUGIN_DIR / (plugin_id + ".tmp")
+    try:
+        if tmp_target.exists():
+            shutil.rmtree(tmp_target)
+        tmp_target.mkdir(parents=True, exist_ok=True)
+        for n in names:
+            rel = os.path.relpath(n, root) if root else n
+            if rel.startswith("..") or os.path.isabs(rel):
+                raise ValueError("Illegal path in archive")
+            if rel in (".", "") or n.endswith("/"):
+                continue
+            suffix = Path(n).suffix.lower()
+            if suffix not in allowed_ext:
+                raise ValueError(f"File type not allowed: {n}")
+            dest = tmp_target / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            with zf.open(n) as src, open(dest, "wb") as out:
+                shutil.copyfileobj(src, out)
+        manifest_path = tmp_target / "manifest.json"
+        if not manifest_path.exists():
+            raise ValueError("manifest.json missing")
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if not manifest.get("name"):
+            raise ValueError("manifest.json must contain 'name'")
+        for f in tmp_target.glob("*.js"):
+            try:
+                r = subprocess.run([NODE_BIN, "--check", str(f)], capture_output=True, text=True, timeout=20)
+            except Exception as e:
+                raise ValueError(f"Syntax check failed: {f.name}: {e}")
+            if r.returncode != 0:
+                raise ValueError(f"Syntax check failed: {f.name}: {r.stderr.strip()[:300]}")
+        backend = tmp_target / "backend.py"
+        if backend.exists():
+            r = subprocess.run([sys.executable, "-m", "py_compile", str(backend)], capture_output=True, text=True, timeout=20)
+            if r.returncode != 0:
+                raise ValueError(f"Syntax check failed: backend.py: {r.stderr.strip()[:300]}")
+        if (PLUGIN_DIR / plugin_id).exists():
+            shutil.rmtree(PLUGIN_DIR / plugin_id)
+        tmp_target.rename(PLUGIN_DIR / plugin_id)
+        state = _load_plugin_state()
+        state.setdefault(plugin_id, {})["enabled"] = True
+        _save_plugin_state(state)
+        return JSONResponse({"ok": True, "message": f"Plugin '{plugin_id}' installed and enabled", "plugins": _list_panel_plugins()})
+    except Exception as e:
+        if tmp_target.exists():
+            shutil.rmtree(tmp_target)
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.api_route("/api/panel-plugins/delete", methods=["POST"])
+async def api_panel_plugin_delete(request: Request):
+    body = await request.json()
+    plugin_id = _safe_plugin_name(body.get("id", ""))
+    target = PLUGIN_DIR / plugin_id
+    if not target.is_dir() or not (target / "manifest.json").exists():
+        return JSONResponse({"error": "Plugin not found"}, status_code=404)
+    shutil.rmtree(target)
+    state = _load_plugin_state()
+    state.pop(plugin_id, None)
+    _save_plugin_state(state)
+    return JSONResponse({"ok": True, "plugins": _list_panel_plugins()})
+
+
+@app.api_route("/api/panel-plugins/download")
+async def api_panel_plugin_download(request: Request):
+    plugin_id = _safe_plugin_name(request.query_params.get("id", ""))
+    folder = PLUGIN_DIR / plugin_id
+    if not folder.is_dir() or not (folder / "manifest.json").exists():
+        return JSONResponse({"error": "Plugin not found"}, status_code=404)
+    import tempfile, zipfile
+    tmp = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
+    try:
+        with zipfile.ZipFile(tmp.name, "w", zipfile.ZIP_DEFLATED) as zf:
+            for root, dirs, files in os.walk(str(folder)):
+                dirs[:] = [d for d in dirs if d not in ("__pycache__",)]
+                for file in files:
+                    fp = Path(root) / file
+                    rel = fp.relative_to(folder)
+                    zf.write(str(fp), str(Path(plugin_id) / rel))
+        return FileResponse(tmp.name, filename=plugin_id + ".zip", media_type="application/zip")
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+@app.api_route("/api/panel-plugins/asset")
+async def api_panel_plugin_asset(request: Request):
+    plugin_id = _safe_plugin_name(request.query_params.get("id", ""))
+    file = request.query_params.get("file", "")
+    if not plugin_id or not file or "/" in file or "\\" in file or ".." in file:
+        return JSONResponse({"error": "Invalid path"}, status_code=400)
+    fpath = PLUGIN_DIR / plugin_id / file
+    if not fpath.is_file():
+        return JSONResponse({"error": "Not found"}, status_code=404)
+    return FileResponse(str(fpath))
+
+
+_PLUGIN_MODULES = {}
+
+
+def _plugin_backend(plugin_id):
+    """Lazily loads plugin/<id>/backend.py. Exposes the plugin's server side."""
+    if plugin_id in _PLUGIN_MODULES:
+        return _PLUGIN_MODULES[plugin_id]
+    path = PLUGIN_DIR / plugin_id / "backend.py"
+    if not path.is_file():
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("fiz_plugin_" + plugin_id, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    _PLUGIN_MODULES[plugin_id] = mod
+    return mod
+
+
+@app.api_route("/api/panel-plugins/rpc", methods=["POST"])
+async def api_panel_plugin_rpc(request: Request):
+    body = await request.json()
+    plugin_id = _safe_plugin_name(body.get("plugin", ""))
+    method = body.get("method", "")
+    args = body.get("args", {})
+    state = _load_plugin_state()
+    if not state.get(plugin_id, {}).get("enabled"):
+        return JSONResponse({"error": "Plugin is disabled"}, status_code=403)
+    mod = _plugin_backend(plugin_id)
+    if mod is None:
+        return JSONResponse({"error": "Plugin has no backend"}, status_code=404)
+    handler = getattr(mod, "handle", None)
+    if not callable(handler):
+        return JSONResponse({"error": "Backend must define handle(method, args)"}, status_code=500)
+    try:
+        result = handler(method, args)
+        if result is None:
+            result = {}
+        if not isinstance(result, dict):
+            result = {"result": result}
+        return JSONResponse({"ok": True, **result})
+    except Exception as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
 
 @app.api_route("/api/mods")
@@ -1725,7 +2015,7 @@ async def api_file_upload(request: Request):
     base = MC_DIR / target_dir if target_dir else MC_DIR
     base.mkdir(parents=True, exist_ok=True)
     fpath = base / file_item.filename
-    fpath.write_bytes(await file_item.file.read())
+    fpath.write_bytes(await file_item.read())
     return JSONResponse({"message": f"Uploaded {file_item.filename}", "ok": True})
 
 

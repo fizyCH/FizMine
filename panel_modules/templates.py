@@ -158,6 +158,19 @@ TRANSLATIONS = {
         "users": "Users", "add_user": "Add user", "user_list": "Users", "username": "Username", "password": "Password", "user_role": "Role", "user": "User", "administrator": "Administrator", "create_user": "Create user", "save_permissions": "Save permissions", "delete_user": "Delete user", "account": "Account",
         "perm_console": "Console and commands", "perm_mods": "Add/remove mods and plugins", "perm_properties": "Edit server properties", "perm_files": "Server file browser", "perm_server_control": "Start, stop and restart server", "perm_players": "OP, ban and whitelist", "no_users": "No users yet", "confirm_delete_user": "Delete user", "user_created": "User created", "user_updated": "Permissions saved", "user_deleted": "User deleted",
         "install_core": "Install",
+        "panelplugins": "Panel Plugins", "panel_plugins": "Panel Plugins",
+        "add_plugin": "Add plugin", "install_plugin": "Install plugin",
+        "drop_plugin_zip": "Drop the plugin .zip here",
+        "no_panel_plugins": "No panel plugins installed",
+        "plugin_enabled": "enabled", "plugin_disabled": "disabled", "plugin_enable": "Enable/disable",
+        "plugin_check": "Check", "plugin_checking": "Checking", "plugin_syntax_ok": "Syntax OK",
+        "plugin_download": "Download plugin (.zip)",
+        "confirm_delete_plugin": "Delete plugin",
+        "plugin_help": "How it works",
+        "plugin_help_p1": "A plugin is a folder in plugin with manifest.json and optional plugin.css, plugin.html, plugin.js and backend.py modules.",
+        "plugin_help_p2": "Plugins can add new tabs to the left sidebar and call panel APIs from JS (FizPlugin.register).",
+        "plugin_help_p3": "backend.py defines handle(method, args) and is reachable from JS via FizPlugin.rpc().",
+        "plugin_help_p4": "Install a plugin by dropping its .zip archive below. JS and backend.py are syntax-checked on install.",
     },
     "ru": {
         "dashboard": "Главная", "setup": "Настройки ядра", "console": "Консоль",
@@ -219,6 +232,19 @@ TRANSLATIONS = {
         "users": "Пользователи", "add_user": "Добавить пользователя", "user_list": "Пользователи", "username": "Логин", "password": "Пароль", "user_role": "Роль", "user": "Пользователь", "administrator": "Администратор", "create_user": "Создать пользователя", "save_permissions": "Сохранить права", "delete_user": "Удалить пользователя", "account": "Аккаунт",
         "perm_console": "Просмотр консоли и команды", "perm_mods": "Добавление и удаление модов/плагинов", "perm_properties": "Редактирование свойств сервера", "perm_files": "Файловый браузер сервера", "perm_server_control": "Запуск, остановка и перезапуск сервера", "perm_players": "OP, бан и вайтлист", "no_users": "Пользователей пока нет", "confirm_delete_user": "Удалить пользователя", "user_created": "Пользователь создан", "user_updated": "Права сохранены", "user_deleted": "Пользователь удалён",
         "install_core": "Установить",
+        "panelplugins": "Плагины панели", "panel_plugins": "Плагины панели",
+        "add_plugin": "Добавить плагин", "install_plugin": "Установка плагина",
+        "drop_plugin_zip": "Перетащите .zip плагина сюда",
+        "no_panel_plugins": "Плагины панели не установлены",
+        "plugin_enabled": "включён", "plugin_disabled": "выключен", "plugin_enable": "Вкл/выкл",
+        "plugin_check": "Проверка", "plugin_checking": "Проверка", "plugin_syntax_ok": "Синтаксис в порядке",
+        "plugin_download": "Скачать плагин (.zip)",
+        "confirm_delete_plugin": "Удалить плагин",
+        "plugin_help": "Как это работает",
+        "plugin_help_p1": "Плагин — это папка в plugin с manifest.json и модулями plugin.css, plugin.html, plugin.js и backend.py.",
+        "plugin_help_p2": "Плагины могут добавлять вкладки в левую панель и вызывать API панели из JS (FizPlugin.register).",
+        "plugin_help_p3": "backend.py определяет handle(method, args) и доступен из JS через FizPlugin.rpc().",
+        "plugin_help_p4": "Установите плагин, перетащив его .zip архив. JS и backend.py проверяются на синтаксис при установке.",
     },
     "de": {
         "dashboard": "Dashboard", "setup": "Kerneinstellungen", "console": "Konsole",
@@ -279,6 +305,19 @@ TRANSLATIONS = {
         "users": "Benutzer", "add_user": "Benutzer hinzufügen", "user_list": "Benutzer", "username": "Benutzername", "password": "Passwort", "user_role": "Rolle", "user": "Benutzer", "administrator": "Administrator", "create_user": "Benutzer erstellen", "save_permissions": "Berechtigungen speichern", "delete_user": "Benutzer löschen", "account": "Konto",
         "perm_console": "Konsole und Befehle anzeigen", "perm_mods": "Mods und Plugins hinzufügen/löschen", "perm_properties": "Servereigenschaften bearbeiten", "perm_files": "Server-Dateibrowser", "perm_server_control": "Server starten, stoppen und neu starten", "perm_players": "OP, Bann und Whitelist", "no_users": "Noch keine Benutzer", "confirm_delete_user": "Benutzer löschen", "user_created": "Benutzer erstellt", "user_updated": "Berechtigungen gespeichert", "user_deleted": "Benutzer gelöscht",
         "install_core": "Installieren",
+        "panelplugins": "Panel-Plugins", "panel_plugins": "Panel-Plugins",
+        "add_plugin": "Plugin hinzufügen", "install_plugin": "Plugin installieren",
+        "drop_plugin_zip": "Plugin-.zip hierher ziehen",
+        "no_panel_plugins": "Keine Panel-Plugins installiert",
+        "plugin_enabled": "aktiviert", "plugin_disabled": "deaktiviert", "plugin_enable": "Aktivieren/Deaktivieren",
+        "plugin_check": "Prüfen", "plugin_checking": "Prüfe", "plugin_syntax_ok": "Syntax OK",
+        "plugin_download": "Plugin herunterladen (.zip)",
+        "confirm_delete_plugin": "Plugin löschen",
+        "plugin_help": "So funktioniert es",
+        "plugin_help_p1": "Ein Plugin ist ein Ordner in plugin mit manifest.json und den Modulen plugin.css, plugin.html, plugin.js und backend.py.",
+        "plugin_help_p2": "Plugins können neue Tabs in der linken Leiste hinzufügen und Panel-APIs per JS aufrufen (FizPlugin.register).",
+        "plugin_help_p3": "backend.py definiert handle(method, args) und ist per FizPlugin.rpc() aus JS erreichbar.",
+        "plugin_help_p4": "Installieren Sie ein Plugin per Drag-and-Drop der .zip-Datei. JS und backend.py werden beim Installieren geprüft.",
     },
     "fr": {
         "dashboard": "Tableau de bord", "setup": "Paramètres du noyau", "console": "Console",
@@ -340,6 +379,19 @@ TRANSLATIONS = {
         "users": "Utilisateurs", "add_user": "Ajouter un utilisateur", "user_list": "Utilisateurs", "username": "Nom d'utilisateur", "password": "Mot de passe", "user_role": "Rôle", "user": "Utilisateur", "administrator": "Administrateur", "create_user": "Créer l'utilisateur", "save_permissions": "Enregistrer les droits", "delete_user": "Supprimer l'utilisateur", "account": "Compte",
         "perm_console": "Voir la console et les commandes", "perm_mods": "Ajouter/supprimer mods et plugins", "perm_properties": "Modifier les propriétés du serveur", "perm_files": "Explorateur de fichiers serveur", "perm_server_control": "Démarrer, arrêter et redémarrer le serveur", "perm_players": "OP, bannissement et whitelist", "no_users": "Aucun utilisateur", "confirm_delete_user": "Supprimer l'utilisateur", "user_created": "Utilisateur créé", "user_updated": "Droits enregistrés", "user_deleted": "Utilisateur supprimé",
         "install_core": "Installer",
+        "panelplugins": "Plugins du panneau", "panel_plugins": "Plugins du panneau",
+        "add_plugin": "Ajouter un plugin", "install_plugin": "Installer un plugin",
+        "drop_plugin_zip": "Déposez le .zip du plugin ici",
+        "no_panel_plugins": "Aucun plugin du panneau installé",
+        "plugin_enabled": "activé", "plugin_disabled": "désactivé", "plugin_enable": "Activer/Désactiver",
+        "plugin_check": "Vérifier", "plugin_checking": "Vérification", "plugin_syntax_ok": "Syntaxe OK",
+        "plugin_download": "Télécharger le plugin (.zip)",
+        "confirm_delete_plugin": "Supprimer le plugin",
+        "plugin_help": "Comment ça marche",
+        "plugin_help_p1": "Un plugin est un dossier dans plugin avec manifest.json et les modules plugin.css, plugin.html, plugin.js et backend.py.",
+        "plugin_help_p2": "Les plugins peuvent ajouter des onglets dans la barre latérale et appeler les API du panneau via JS (FizPlugin.register).",
+        "plugin_help_p3": "backend.py définit handle(method, args) et est accessible depuis JS via FizPlugin.rpc().",
+        "plugin_help_p4": "Installez un plugin en déposant son .zip ci-dessous. JS et backend.py sont vérifiés à l'installation.",
     },
     "zh": {
         "dashboard": "仪表盘", "setup": "核心设置", "console": "控制台",
@@ -401,6 +453,19 @@ TRANSLATIONS = {
         "users": "用户", "add_user": "添加用户", "user_list": "用户", "username": "用户名", "password": "密码", "user_role": "角色", "user": "用户", "administrator": "管理员", "create_user": "创建用户", "save_permissions": "保存权限", "delete_user": "删除用户", "account": "账户",
         "perm_console": "查看控制台和命令", "perm_mods": "添加/删除模组和插件", "perm_properties": "编辑服务器属性", "perm_files": "服务器文件浏览器", "perm_server_control": "启动、停止和重启服务器", "perm_players": "OP、封禁和白名单", "no_users": "暂无用户", "confirm_delete_user": "删除用户", "user_created": "用户已创建", "user_updated": "权限已保存", "user_deleted": "用户已删除",
         "install_core": "安装",
+        "panelplugins": "面板插件", "panel_plugins": "面板插件",
+        "add_plugin": "添加插件", "install_plugin": "安装插件",
+        "drop_plugin_zip": "将插件 .zip 拖到此处",
+        "no_panel_plugins": "未安装面板插件",
+        "plugin_enabled": "已启用", "plugin_disabled": "已禁用", "plugin_enable": "启用/禁用",
+        "plugin_check": "检查", "plugin_checking": "检查中", "plugin_syntax_ok": "语法正确",
+        "plugin_download": "下载插件 (.zip)",
+        "confirm_delete_plugin": "删除插件",
+        "plugin_help": "工作原理",
+        "plugin_help_p1": "插件是 plugin 中的文件夹，包含 manifest.json 及 plugin.css、plugin.html、plugin.js 和 backend.py 模块。",
+        "plugin_help_p2": "插件可以在左侧栏添加新标签页，并通过 JS 调用面板 API（FizPlugin.register）。",
+        "plugin_help_p3": "backend.py 定义 handle(method, args)，可通过 FizPlugin.rpc() 从 JS 调用。",
+        "plugin_help_p4": "将插件的 .zip 压缩包拖到下方即可安装。安装时会检查 JS 和 backend.py 的语法。",
     }
 }
 
@@ -711,7 +776,8 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
    <a href="#" onclick="showTab('players')" id="nav-players"><span class="icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span data-i18n="players">Players</span></a>
    <a href="#" onclick="showTab('files')" id="nav-files"><span class="icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span data-i18n="properties">Properties</span></a>
    <a href="#" onclick="showTab('filebrowser')" id="nav-filebrowser"><span class="icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span><span data-i18n="files">Files</span></a>
-   <a href="#" onclick="showTab('plugins')" id="nav-plugins"><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></span><span data-i18n="plugins">Plugins & Mods</span></a>
+    <a href="#" onclick="showTab('plugins')" id="nav-plugins"><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></span><span data-i18n="plugins">Plugins & Mods</span></a>
+    <a href="#" onclick="showTab('panelplugins')" id="nav-panelplugins"><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 22a10 10 0 100-20 10 10 0 000 20z"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span data-i18n="panelplugins">Panel Plugins</span></a>
     <a href="#" onclick="showTab('settings')" id="nav-settings"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span data-i18n="settings">Settings</span></a>
     <div id="account-badge" style="margin-top:auto;padding:12px 16px 4px;color:var(--text2);font-size:12px"></div>
     <a href="/logout" style="display:flex;align-items:center;gap:12px;padding:11px 16px;color:var(--red);border-radius:10px;font-size:13.5px;font-weight:500;transition:all .25s;text-decoration:none" onmouseover="this.style.background='rgba(239,68,68,.1)'" onmouseout="this.style.background='transparent'"><span class="icon"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 12"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span><span data-i18n="logout">Logout</span></a>
@@ -894,6 +960,27 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
   </div>
  </div>
 
+ <div id="tab-panelplugins" style="display:none">
+  <div class="grid-2">
+   <div class="panel">
+    <h3><svg class="ico" viewBox="0 0 24 24"><path d="M12 22a10 10 0 100-20 10 10 0 000 20z"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> <span data-i18n="panel_plugins">Panel Plugins</span></h3>
+    <div id="panel-plugins-list"><div class="empty">Loading...</div></div>
+    <div style="margin-top:16px">
+      <button class="btn btn-accent" onclick="openPluginInstall()"><svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span data-i18n="add_plugin">Add plugin</span></button>
+    </div>
+   </div>
+   <div class="panel">
+    <h3><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> <span data-i18n="plugin_help">How it works</span></h3>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7">
+      <p style="margin:0 0 8px"><span data-i18n="plugin_help_p1">A plugin is a folder in plugin with manifest.json and optional plugin.css, plugin.html, plugin.js and backend.py modules.</span></p>
+     <p style="margin:0 0 8px"><span data-i18n="plugin_help_p2">Plugins can add new tabs to the left sidebar and call panel APIs from JS (FizPlugin.register).</span></p>
+     <p style="margin:0 0 8px"><span data-i18n="plugin_help_p3">backend.py defines handle(method, args) and is reachable from JS via FizPlugin.rpc().</span></p>
+     <p style="margin:0"><span data-i18n="plugin_help_p4">Install a plugin by dropping its .zip archive below. JS and backend.py are syntax-checked on install.</span></p>
+    </div>
+   </div>
+  </div>
+ </div>
+
  <div id="tab-users" style="display:none">
   <div class="grid-2">
    <div class="panel">
@@ -1029,16 +1116,32 @@ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrollin
  </div>
 </div>
 
-<div class="modal-overlay" id="input-modal-overlay" onclick="if(event.target===this)closeInputModal()">
- <div class="modal" style="width:420px">
-  <h3 id="input-modal-title"></h3>
-  <div class="form-group"><label id="input-modal-label"></label><input type="text" id="input-modal-value" autocomplete="off" onkeydown="if(event.key==='Enter')inputModalConfirm()"></div>
-  <div style="display:flex;gap:10px;justify-content:flex-end">
-   <button class="btn btn-outline" onclick="closeInputModal()"><span data-i18n="cancel">Cancel</span></button>
-   <button class="btn btn-accent" onclick="inputModalConfirm()"><span data-i18n="confirm">Confirm</span></button>
+ <div class="modal-overlay" id="input-modal-overlay" onclick="if(event.target===this)closeInputModal()">
+  <div class="modal" style="width:420px">
+   <h3 id="input-modal-title"></h3>
+   <div class="form-group"><label id="input-modal-label"></label><input type="text" id="input-modal-value" autocomplete="off" onkeydown="if(event.key==='Enter')inputModalConfirm()"></div>
+   <div style="display:flex;gap:10px;justify-content:flex-end">
+    <button class="btn btn-outline" onclick="closeInputModal()"><span data-i18n="cancel">Cancel</span></button>
+    <button class="btn btn-accent" onclick="inputModalConfirm()"><span data-i18n="confirm">Confirm</span></button>
+   </div>
   </div>
  </div>
-</div>
+
+ <div class="modal-overlay" id="plugin-install-overlay" onclick="if(event.target===this)closePluginInstall()">
+  <div class="modal" style="width:460px">
+   <h3 data-i18n="install_plugin">Install plugin</h3>
+   <div class="drop-zone" id="drop-plugin-install" ondragover="handleDrag(event,this)" ondragleave="handleDragLeave(this)" ondrop="handlePluginDrop(event)" onclick="document.getElementById('plugin-install-input').click()">
+    <input type="file" id="plugin-install-input" accept=".zip" style="display:none" onchange="installPluginFile(this.files[0]);this.value=''">
+    <div class="drop-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+    <div class="drop-text" data-i18n="drop_plugin_zip">Drop the plugin .zip here</div>
+    <div class="drop-hint" data-i18n="or_browse">or click to browse</div>
+   </div>
+   <div id="plugin-install-result" style="margin-top:12px"></div>
+   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+    <button class="btn btn-outline" onclick="closePluginInstall()"><span data-i18n="cancel">Cancel</span></button>
+   </div>
+  </div>
+ </div>
 
 <script>
 const CAN=%PERMISSIONS%;
@@ -1054,7 +1157,7 @@ function applyAccess(){
  });
  if(!CAN.includes('server_control')){const controls=document.getElementById('control-btns');if(controls&&controls.closest('.panel'))controls.closest('.panel').style.display='none';}
  if(!CAN.includes('console')){const dash=document.getElementById('dash-console');if(dash&&dash.closest('.panel'))dash.closest('.panel').style.display='none';}
- if(!IS_ADMIN){const nav=document.getElementById('nav-settings'),panel=document.getElementById('tab-settings'),users=document.getElementById('tab-users');if(nav)nav.style.display='none';if(panel)panel.remove();if(users)users.remove();return;}
+ if(!IS_ADMIN){const nav=document.getElementById('nav-settings'),panel=document.getElementById('tab-settings'),users=document.getElementById('tab-users'),pnav=document.getElementById('nav-panelplugins'),ppanel=document.getElementById('tab-panelplugins');if(nav)nav.style.display='none';if(panel)panel.remove();if(users)users.remove();if(pnav)pnav.style.display='none';if(ppanel)ppanel.remove();return;}
  const settingsNav=document.getElementById('nav-settings');
  if(settingsNav&&!document.getElementById('nav-users')){
   const nav=document.createElement('a');nav.id='nav-users';nav.href='#';nav.onclick=()=>showTab('users');nav.innerHTML='<span class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg></span><span data-i18n="users">Пользователи</span>';settingsNav.parentNode.insertBefore(nav,settingsNav);
@@ -1117,12 +1220,13 @@ function t(key){return T[key]||key;}
 async function loadLang(){
  applyAccess();
  loadCurrentAccount();
- try{
-  const r=await fetch('/api/lang',{credentials:'same-origin'});
-  T=await r.json();
-  const lang=(await fetch('/api/settings',{credentials:'same-origin'}).then(x=>x.json()).catch(()=>({lang:'en'}))).lang||'en';
-  if(!T.password_hint)T.password_hint=(EXTRA_TRANSLATIONS[lang]||EXTRA_TRANSLATIONS.en).password_hint;
- }catch(e){T={};}
+  try{
+   const r=await fetch('/api/lang',{credentials:'same-origin'});
+   T=await r.json();
+   const lang=(await fetch('/api/settings',{credentials:'same-origin'}).then(x=>x.json()).catch(()=>({lang:'en'}))).lang||'en';
+   window.__fizLang=lang;
+   if(!T.password_hint)T.password_hint=(EXTRA_TRANSLATIONS[lang]||EXTRA_TRANSLATIONS.en).password_hint;
+  }catch(e){T={};}
  try{
   const sr=await fetch('/api/settings',{credentials:'same-origin'});
   const sd=await sr.json();
@@ -1146,7 +1250,7 @@ function applyTranslations(){
  if(roleSelect)selectUserRole(roleSelect.value||'user');
  const profileRole=document.getElementById('profile-role');
  if(profileRole)selectProfileRole(profileRole.value||'user');
- document.getElementById('page-title').textContent=t(currentTab);
+ document.getElementById('page-title').textContent=window.FizPlugin&&window.FizPlugin.titleOf(currentTab)||t(currentTab);
  const ml=document.getElementById('chart-mem-label');if(ml)ml.textContent=t('memory_used');
  const dl=document.getElementById('chart-disk-label');if(dl)dl.textContent=t('disk_usage');
  const cl=document.getElementById('chart-cpu-label');if(cl)cl.textContent=t('cpu_load');
@@ -1177,13 +1281,14 @@ function showTab(tab){
  document.querySelectorAll('[id^="tab-"]').forEach(e=>e.style.display='none');
  document.querySelectorAll('.sidebar nav a').forEach(e=>e.classList.remove('active'));
  const tabEl=document.getElementById('tab-'+tab);
+ if(!tabEl)return;
  tabEl.style.display='block';
  tabEl.classList.remove('tab-enter');
  void tabEl.offsetWidth;
  tabEl.classList.add('tab-enter');
  document.getElementById('nav-'+tab).classList.add('active');
  currentTab=tab;
- document.getElementById('page-title').textContent=t(tab);
+ document.getElementById('page-title').textContent=window.FizPlugin&&window.FizPlugin.titleOf(tab)||t(tab);
  if(tab==='dashboard')refreshDashboard();
  if(tab==='setup')loadSetup();
   if(tab==='console')loadConsole();
@@ -1191,8 +1296,10 @@ function showTab(tab){
   if(tab==='files')loadProperties();
   if(tab==='filebrowser')loadFiles();
   if(tab==='plugins')loadPlugins();
+  if(tab==='panelplugins')loadPanelPlugins();
   if(tab==='settings')loadSettingsPage();
   if(tab==='users')loadUsers();
+  if(window.FizPlugin)window.FizPlugin.onTabShown(tab);
 }
 
 function selectedPermissions(){return [...document.querySelectorAll('#new-user-perms input:checked')].map(el=>el.value);}
@@ -1321,6 +1428,8 @@ async function executeAction(action,type,name){
    deleteFileItemConfirm(type);
   }else if(action==='deleteUserConfirm'){
    deleteUserConfirm(type);
+  }else if(action==='deletePanelPluginConfirm'){
+   deletePanelPluginConfirm(type);
   }
 }
 function lineClass(l){
@@ -2569,6 +2678,180 @@ function setPanelOpacity(val){
  document.documentElement.style.setProperty('--panel-bg',`rgba(21,25,34,${a})`);
 }
 
+// ============================ Panel plugin engine ========================
+window.FizPlugin=(function(){
+ const registry={};
+ const htmlCache={};
+ const executed={};
+ const cssLoaded={};
+ function titleFor(tab,plugin){
+  const def=(plugin.tabs||[]).find(x=>x.id===tab);
+  if(!def)return tab;
+  if(def.title&&typeof def.title==='object')return def.title[window.__fizLang||'en']||def.title.en||tab;
+  return def.title||tab;
+ }
+ function ensureCss(plugin){
+  if(cssLoaded[plugin.id]||!(plugin.files||[]).includes('plugin.css'))return;
+  const link=document.createElement('link');
+  link.id='plugin-css-'+plugin.id;link.rel='stylesheet';
+  link.href='/api/panel-plugins/asset?id='+encodeURIComponent(plugin.id)+'&file=plugin.css';
+  document.head.appendChild(link);
+  cssLoaded[plugin.id]=true;
+ }
+ function ensureTab(plugin){
+  const navEl=document.querySelector('.sidebar nav');
+  if(!navEl)return;
+  (plugin.tabs||[]).forEach(tab=>{
+   if(document.getElementById('tab-'+tab.id))return;
+   const anchor=document.createElement('a');
+   anchor.id='nav-'+tab.id;anchor.href='#';
+   anchor.onclick=()=>showTab(tab.id);
+   anchor.innerHTML='<span class="icon">'+(tab.icon||'')+'</span><span>'+esc(titleFor(tab.id,plugin))+'</span>';
+   navEl.insertBefore(anchor,navEl.querySelector('#nav-settings')||null);
+   const panel=document.createElement('div');
+   panel.id='tab-'+tab.id;panel.style.display='none';
+   const main=document.querySelector('.main');
+   if(main)main.appendChild(panel);
+   if(typeof T!=='undefined'&&T)T[tab.id]=titleFor(tab.id,plugin);
+  });
+ }
+ function removeTab(tab){
+  const nav=document.getElementById('nav-'+tab);
+  if(nav)nav.remove();
+  const panel=document.getElementById('tab-'+tab);
+  if(panel)panel.remove();
+  if(typeof T!=='undefined'&&T)delete T[tab.id];
+ }
+ async function loadPlugin(plugin){
+  ensureCss(plugin);
+  ensureTab(plugin);
+  if((plugin.files||[]).includes('plugin.html')&&!htmlCache[plugin.id]){
+   try{htmlCache[plugin.id]=await fetch('/api/panel-plugins/asset?id='+encodeURIComponent(plugin.id)+'&file=plugin.html').then(r=>r.text());}catch(e){htmlCache[plugin.id]='';}
+  }
+  if(htmlCache[plugin.id]){
+   (plugin.tabs||[]).forEach(tab=>{const el=document.getElementById('tab-'+tab.id);if(el)el.innerHTML=htmlCache[plugin.id];});
+  }
+  if((plugin.files||[]).includes('plugin.js')&&!executed[plugin.id]){
+   executed[plugin.id]=true;
+   let code='';
+   try{code=await fetch('/api/panel-plugins/asset?id='+encodeURIComponent(plugin.id)+'&file=plugin.js').then(r=>r.text());}catch(e){}
+   if(code){try{(new Function(code))();}catch(e){console.error('[plugin '+plugin.id+']',e);}}
+  }
+  const p=registry[plugin.id];
+  if(p&&p.onLoad){try{p.onLoad();}catch(e){console.error('[plugin '+plugin.id+']',e);}}
+ }
+ function unloadPlugin(plugin){
+  (plugin.tabs||[]).forEach(t=>removeTab(t.id));
+  const css=document.getElementById('plugin-css-'+plugin.id);
+  if(css)css.remove();
+  const p=registry[plugin.id];
+  if(p&&p.onUnload){try{p.onUnload();}catch(e){console.error(e);}}
+  delete registry[plugin.id];
+  delete executed[plugin.id];
+  delete cssLoaded[plugin.id];
+  delete htmlCache[plugin.id];
+ }
+ function register(def){registry[def.id]=def;}
+ function titleOf(tab){for(const id in registry){const p=registry[id];if((p.tabs||[]).some(x=>x.id===tab))return titleFor(tab,p);}return null;}
+ function onTabShown(tab){for(const id in registry){const p=registry[id];if(p.onTabShow&&(p.tabs||[]).some(x=>x.id===tab)){try{p.onTabShow(tab);}catch(e){console.error(e);}}}}
+ async function rpc(plugin,method,args){
+  try{const r=await fetch('/api/panel-plugins/rpc',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({plugin,method,args:args||{}})});return await r.json();}catch(e){return {error:e.message};}
+ }
+ async function refresh(){
+  let data;
+  try{data=await fetch('/api/panel-plugins',{credentials:'same-origin'}).then(r=>r.json());}catch(e){return;}
+  const enabled={};
+  (data.plugins||[]).forEach(p=>{if(p.enabled)enabled[p.id]=p;});
+  for(const id in registry){if(!enabled[id])unloadPlugin(registry[id]);}
+  for(const id in enabled){await loadPlugin(enabled[id]);}
+ }
+ return {register,refresh,onTabShown,rpc,titleOf,loadPlugin,unloadPlugin,registry};
+})();
+
+async function loadPanelPlugins(){
+ const out=document.getElementById('panel-plugins-list');
+ if(!out)return;
+ const data=await api('panel-plugins');
+ if(data.error){out.innerHTML='<div class="empty">'+esc(data.error)+'</div>';return;}
+ const plugins=data.plugins||[];
+ out.innerHTML=plugins.map(p=>{
+  const checked=p.enabled?'checked':'';
+  return '<div class="panel" style="padding:14px;margin-bottom:10px">'
+   +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">'
+   +'<div style="min-width:0">'
+   +'<b style="font-size:14px">'+esc(p.name)+'</b>'
+   +'<span style="color:var(--text2);font-size:11px;margin-left:8px">v'+esc(p.version)+'</span>'
+   +(p.author?'<span style="color:var(--text2);font-size:11px;margin-left:8px">'+esc(p.author)+'</span>':'')
+   +'<div style="color:var(--text2);font-size:12px;margin-top:4px">'+esc(p.description||'')+'</div>'
+   +'<div style="color:var(--text2);font-size:11px;margin-top:6px">id: <code>'+esc(p.id)+'</code> · '+esc(p.files.join(', '))+'</div>'
+   +'</div>'
+   +'<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">'
+   +'<label class="toggle" title="'+t('plugin_enable')+'"><input type="checkbox" data-plugin="'+esc(p.id)+'" '+checked+' onchange="togglePanelPlugin(this)"><span class="slider"></span></label>'
+   +'<button class="btn btn-outline btn-sm" onclick="checkPluginSyntax(\''+esc(p.id)+'\')">'+t('plugin_check')+'</button>'
+   +'<a class="btn btn-outline btn-sm" href="/api/panel-plugins/download?id='+encodeURIComponent(p.id)+'" title="'+t('plugin_download')+'"><svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>'
+   +'<button class="btn btn-red btn-sm" onclick="deletePanelPlugin(\''+esc(p.id)+'\')" title="'+t('delete_user')+'"><svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>'
+   +'</div>'
+   +'</div>'
+   +'<div id="plugin-status-'+esc(p.id)+'" style="margin-top:10px;font-size:12px;color:var(--text2)"></div>'
+   +'</div>';
+ }).join('')||'<div class="empty">'+t('no_panel_plugins')+'</div>';
+}
+async function togglePanelPlugin(el){
+ const id=el.dataset.plugin;
+ const enabled=el.checked;
+ el.disabled=true;
+ try{
+  const data=await api('panel-plugins/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,enabled})});
+  if(data.error){toast(data.error);el.checked=!enabled;return;}
+  toast((enabled?t('plugin_enabled'):t('plugin_disabled'))+': '+id);
+  await FizPlugin.refresh();
+  loadPanelPlugins();
+ }finally{el.disabled=false;}
+}
+async function checkPluginSyntax(id){
+ const box=document.getElementById('plugin-status-'+id);
+ if(box)box.innerHTML='<span style="color:var(--accent)">'+t('plugin_checking')+'...</span>';
+ const data=await api('panel-plugins/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+ if(!box)return;
+ if(data.ok){box.innerHTML='<span style="color:var(--green)">'+t('plugin_syntax_ok')+'</span>';}
+ else{box.innerHTML='<span style="color:var(--red)">'+esc((data.errors||[]).join(' · '))+'</span>';}
+}
+function deletePanelPlugin(id){
+ confirmAction(t('confirm_delete_plugin')+': '+id+'?','deletePanelPluginConfirm',id,'','true');
+}
+async function deletePanelPluginConfirm(id){
+ const data=await api('panel-plugins/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+ if(data.error){toast(data.error);return;}
+ toast(id+' '+t('removed'));
+ await FizPlugin.refresh();
+ loadPanelPlugins();
+}
+function openPluginInstall(){document.getElementById('plugin-install-overlay').classList.add('active');document.getElementById('plugin-install-result').innerHTML='';}
+function closePluginInstall(){document.getElementById('plugin-install-overlay').classList.remove('active');}
+function handlePluginDrop(e){
+ e.preventDefault();e.stopPropagation();
+ const el=document.getElementById('drop-plugin-install');
+ if(el)el.classList.remove('dragover');
+ const f=e.dataTransfer.files[0];
+ if(f)installPluginFile(f);
+}
+async function installPluginFile(file){
+ const result=document.getElementById('plugin-install-result');
+ if(!file)return;
+ if(!file.name.toLowerCase().endsWith('.zip')){result.innerHTML='<div style="color:var(--red);font-size:13px">Only .zip archives</div>';return;}
+ result.innerHTML='<div style="color:var(--accent);font-size:13px">'+t('plugin_installing')+' '+esc(file.name)+'...</div>';
+ const fd=new FormData();fd.append('file',file);
+ try{
+  const r=await fetch('/api/panel-plugins/install',{method:'POST',body:fd,credentials:'same-origin'});
+  const d=await r.json();
+  if(d.error){result.innerHTML='<div style="color:var(--red);font-size:13px">'+esc(d.error)+'</div>';return;}
+  result.innerHTML='<div style="color:var(--green);font-size:13px">'+esc(d.message)+'</div>';
+  await FizPlugin.refresh();
+  loadPanelPlugins();
+  setTimeout(()=>{if(document.getElementById('plugin-install-overlay').classList.contains('active'))closePluginInstall();},900);
+ }catch(e){result.innerHTML='<div style="color:var(--red);font-size:13px">'+esc(e.message)+'</div>';}
+}
+
 window.addEventListener('resize',()=>{
  const c=document.getElementById('fireflies-canvas');
  if(!c)return;
@@ -2580,6 +2863,7 @@ window.addEventListener('resize',()=>{
 refreshDashboard();
 loadLang();
 loadEnvInfo();
+FizPlugin.refresh();
 setInterval(()=>{if(currentTab==='dashboard')refreshDashboard();},2000);
 setInterval(()=>{if(currentTab==='players')loadOnlinePlayers();},3000);
 setInterval(updateUserStatus,10000);
