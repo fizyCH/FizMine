@@ -54,7 +54,7 @@ import uvicorn
 
 from panel_modules.templates import LOGIN_HTML, HTML_TEMPLATE, TRANSLATIONS
 
-PANEL_VERSION = "3.7 latest pre-release"
+PANEL_VERSION = "4"
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(32).hex())
 
