@@ -45,18 +45,17 @@ irm https://raw.githubusercontent.com/fizyCH/FizMine/main/install.ps1 | iex
 ./ctl.sh log        # View logs
 ```
 
-# Version 3.0
+# Version 4.0
 
 ## What's New
 
-| Category | Changes |
-|----------|----------|
-| Account System | Added a full account system with **Administrator** and **User** roles. |
-| User Management | - Create, edit, and delete users.<br>- Change nickname and password.<br>- Change user roles.<br>- Demote administrators to regular users. |
-| Permissions | Added flexible permission management for:<br>- Console<br>- Server management<br>- Files<br>- Properties<br>- Plugins and Mods<br>- Player management<br><br>Administrators have unrestricted access. |
-| File Browser | Added a built-in server file browser with support for creating files. |
-| Mobile Interface | Added an adaptive interface for mobile devices (**BETA**). |
-| Modular Architecture | The application has been split into modules:<br>- `app.py`<br>- `auth.py`<br>- `users.py`<br>- `server.py`<br>- `files.py`<br>- `settings.py`<br>- `rcon.py`<br>- `backup.py`<br>- `panel.py` (compatible launcher) |
-| Panel Updater | Added an automatic updater that:<br>- Checks the latest version via `app.py`.<br>- Downloads `app.py`, `panel.py`, and all modules.<br>- Creates `.bak` backups before updating.<br>- Restarts the panel automatically. |
-| First Administrator | On the first launch, the panel automatically creates an administrator account:<br>- Login: `admin`<br>- Random secure password<br>- Credentials are displayed in a formatted table. |
-| Automatic Account Generation | Accounts are automatically initialized when the panel is launched using `ctl.sh` or `ctl.ps1`. |
+| Feature                    | Description                                                                                                                                                                                                     |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Plugin System**          | The panel now loads plugins from the `plugin/` directory. Each plugin can include `manifest.json`, `plugin.css`, `plugin.html`, `plugin.js`, and an optional `backend.py` server-side module.                   |
+| **Plugin Export**          | Every installed plugin can be downloaded as a reinstallable `.zip` archive using the new **Download** button next to **Delete**.                                                                                |
+| **Plugin RPC**             | Plugins can communicate with their backend using `FizPlugin.rpc()`, which sends requests to `POST /api/panel-plugins/rpc`. The backend implements `handle(method, args)` inside `backend.py`.                   |
+| **Permissions**            | Plugin management (install, enable/disable, syntax check, delete, download, and RPC) is restricted to **administrators**. Any authenticated user can view the list of installed plugins and read plugin assets. |
+| **Server Properties Menu** | Redesigned the server properties menu — it is now more convenient, cleaner, and easier to use.                                                                                                                  |
+| **User Online Status**     | Added the ability to see which users are currently online and which are offline in the **Users** tab.                                                                                                           |
+| **Mobile Panel Fixes**     | Fixed issues with panel display and layout on mobile devices.                                                                                                                                                   |
+
